@@ -2,57 +2,88 @@
 
 /* Controllers */
 
-//socket
-function AppCtrl($scope, socket) {
-  socket.on('send:name', function (data) {
-    $scope.name = data.name;
-  });
-}
-
-//login controller
+/*
+	login controller
+*/
 function loginCtrl($scope, $http, $routeParmas, $location){
 
 	$scope.loginForm = {};
 
-	$scope.loginSubmit = function(){
+	//submit function
+	$scope.loginPost = function(){
 		$http.post('/login/post').success(function(data, status, headers, config){
-			$scope.data = data;	
+			//do something if return success
+			//$scope.successMsg = data;	
 		}).error(function(data, status, headers, config){
-			$scope.error = error;
+			//do something if return error
+			//$scope.errorMsg = error;
 		});
 	};
 }
 loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 
-//register controller
+/*
+	register controller
+*/
 function registerCtrl($scope, $http, $routeParmas, $location){
 
 	$scope.registerForm = {};
 
-	$http.post('/register/post', $scope.registerForm).success(function(data, status, headers, config){
-		$scope.data = data;	
-	}).error(function(data, status, headers, config){
-		$scope.error = error;
-	});
-
-	$http.post('registerCheck', $scope.registerForm).success(function(data){
-		//.......
-	})
+	//submit function
+	$scope.registerPost = function () {
+		$http.post('/register/post', $scope.registerForm).success(function(data, status, headers, config){
+			//do something if return success
+			//$scope.successMsg = data;	
+		}).error(function(data, status, headers, config){
+			//do something if return error
+			//$scope.errorMsg = error;
+		});
+	}
+	
+	//check if the name is only
+	//use with the "ng-change" of input=text
+	$scope.registerCheck = function () {
+		$http.post('/register/check', $scope.registerForm).success(function(data){
+			//do something if return success
+			//$scope.successMsg = data;	
+		}).error(function(data, status, headers, config){
+			//do something if return error
+			//$scope.errorMsg = error;
+		});
+	};
+	
 }
 registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 
-
-
-
-
-function MyCtrl1($scope, socket) {
-  socket.on('send:time', function (data) {
-    $scope.time = data.time;
-  });
+/*
+	index controller
+*/
+function indexCtrl($scope){
+	//
+	//
 }
-MyCtrl1.$inject = ['$scope', 'socket'];
+indexCtrl.$inject = ['$scope'];
 
-
-function MyCtrl2() {
+/*
+	gameRule controller
+*/
+function gameRuleCtrl ($scope) {
+	// body...
 }
-MyCtrl2.$inject = [];
+gameRuleCtrl.$inject = ['$scope'];
+
+/*
+	contact controller
+*/
+function contactCtrl ($scope) {
+	// body...
+}
+contactCtrl.$inject = ['$scope'];
+
+/*
+	about controller
+*/
+function aboutCtrl ($scope) {
+	// body...
+}
+contactCtrl.$inject = ['$scope'];

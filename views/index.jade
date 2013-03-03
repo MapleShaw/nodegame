@@ -1,19 +1,22 @@
 extends layout
 
 block body
-  div(ng-controller='AppCtrl')
-    h2 Hello {{name}}
-    ul.menu
-      li
-        a(href='view1') view1
-      li
-        a(href='view2') view2
+  div.header
+    h1.logo 捉鬼游戏
+    div.ctrl
+      a(href='/login') 登录
+      a(href='/register') 注册
+      a(href='/gameRule') 游戏规则
+      a(href='/contact') 联系我们
+      a(href='/about') 关于我们
 
+  div.container
     div(ng-view)
 
-    div
-      | Angular Socket.io seed app: v
-      span(app-version)
+  div.footer
+    a(href='/gameRule') 游戏规则
+    a(href='/contact') 联系我们
+    a(href='/about') 关于我们
 
   script(src='js/lib/angular/angular.js')
   script(src='/socket.io/socket.io.js')

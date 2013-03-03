@@ -13,17 +13,21 @@ var app = angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.dir
 			templateUrl : 'partials/login',
 			controller : loginCtrl
 		}).
-		when('register', {
+		when('/register', {
 			templateUrl : 'partials/register',
 			controller : registerCtrl
 		}).
-		when('/view1', {
-			templateUrl : 'partials/partial1',
-			controller : MyCtrl1
+		when('/gameRule', {
+			templateUrl : 'partials/gameRule',
+			controller : gameRuleCtrl
 		}).
-		when('/view2', {
-			templateUrl : 'partials/partial2',
-			controller: MyCtrl2
+		when('/contact', {
+			templateUrl : 'partials/contact',
+			controller : contactCtrl
+		}).
+		when('/about', {
+			templateUrl : 'partials/about',
+			controller : aboutCtrl
 		}).
 		otherwise({redirectTo: '/'});
 	$locationProvider.html5Mode(true);

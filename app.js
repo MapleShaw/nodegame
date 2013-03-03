@@ -2,12 +2,11 @@
 /**
  * Module dependencies.
  */
-//test
-//test2
 
 var express = require('express'),
-  routes = require('./routes'),
-  socket = require('./routes/socket.js');
+	routes = require('./routes'),
+	register = require('./routes/register'),
+	socket = require('./routes/socket.js');
 
 var app = module.exports = express();
 var server = require('http').createServer(app);
@@ -18,16 +17,16 @@ var io = require('socket.io').listen(server);
 // Configuration
 
 app.configure(function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(express.static(__dirname + '/public'));
-  app.use(app.router);
+	app.set('views', __dirname + '/views');
+	app.set('view engine', 'jade');
+	app.use(express.bodyParser());
+	app.use(express.methodOverride());
+	app.use(express.static(__dirname + '/public'));
+	app.use(app.router);
 });
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 app.configure('production', function(){
@@ -38,6 +37,13 @@ app.configure('production', function(){
 
 app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
+
+//API
+
+//check the username
+app.post('/register/check', register.check);
+//register submit
+app.post('/register/post', register.post);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
