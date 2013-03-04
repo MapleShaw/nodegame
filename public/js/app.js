@@ -29,6 +29,10 @@ var app = angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.dir
 			templateUrl : 'partials/about',
 			controller : aboutCtrl
 		}).
+		when('/chat', {
+			templateUrl : 'partials/chat',
+			controller : chatCtrl
+		}).
 		otherwise({redirectTo: '/'});
 	$locationProvider.html5Mode(true);
   }]);

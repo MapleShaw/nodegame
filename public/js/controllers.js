@@ -5,7 +5,7 @@
 /*
 	login controller
 */
-function loginCtrl($scope, $http, $routeParmas, $location){
+function loginCtrl($scope, $http, $routeParams, $location){
 
 	$scope.loginForm = {};
 
@@ -25,7 +25,7 @@ loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 /*
 	register controller
 */
-function registerCtrl($scope, $http, $routeParmas, $location){
+function registerCtrl($scope, $http, $routeParams, $location){
 
 	$scope.registerForm = {};
 
@@ -54,6 +54,39 @@ function registerCtrl($scope, $http, $routeParmas, $location){
 	
 }
 registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
+
+/*
+	register controller
+*/
+function chatCtrl ($scope, $http, $routeParams, $location, socket) {
+	//produce the only "id"
+	var _id = '';
+	for (var i = 0; i < 20; i++) {
+		_id += Math.ceil(Math.random()*9);
+	}
+	$scope.id = _id;
+
+	$scope.msgs = [];
+	socket.on(_id, function (data) {
+		$scope.msgs.push({
+			username : data.f_id,
+			time : new Date(),
+			cnt : data.cnt
+		});
+	})
+
+	$scope.userId = '';
+	$scope.invite = function () {
+		//console.log($scope.userId);
+		socket.emit('invite friend', {
+			f_id : $scope.userId,
+			m_id : _id,
+			cnt : "hello how are you."
+		})
+	}
+}
+chatCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'socket'];
+
 
 /*
 	index controller

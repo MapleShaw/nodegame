@@ -1,0 +1,18 @@
+div.chat
+	div.userMsg
+		p your id : {{id}}
+		p
+			input.text(type='text', ng-model='userId', placeholder="input your friend's id...")
+			input.submit(type='submit', ng-click='invite()', value='invite friend')
+	div.title
+		h3 与{{}}聊天中
+	div.content
+		ul.items
+			li(ng-repeat='msg in msgs')
+				div.chatCnt
+					p.c_name
+						span.username {{msg.name}}
+						span.time {{msg.time}}
+					p.c_cnt {{msg.cnt}}
+
+

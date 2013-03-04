@@ -3,13 +3,16 @@
  */
 
 module.exports = function (socket) {
-  socket.emit('send:name', {
-    name: 'Bob'
-  });
 
-  setInterval(function () {
-    socket.emit('send:time', {
-      time: (new Date()).toString()
-    });
-  }, 1000);
+	//invite friend
+	socket.on('invite friend', function (data) {
+		socket.broadcast.emit(data.f_id, data);
+	});
+	/*
+	setInterval(function () {
+		socket.emit('send:time', {
+			time: (new Date()).toString()
+		});
+  	}, 1000);
+	*/
 };

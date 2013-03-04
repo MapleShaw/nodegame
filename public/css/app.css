@@ -11,6 +11,15 @@
 .container{}
 .container .index{text-align: center;padding: 40px 0;}
 
+/*chart*/
+.container .chat{width: 500px;height:600px;border: 1px solid #ccc;margin: 0 auto;overflow: auto;}
+.container .chat .userMsg{padding: 10px;border-bottom: 1px solid #ccc;background-color: #eee;}
+.container .chat .userMsg .text{padding: 4px;margin-top: 5px;border: 1px solid #ccc;vertical-align: middle;}
+.container .chat .userMsg .submit{height: 26px;vertical-align: middle;margin-top: 5px;margin-left: 5px;padding: 0 5px;}
+.container .chat .title{height: 60px;line-height: 60px;text-align: center;border-bottom: 1px solid #ccc;}
+.container .chat .content{padding: 10px;}
+.container .chat .content .c_name{margin-bottom: 5px;} 
+.container .chat .content .c_name .username{margin-right: 15px;}
 
 /*footer*/
 .footer{padding: 20px;text-align: center;}
