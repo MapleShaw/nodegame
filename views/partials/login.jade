@@ -1,2 +1,15 @@
 div.index
-  h2 this is the login page.
+	h2 Login
+	form
+		div.eachItem
+			label Username
+			input(type="text" , placeholder="Type your name…")
+		div.eachItem
+			label Password
+			input(type="password" , placeholder="Type your password…")
+		div.eachItem
+			label.checkbox
+				input(type="checkbox") 
+				span remember me
+		button.btn(type="submit") Login
+	
