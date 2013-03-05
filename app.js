@@ -41,9 +41,9 @@ app.get('/partials/:name', routes.partials);
 //API
 
 //check the username
-app.post('/register/check', register.check);
+app.get('/register/check', register.check);
 //register submit
-app.post('/register/post', register.post);
+app.get('/register/post', register.post);
 
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
