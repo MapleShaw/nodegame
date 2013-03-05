@@ -12,14 +12,19 @@
 .container .index{text-align: center;padding: 40px 0;}
 
 /*chart*/
-.container .chat{width: 500px;height:600px;border: 1px solid #ccc;margin: 0 auto;overflow: auto;}
-.container .chat .userMsg{padding: 10px;border-bottom: 1px solid #ccc;background-color: #eee;}
-.container .chat .userMsg .text{padding: 4px;margin-top: 5px;border: 1px solid #ccc;vertical-align: middle;}
-.container .chat .userMsg .submit{height: 26px;vertical-align: middle;margin-top: 5px;margin-left: 5px;padding: 0 5px;}
-.container .chat .title{height: 60px;line-height: 60px;text-align: center;border-bottom: 1px solid #ccc;}
-.container .chat .content{padding: 10px;}
+.container .chat{width: 500px;border: 1px solid #ccc;margin: 0 auto;overflow: auto;}
+.container .chat .userMsg{padding: 10px;border-bottom: 1px solid #ccc;}
+.container .chat .title{height: 50px;line-height: 50px;text-align: center;background-color: #eee;}
+
+.container .chat .yourId{margin: 0 0 0 20px;}
+.container .chat .chat_msg{height: 60px;padding: 10px 10px;width: 480px;border: none;outline: none;}
+.container .chat .chat_msg:focus{box-shadow: none;}
+.container .chat .user_id{padding: 10px;border-bottom: 1px solid #ccc;}
+.container .chat .user_txt{border-bottom: 1px solid #ccc;}
+.container .chat .user_ctrl{padding: 10px;background-color: #eee;}
+.container .chat .content{padding: 10px;height: 250px;border-bottom: 1px solid #ccc;}
+.container .chat .content .items li{overflow: hidden;margin: 0 10px 10px 10px;padding: 0 0 10px 0;border-bottom: 1px dashed #ccc;}
 .container .chat .content .c_name{margin-bottom: 5px;} 
-.container .chat .content .c_name .username{margin-right: 15px;}
 
 /*footer*/
 .footer{padding: 20px;text-align: center;}

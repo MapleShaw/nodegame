@@ -72,4 +72,21 @@ angular.module('myApp.services', []).
         })
       }
     };
+  }).
+  factory('global', function ($rootScope) {
+    //
+    return {
+      _getTime : function () {
+        var _date = new Date(),
+            _year = _date.getFullYear(),
+            _month = _date.getMonth() + 1,
+            _day = _date.getDate(),
+            _hours = _date.getHours(),
+            _minutes = _date.getMinutes(),
+            _seconds = _date.getSeconds();
+        var _time = _year + '/' + _month + '/' + _day + ' ' + _hours + ':' + _minutes + ':' + _seconds;
+        //return current time
+        return _time;
+      }
+    }
   });
