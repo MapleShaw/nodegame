@@ -48,9 +48,12 @@ app.get('/register/post', register.post);
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
 
-// Socket.io Communication
+/*
+	chat socket
+*/
 
-io.sockets.on('connection', socket);
+io.sockets.on('connection', socket.chat);
+
 
 // Start server
 
