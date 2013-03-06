@@ -6,6 +6,8 @@
 var express = require('express'),
 	routes = require('./routes'),
 	register = require('./routes/register'),
+	MongoStore = require('connect-mongo')(express),
+	settings = require('./settings'),
 	socket = require('./routes/socket.js');
 
 var app = module.exports = express();
@@ -21,6 +23,13 @@ app.configure(function(){
 	app.set('view engine', 'jade');
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
+	app.use(express.cookieParser());
+	app.use(express.session({
+		secret: settings.cookieSecret,
+		store: new MongoStore({
+			db: settings.db
+		})
+	}));
 	app.use(express.static(__dirname + '/public'));
 	app.use(app.router);
 });

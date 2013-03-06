@@ -31,7 +31,7 @@ function registerCtrl($scope, $http, $routeParams, $location){
 
 	//submit function
 	$scope.registerPost = function () {
-		$http.post('/register/post', $scope.registerForm).success(function(data, status, headers, config){
+		$http.get('/register/post', $scope.registerForm).success(function(data, status, headers, config){
 			//do something if return success
 			//$scope.successMsg = data;	
 		}).error(function(data, status, headers, config){
@@ -43,15 +43,24 @@ function registerCtrl($scope, $http, $routeParams, $location){
 	//check if the name is only
 	//use with the "ng-change" of input=text
 	$scope.registerCheck = function () {
-		$http.post('/register/check', $scope.registerForm).success(function(data){
+		$http.get('/register/check', $scope.registerForm).success(function(data){
 			//do something if return success
 			//$scope.successMsg = data;	
+			$scope.usernameMsg = "The username is available!";
 		}).error(function(data, status, headers, config){
 			//do something if return error
 			//$scope.errorMsg = error;
+			$scope.usernameMsg = data._data;
 		});
 	};
-	
+	$scope.passwordCheck = function () {
+		//檢驗用戶兩次輸入的口令是否一致
+	    if ($scope.registerForm.passwordRepeat != $scope.registerForm.password) {	      
+	      $scope.error = "uncorrect!";
+	    }else{
+	      $scope.error = "Yeah!";
+	    }
+	}
 }
 registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 

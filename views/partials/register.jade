@@ -1,17 +1,22 @@
 div.index
 	h2 Register
-	form
+	form.cssForm(method="post")
 		div.eachItem
 			label Username
-			input(type="text" , placeholder="Type your name…")
+			input(type="text" , name="username" , ng-model="registerForm.username", ng-change="registerCheck()", placeholder="Type your name…" , required)
+			span {{usernameMsg}}
 		div.eachItem
 			label Email
-			input(type="email" , placeholder="Type your email…")
+			input(type="email" , name="email" ,ng-model="registerForm.email", placeholder="Type your email…" , required)
 		div.eachItem
 			label Password
-			input(type="password" , placeholder="Type your password…")
+			input(type="password" , name="password" , ng-model="registerForm.password", placeholder="Type your password…" , required)
+		div.eachItem
+			label Password Repeat
+			input(type="password" , name="passwordRepeat" , ng-model="registerForm.passwordRepeat", ng-change="passwordCheck()" , placeholder="Type again…" , required)
+			span {{error}}
 		div.eachItem
 			label.checkbox
 				input(type="checkbox") 
 				span check me out
-		button.btn(type="submit") Register
+		button.btn(type="submit" , ng-click="update(registerForm)") Register
