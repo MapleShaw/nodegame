@@ -18,7 +18,7 @@ input[type="password"]
 {
   display: inline-block;
   height: 20px;
-  width: 180px;
+  width: 300px;
   padding: 4px 6px;
   font-size: 14px;
   line-height: 20px;
@@ -65,11 +65,13 @@ textarea:focus
 
 .checkbox {
   min-height: 20px;
+  vertical-align: middle;
+  margin-right: 5px;
 }
 
 .btn {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 4px 15px;
   margin-bottom: 0;
   font-size: 14px;
   line-height: 20px;
