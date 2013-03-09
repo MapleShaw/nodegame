@@ -6,7 +6,8 @@
 // Demonstrate how to register services
 // In this case it is a simple value service.
 angular.module('myApp.services', []).
-  value('version', '0.1').
+  //game version
+  value('gameVersion', '0.1').
   //socket factory
   factory('socket', function ($rootScope) {
     var socket = io.connect();
@@ -62,7 +63,7 @@ angular.module('myApp.services', []).
         })
       },
       get : function (dataName, dataVal, callback) {
-        socket.get(dataName, dataVal, function () {
+        socket.get(dataName, function () {
           var args = arguments;
           $rootScope.$apply(function () {
             if (callback) {

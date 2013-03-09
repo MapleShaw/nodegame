@@ -1,2 +1,8 @@
-div.index
-  h2 this is the home page.
+div.wrap
+  div#chatTemplate
+
+  div.friend_list
+    ul.iteams
+      li(ng-repeat='user in users', title='{{user.name}}', ng-click='initName(user)')
+        span.face {{user.username}} : 
+        span.username {{user.id}}

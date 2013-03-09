@@ -6,17 +6,17 @@ var users_chat = {};
 
 module.exports = function (socket) {
     //客户端连接成功则设置客户端标示
-	socket.on('set nickname', function (id) {
-        users_chat[id] = socket;
+	socket.on('set nickname', function (user) {
+        var user = eval(user);
+        users_chat[user.id] = socket;
         //set username
-        users_chat[id].set('username', id, function () { 
-            users_chat[id].emit('ready', {}); 
+        users_chat[user.id].set('username', user.id, function () { 
+            users_chat[user.id].emit('ready', {}); 
         });
         //event of public message
-        users_chat[id].on('chat_publicmsg', function(data){
-            //console.log(JSON);return false;
+        users_chat[user.id].on('chat_publicmsg', function(data){
             var data = eval(data);
-            users_chat[id].get('username', function(err, name){
+            users_chat[user.id].get('username', function(err, name){
                     io.sockets.emit('chat_usermsg',{
                         from : name,
                         msg : data
@@ -24,47 +24,47 @@ module.exports = function (socket) {
             });
         });
         //event of private message
-        users_chat[id].on('chat_privatemsg', function(data){
-            //console.log(JSON);return false;
+        users_chat[user.id].on('chat_privatemsg', function(data){
             var data = eval(data);
             //get the username to judge if the user of "data.sendTo" is exist.
             try{
                 users_chat[data.sendTo].get('username', function(err, name){
                 //send message to friend from server
                 if (err) {
-                    users_chat[id].emit('chat_errmsg', {
-                        from : id,
+                    users_chat[user.id].emit('chat_errmsg', {
+                        fromId : data.sendTo,
+                        fromName : user.username,
                         to : name,
-                        msg : 'error msg : network problem.',
+                        msg : 'error msg : network problem.'
                     });
-                    users_chat[id].emit('chat_have_receive', {
+                    users_chat[user.id].emit('chat_have_receive', {
+                        fromId : data.sendTo,
                         flag : false
                     });
                 } else {
                     users_chat[data.sendTo].emit('chat_usermsg', {
-                        from : id,
+                        fromId : user.id,
+                        fromName : user.username,
                         to : name,
                         msg : data.sendText,
                     });
-                    users_chat[id].emit('chat_have_receive', {
+                    users_chat[user.id].emit('chat_have_receive', {
+                        fromId : data.sendTo,
                         flag : true
                     });
                 }
             });
             }catch(e){
-                //console.log('the user is not exist.');
-                users_chat[id].emit('chat_errmsg', {
-                    from : 'system : ',
+                users_chat[user.id].emit('chat_errmsg', {
+                    fromId : data.sendTo,
+                    fromName : 'system : ',
                     msg : 'error msg : the user is not exist.',
                 });
-                users_chat[id].emit('chat_have_receive', {
+                users_chat[user.id].emit('chat_have_receive', {
                     flag : false
                 });
             }
             
         });
-        for(var c in users_chat) {
-            console.log(c);
-        }
     });
 };

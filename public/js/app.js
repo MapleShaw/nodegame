@@ -9,6 +9,10 @@ var app = angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.dir
 			templateUrl : 'partials/index',
 			controller : indexCtrl
 		}).
+		when('/index', {
+			templateUrl : 'partials/index',
+			controller : indexCtrl
+		}).
 		when('/login', {
 			templateUrl : 'partials/login',
 			controller : loginCtrl
