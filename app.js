@@ -6,6 +6,7 @@
 var express = require('express'),
 	routes = require('./routes'),
 	register = require('./routes/register'),
+	login = require('./routes/login'),
 	MongoStore = require('connect-mongo')(express),
 	settings = require('./settings'),
 	socket = require('./routes/socket.js');
@@ -24,6 +25,7 @@ app.configure(function(){
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser());
+	//app.use(express.cookieSession());
 	app.use(express.session({
 		secret: settings.cookieSecret,
 		store: new MongoStore({
@@ -31,6 +33,12 @@ app.configure(function(){
 		})
 	}));
 	app.use(express.static(__dirname + '/public'));
+	app.use(function(req, res, next){
+	  res.locals.csrf = req.session ? req.session._csrf : '';
+	  res.locals.req = req;
+	  res.locals.user = req.session.user;  //想要什么值在这里补
+	  next();
+	});
 	app.use(app.router);
 });
 
@@ -50,10 +58,13 @@ app.get('/partials/:name', routes.partials);
 //API
 
 //check the username
-app.get('/register/check', register.check);
+app.post('/register/check', register.check);
 //register submit
-app.get('/register/post', register.post);
+app.post('/register/post', register.post);
+//check the username
+app.post('/login/login', login.login);
 
+app.get('/login/loginout', login.loginout);
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
 
@@ -62,6 +73,7 @@ app.get('*', routes.index);
 */
 
 io.sockets.on('connection', socket.chat);
+
 
 
 // Start server

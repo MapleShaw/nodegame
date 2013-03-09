@@ -2,7 +2,9 @@ var mongodb = require('./db');
 
 function User(user) {
   this.name = user.name;
+  this.email = user.email;
   this.password = user.password;
+  this.systemid =  user.id;
 };
 module.exports = User;
 
@@ -12,6 +14,7 @@ User.prototype.save = function save(callback) {
     name: this.name,
     email: this.email,
     password: this.password,
+    systemid: this.systemid,
   };
   mongodb.open(function(err, db) {
     if (err) {

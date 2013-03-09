@@ -1,6 +1,6 @@
 div.index
 	h2 Register
-	form.cssForm(method="post")
+	form.cssForm
 		div.eachItem
 			label Username
 			input(type="text" , name="username" , ng-model="registerForm.username", ng-change="registerCheck()", placeholder="Type your name…" , required)
@@ -19,4 +19,5 @@ div.index
 			label.checkbox
 				input(type="checkbox") 
 				span check me out
-		button.btn(type="submit" , ng-click="update(registerForm)") Register
+		button.btn(type="submit" , ng-click="registerPost()") Register
+		span {{successMsg}}

@@ -1,7 +1,18 @@
 'use strict';
 
-/* Controllers */
-
+/*loginOut Controllers */
+function loginOutController($scope, $http, $routeParams, $location) {
+  $scope.loginOut = function(){
+		$http.get('/login/loginout').success(function(data, status, headers, config){
+			//do something if return success
+			
+			$location.path('/');
+		}).error(function(data, status, headers, config){
+			//do something if return error
+			//$scope.errorMsg = error;
+		});
+	};
+}
 /*
 	login controller
 */
@@ -11,14 +22,18 @@ function loginCtrl($scope, $http, $routeParams, $location){
 
 	//submit function
 	$scope.loginPost = function(){
-		$http.post('/login/post').success(function(data, status, headers, config){
+		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
 			//do something if return success
-			//$scope.successMsg = data;	
+			$scope.userMsg = data.data;	
+			//$location.path('/');
+			$location.reload();
 		}).error(function(data, status, headers, config){
 			//do something if return error
 			//$scope.errorMsg = error;
 		});
 	};
+
+	
 }
 loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 
@@ -31,9 +46,9 @@ function registerCtrl($scope, $http, $routeParams, $location){
 
 	//submit function
 	$scope.registerPost = function () {
-		$http.get('/register/post', $scope.registerForm).success(function(data, status, headers, config){
+		$http.post('/register/post', $scope.registerForm).success(function(data, status, headers, config){
 			//do something if return success
-			//$scope.successMsg = data;	
+			$scope.successMsg = data.data;	
 		}).error(function(data, status, headers, config){
 			//do something if return error
 			//$scope.errorMsg = error;
@@ -43,14 +58,14 @@ function registerCtrl($scope, $http, $routeParams, $location){
 	//check if the name is only
 	//use with the "ng-change" of input=text
 	$scope.registerCheck = function () {
-		$http.get('/register/check', $scope.registerForm).success(function(data){
+		$http.post('/register/check', $scope.registerForm).success(function(data){
 			//do something if return success
 			//$scope.successMsg = data;	
-			$scope.usernameMsg = "The username is available!";
+			$scope.usernameMsg = data.data;
 		}).error(function(data, status, headers, config){
 			//do something if return error
 			//$scope.errorMsg = error;
-			$scope.usernameMsg = data._data;
+			
 		});
 	};
 	$scope.passwordCheck = function () {
@@ -160,6 +175,7 @@ chatCtrl.$inject = ['$scope', '$http', 'socket', 'global'];
 function indexCtrl($scope){
 	//
 	//
+	
 }
 indexCtrl.$inject = ['$scope'];
 

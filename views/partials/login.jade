@@ -3,13 +3,13 @@ div.index
 	form(method="post")
 		div.eachItem
 			label Username
-			input(type="text" , placeholder="Type your name…")
+			input(type="text" , name="username" , ng-model="loginForm.username" , placeholder="Type your name…")
 		div.eachItem
 			label Password
-			input(type="password" , placeholder="Type your password…")
+			input(type="password" , name="password" , ng-model="loginForm.password" , placeholder="Type your password…")
 		div.eachItem
 			label.checkbox
 				input(type="checkbox") 
 				span remember me
-		button.btn(type="submit") Login
+		button.btn(type="submit" , ng-click="loginPost()") Login
 	
