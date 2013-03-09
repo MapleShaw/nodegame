@@ -26,7 +26,6 @@ function loginCtrl($scope, $http, $routeParams, $location){
 		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
 			//do something if return success
 			$scope.userMsg = data.data;	
-			window.location.href="";
 			window.location.reload();
 		}).error(function(data, status, headers, config){
 			//do something if return error
