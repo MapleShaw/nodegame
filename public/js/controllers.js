@@ -1,6 +1,8 @@
 'use strict';
 
-/*loginOut Controllers */
+/*
+	loginOut controllers
+*/
 function loginOutController($scope, $http, $routeParams, $location) {
   $scope.loginOut = function(){
 		$http.get('/login/loginout').success(function(data, status, headers, config){
@@ -80,110 +82,202 @@ function registerCtrl($scope, $http, $routeParams, $location){
 registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 
 /*
-	register controller
+	index controller
 */
-function chatCtrl ($scope, $http, socket, global) {
+function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 	//produce the only "id"
-	var _id = '';
-	for (var i = 0; i < 10; i++) {
-		_id += Math.ceil(Math.random()*9);
-	}
-	_id = _id + new Date().getTime();
-
-	$scope.id = _id;
+	$scope.users = [];
+	$scope.users = [
+		{
+			id : 'a1111111111',
+			username : 'zhoon_1'
+		},
+		{
+			id : 'a2222222222',
+			username : 'zhoon_2'
+		},
+		{
+			id : 'a3333333333',
+			username : 'zhoon_3'
+		},
+		{
+			id : 'a4444444444',
+			username : 'zhoon_4'
+		},
+		{
+			id : 'a5555555555',
+			username : 'zhoon_5'
+		}
+	];
 
 	//send id to server
-	socket.emit('set nickname', _id);
+	var _hash = $location.hash();
+	if(_hash) {
+		socket.emit('set nickname', $scope.users[_hash]);
+	}
 
     socket.on('ready', function () {
        //do something if server return ready
     });
 
-    var chat = document.getElementById('chat');
-    function _scrollTop () {
-	    chat.scrollTop = chat.scrollHeight;
-    }
     
+    $scope.msgFrom = {};
+    $scope.userTxt = {};
+    $scope.sendToId = {};
+    $scope.sendToName = {};
+    $scope.msgs = {};
 
-    //get the data
-    $scope.msgs = [];
-    socket.on('chat_usermsg', function (data) {
-       //do something if someone send "data" to you
-       var data = eval(data);
-       $scope.msgFrom = data.from;
-       $scope.msgs.push({
-			name : data.from + ' : ',
-			time : global._getTime(),
-			cnt : data.msg
-		});
-        setTimeout(_scrollTop, 10);
-    });
-    socket.on('chat_errmsg', function (data) {
-    	//if the user is not exist
-    	var data = eval(data);
-       	//$scope.msgFrom = data.from;
-       	$scope.msgs.push({
-			name : data.from,
-			time : global._getTime(),
-			cnt : data.msg
-		});
-		setTimeout(_scrollTop, 10);
-    })
+    //the function of init message
+    $scope.initName = function (user) {
 
-    //the function of sending message
-    var sendTo;
-    var sendText;
-    $scope.sendMsg = function(){
-        sendTo = $scope.userId;
-        sendText = $scope.userTxt;
-        $scope.flag = true;
-        $scope.msgFrom = sendTo;
-        if(sendTo == ''){
-            socket.emit('chat_publicmsg',sendText);
-        }else{
-            socket.emit('chat_privatemsg',{
-            	'sendTo' : sendTo,
-            	'sendText' : sendText
-            });
+    	//chat_users[user.id] = socket;
+    	$scope.sendToId[user.id] = user.id;
+    	$scope.sendToName[user.id] = user.username;
+    	$scope.msgFrom[user.id] = $scope.sendToName[user.id];
+
+    	//template string
+    	var _html = ['<div class="chat chatDialog" style="left:500px;top: 100px;" data-left="500" data-top="100">',
+    					'<div on-draggable="on-draggable" class="userMsgg">',
+    						'<div class="title">',
+    							'<h3>与{{msgFrom["', user.id, '"]}}聊天中</h3>',
+    						'</div>',
+    					'</div>',
+    					'<div id="chatScorll_', user.id, '" class="content">',
+							'<ul class="items">',
+								'<li ng-repeat="msg in msgs[\'', user.id, '\']">',
+	            					'<div class="chatCnt">',
+		              					'<p class="c_name">',
+							                '<span class="username">{{msg.name}}</span>',
+		                					'<span class="gray">{{msg.time}}</span>',
+		              					'<p class="c_cnt">{{msg.cnt}}</p>',
+		              				'</div>',
+	              				'</li>',
+							'</ul>',
+						'</div>',
+						'<p class="user_id">',
+							'<input id="firend_id" type="text" ng-model="userId" placeholder="input your friend\'s id..." class="">',
+							'<span class="yourId">Your ID : </span></p>',
+						'<p class="user_txt">',
+							'<textarea class="chat_msg" id="chat_msg_', user.id, '" ng-model="userTxt.', user.id, '" on-enter="sendMsg(\'', user.id, '\')" placeholder="input your message..." class=""></textarea>',
+						'</p>',
+						'<p class="user_ctrl">',
+							'<input type="button" value="send message" ng-click="sendMsg(\'', user.id, '\')" class="btn">',
+							'<span class="gray">&nbsp; or press "Enter" key</span>',
+						'</p>',
+					'</div>'].join("");
+    	var chatTeml = $compile(_html)($scope);
+   		document.getElementById('chatTemplate').appendChild(chatTeml[0]);
+    	
+    	//get the data 
+	    $scope.msgs[user.id] = [];
+
+	}
+
+	$scope.sendMsg = function(_userId){
+   		// send the message to server
+        if ($scope.userTxt[_userId] == undefined || $scope.userTxt[_userId] == "") {
+        	document.getElementById('chat_msg').focus();
+        	return false;
+        } else {
+        	$scope.flag = true;
+	        if($scope.sendToId[_userId] == ''){
+	            chat_users[_userId].emit('chat_publicmsg',$scope.userTxt[_userId]);
+	        }else{
+	            //chat_users[_userId].emit('chat_privatemsg',{
+	            socket.emit('chat_privatemsg', {
+	            	'sendTo' : $scope.sendToId[_userId],
+	            	'sendText' : $scope.userTxt[_userId]
+	            });
+	        }
         }
-        
  	}
+
+	//chat_users[$scope.sendToId[user.id]].on('chat_have_receive', function (data) {
  	socket.on('chat_have_receive', function (data) {
-    	//if error
+
+    	// if return error
     	var data = eval(data);
+
     	$scope.flag = data.flag;
 
-        if ($scope.flag) {
-        	$scope.msgs.push({
+        if ($scope.flag && $scope.userTxt[data.fromId] != "") {
+        	$scope.msgs[data.fromId].push({
 				name : 'Me : ',
 				time : global._getTime(),
-				cnt : sendText
+				cnt : $scope.userTxt[data.fromId]
 			});
-			setTimeout(_scrollTop, 10);
-			//
-			$scope.userTxt = '';
-        }
-        _scrollTop();
-    });
-}
-chatCtrl.$inject = ['$scope', '$http', 'socket', 'global'];
 
+        	clearTimeout(timeout);
+			_scrollTop(data.fromId);
+			
+			$scope.userTxt[data.fromId] = '';
+			document.getElementById('chat_msg_' + data.fromId).focus();
+        }
+    });	
+
+	//chat_users[$scope.sendToId[user.id]].on('chat_usermsg', function (data) {
+    socket.on('chat_usermsg', function (data) {
+
+       //do something if someone send "data" to you
+       var data = eval(data);
+
+       $scope.msgs[data.fromId].push({
+			name : data.fromName + ' : ',
+			time : global._getTime(),
+			cnt : data.msg
+		});
+
+       clearTimeout(timeout);
+       _scrollTop(data.fromId);
+
+    });
+
+    //chat_users[user.id].on('chat_errmsg', function (data) {
+    socket.on('chat_errmsg', function (data) {
+
+    	// if the user is not exist
+    	var data = eval(data);
+
+       	$scope.msgs[data.fromId].push({
+			name : data.fromName,
+			time : global._getTime(),
+			cnt : data.msg
+		});
+
+       	clearTimeout(timeout);
+		_scrollTop(data.fromId);
+
+    });
+    
+
+    //scroll
+    var oldHeight = -1;    
+    var timeout;
+    function _scrollTop (id) {
+    	var chatScorll = document.getElementById('chatScorll_' + id);
+    	if (oldHeight != chatScorll.scrollHeight) {
+    		chatScorll.scrollTop = chatScorll.scrollHeight;
+    		oldHeight = chatScorll.scrollHeight;
+    	}
+    	timeout = setTimeout(function(){_scrollTop(id);}, 0);
+    }
+}
+indexCtrl.$inject = ['$scope', '$http', '$location', '$compile', 'socket', 'global'];
 
 /*
-	index controller
+	chat controller
 */
-function indexCtrl($scope){
-	//
-	//
-	
+function chatCtrl($scope) {
+	//.............
+	//.............
 }
-indexCtrl.$inject = ['$scope'];
 
 /*
 	gameRule controller
 */
 function gameRuleCtrl ($scope) {
 	// body...
+	debugger;
 }
 gameRuleCtrl.$inject = ['$scope'];
 
