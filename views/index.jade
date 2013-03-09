@@ -2,28 +2,29 @@ extends layout
 
 block body
   div.header
-    h1.logo 捉鬼游戏
+    h1.logo 
+      a(ng-href="/")捉鬼游戏
     div.ctrl(ng-controller="loginOutController")
       if user
-        a(href='/xxx') #{user.name}
-        a(href='' , ng-click='loginOut()') 退出
-        a(href='/gameRule') 游戏规则
-        a(href='/contact') 联系我们
-        a(href='/about') 关于我们
+        a(ng-href='/') #{user.name}
+        a(ng-href='/login' , ng-click='loginOut()') 退出
+        a(ng-href='/gameRule') 游戏规则
+        a(ng-href='/contact') 联系我们
+        a(ng-href='/about') 关于我们
       else
-        a(href='/login') 登录
-        a(href='/register') 注册
-        a(href='/gameRule') 游戏规则
-        a(href='/contact') 联系我们
-        a(href='/about') 关于我们
+        a(ng-href='/login') 登录
+        a(ng-href='/register') 注册
+        a(ng-href='/gameRule') 游戏规则
+        a(ng-href='/contact') 联系我们
+        a(ng-href='/about') 关于我们
 
   div.container
     div(ng-view)
 
   div.footer
-    a(href='/gameRule') 游戏规则
-    a(href='/contact') 联系我们
-    a(href='/about') 关于我们
+    a(ng-href='/gameRule') 游戏规则
+    a(ng-href='/contact') 联系我们
+    a(ng-href='/about') 关于我们
 
   script(src='js/lib/angular/angular.js')
   script(src='/socket.io/socket.io.js')

@@ -1,6 +1,6 @@
 /* app css stylesheet */
 *{margin: 0;padding: 0;}
-body{font-size: 12px;line-height: 1.5;color: #333;-webkit-user-select: none;-moz-user-select: none;}
+body{font-size: 14px;line-height: 1.5;color: #333;-webkit-user-select: none;-moz-user-select: none;background: url(../img/bg.png);}
 body, html{height: 100%;width: 100%;overflow: hidden;}
 ul, ol{list-style-type: none;}
 a{text-decoration: none;color: #4183c4;}
@@ -8,17 +8,18 @@ a:hover{text-decoration: underline;}
 img{border: none;}
 
 /*header*/
-.header{overflow: hidden;position: relative;height: 60px;}
-.header h1{text-align: center;line-height: 60px;}
+.header{overflow: hidden;position: relative;height: 60px;box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);}
+.header h1{text-align: center;line-height: 60px;background-color: #a5bbb6;}
+.header h1 a{color: #fff;font-size: 24px;text-decoration: none;}
 .header .ctrl{position: absolute;right: 0px;top: 0px;height: 60px;}
-.header .ctrl a{line-height: 60px;margin: 0 10px;}
+.header .ctrl a{line-height: 60px;margin: 0 10px;color: #fff;}
 
 /*container*/
 .container{}
 .container .index{text-align: center;padding: 40px 0;}
 
 /*chart*/
-.chatDialog{width: 400px;border: 1px solid #ccc;position: absolute;background-color: #fff;box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);}
+.chatDialog{width: 400px;border: 1px solid #ccc;position: absolute;background-color: #fff;box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);}
 .chatDialog .userMsg{padding: 6px;border-bottom: 1px solid #ccc;}
 .chatDialog .title{height: 40px;line-height: 40px;text-align: center;background-color: #eee;border-bottom: 1px solid #ccc;cursor: move;position: relative;}
 .chatDialog .close{position: absolute;right: 10px;line-height: 40px;top: 0px;}
