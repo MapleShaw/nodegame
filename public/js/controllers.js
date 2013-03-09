@@ -7,8 +7,7 @@ function loginOutController($scope, $http, $routeParams, $location) {
   $scope.loginOut = function(){
 		$http.get('/login/loginout').success(function(data, status, headers, config){
 			//do something if return success
-			
-			$location.path('/');
+			window.location.reload();
 		}).error(function(data, status, headers, config){
 			//do something if return error
 			//$scope.errorMsg = error;
@@ -27,8 +26,7 @@ function loginCtrl($scope, $http, $routeParams, $location){
 		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
 			//do something if return success
 			$scope.userMsg = data.data;	
-			//$location.path('/');
-			$location.reload();
+			window.location.reload();
 		}).error(function(data, status, headers, config){
 			//do something if return error
 			//$scope.errorMsg = error;
@@ -130,16 +128,24 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
     //the function of init message
     $scope.initName = function (user) {
 
+    	var _dialog = document.getElementById("dialog_" + user.id);
+    	if (_dialog) {
+    		_dialog.style.display = "block";
+    		return ;
+    	}
+
     	//chat_users[user.id] = socket;
     	$scope.sendToId[user.id] = user.id;
     	$scope.sendToName[user.id] = user.username;
     	$scope.msgFrom[user.id] = $scope.sendToName[user.id];
 
     	//template string
-    	var _html = ['<div class="chat chatDialog" style="left:500px;top: 100px;" data-left="500" data-top="100">',
+    	var _html = ['<div class="chat chatDialog" id="dialog_', user.id, '" style="left:500px;top: 100px;" data-left="500" data-top="100">',
     					'<div on-draggable="on-draggable" class="userMsgg">',
     						'<div class="title">',
     							'<h3>与{{msgFrom["', user.id, '"]}}聊天中</h3>',
+    							'<a href="javascript:;" class="close" ng-click="closeDialog(\'', user.id, '\')">关闭</a>',
+    							'<a href="javascript:;" class="min" ng-click="minDialog(\'', user.id, '\')">最小化</a>',
     						'</div>',
     					'</div>',
     					'<div id="chatScorll_', user.id, '" class="content">',
@@ -163,6 +169,7 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 						'<p class="user_ctrl">',
 							'<input type="button" value="send message" ng-click="sendMsg(\'', user.id, '\')" class="btn">',
 							'<span class="gray">&nbsp; or press "Enter" key</span>',
+							'<a href="javascript:;" class="clearTxt" ng-click="clearMsg(\'', user.id, '\')">清除记录</a>',
 						'</p>',
 					'</div>'].join("");
     	var chatTeml = $compile(_html)($scope);
@@ -261,6 +268,33 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
     	}
     	timeout = setTimeout(function(){_scrollTop(id);}, 0);
     }
+
+    // close the dialog
+    $scope.closeDialog = function (userId) {
+
+    	var dialog = document.getElementById("dialog_" + userId);
+    	var dParent = document.getElementById("chatTemplate");
+
+    	dParent.removeChild(dialog);
+
+    }
+
+    // clear the msg
+    $scope.clearMsg = function (userId) {
+    	
+    	$scope.msgs[userId] = [];
+
+    }
+
+    // minimize the window
+    $scope.minDialog = function (userId) {
+
+    	var dialog = document.getElementById("dialog_" + userId);
+
+    	dialog.style.display = "none";
+
+    }
+
 }
 indexCtrl.$inject = ['$scope', '$http', '$location', '$compile', 'socket', 'global'];
 

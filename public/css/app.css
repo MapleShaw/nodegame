@@ -20,14 +20,16 @@ img{border: none;}
 /*chart*/
 .chatDialog{width: 400px;border: 1px solid #ccc;position: absolute;background-color: #fff;box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);}
 .chatDialog .userMsg{padding: 6px;border-bottom: 1px solid #ccc;}
-.chatDialog .title{height: 40px;line-height: 40px;text-align: center;background-color: #eee;border-bottom: 1px solid #ccc;cursor: move;}
-
+.chatDialog .title{height: 40px;line-height: 40px;text-align: center;background-color: #eee;border-bottom: 1px solid #ccc;cursor: move;position: relative;}
+.chatDialog .close{position: absolute;right: 10px;line-height: 40px;top: 0px;}
+.chatDialog .min{position: absolute;right: 40px;line-height: 40px;top: 0px;}
+.chatDialog .clearTxt{position: absolute;right: 10px;line-height: 30px;}
 .chatDialog .yourId{margin: 0 0 0 20px;}
 .chatDialog .chat_msg{height: 60px;padding: 6px 6px;width: 388px;border: none;outline: none;display: block;}
 .chatDialog .chat_msg:focus{box-shadow: none;}
 .chatDialog .user_id{padding: 6px;border-bottom: 1px solid #ccc;display: none;}
 .chatDialog .user_txt{border-bottom: 1px solid #ccc;}
-.chatDialog .user_ctrl{padding: 6px;background-color: #eee;}
+.chatDialog .user_ctrl{padding: 6px;background-color: #eee;position: relative;}
 .chatDialog .content{padding: 10px 6px;height: 200px;border-bottom: 1px solid #ccc;overflow: auto;}
 .chatDialog .content .items li{overflow: hidden;margin: 0 6px 0 6px;padding: 0 0 10px 0;}
 .chatDialog .c_name{margin-bottom: 5px;} 
