@@ -48,7 +48,7 @@ exports.post = function(req, res){
 } ;
 
 exports.check = function(req, res){
-	var _return = {};
+	var _return = {},checkMark;
 	//the data of form (json)
 	var data = req.body;
   // for (var a in data) {
@@ -64,18 +64,20 @@ exports.check = function(req, res){
   //檢查用戶名是否已經存在
   User.get(newUser.name, function(err, user) {
     if (user){
-      err = 'Username already exists.';
+      checkMark = 0;
+    }else if(newUser.name==null){
+      checkMark = 2;    
     }else{
-      err = 'The username is available!';      
+      checkMark = 1;
     }
-      _callback(err);
+      _callback(checkMark);
   });
 
 	//the callback function of database if return something
 	function _callback (_data) {
 		//do something of the return "_data"
 		res.json({
-			data : _data
+      data : _data
 		});
 	}
 } ;

@@ -146,3 +146,8 @@ textarea:focus
 .cssForm input.ng-valid.ng-dirty {
   background-color: #78FA89;
 }
+
+.errorTips{
+  margin-top: 10px;
+  color: red;
+}

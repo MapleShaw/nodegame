@@ -3,8 +3,8 @@ div.index
 	form.cssForm
 		div.eachItem
 			label Username
-			input(type="text" , name="username" , ng-model="registerForm.username", ng-change="registerCheck()", placeholder="Type your name…" , required)
-			span {{usernameMsg}}
+			input(type="text" , id="errorTipsOfName" , name="username" , ng-model="registerForm.username", ng-change="registerCheck()", placeholder="Type your name…" , required , checkUsername)
+			p {{usernameMsg}}
 		div.eachItem
 			label Email
 			input(type="email" , name="email" ,ng-model="registerForm.email", placeholder="Type your email…" , required)
@@ -13,11 +13,11 @@ div.index
 			input(type="password" , name="password" , ng-model="registerForm.password", placeholder="Type your password…" , required)
 		div.eachItem
 			label Password Repeat
-			input(type="password" , name="passwordRepeat" , ng-model="registerForm.passwordRepeat", ng-change="passwordCheck()" , placeholder="Type again…" , required)
-			span {{error}}
+			input(type="password" , id="errorTipsOfPw" , name="passwordRepeat" , ng-model="registerForm.passwordRepeat", ng-change="passwordCheck()" , placeholder="Type again…" , required)
+			p {{error}}
 		div.eachItem
 			label.checkbox
 				input.checkbox(type="checkbox") 
 				span check me out
 		button.btn(type="submit" , ng-click="registerPost()") Register
-		span {{successMsg}}
+		p.errorTips {{successMsg}}

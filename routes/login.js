@@ -5,27 +5,28 @@ var User = require('../models/user');
 exports.login = function(req, res){
 	//
 	
-	var data = req.body;
+	var data = req.body , loginMark;
 	//生成口令的散列值
     var md5 = crypto.createHash('md5');
     var password = md5.update(data.password).digest('base64');
     
     User.get(data.username, function(err, user) {
       if (!user) {
-        err = "User is not existed!";
+        err = 1;
         _callback (err);
+      }else{
+        if (user.password != password) {
+          err = 2;
+          _callback (err);
+        }else{
+          req.session.user = user;
+          err = 0;
+          _callback (err);
+          
+        }
       }
-      if (user.password != password) {
-        err = "Password is wrong!";
-        _callback (err);
-      }
-      req.session.user = user;
-
-      // req.flash('success', '登入成功');
-      // res.redirect('/');
       
-      _callback(user.name);
-
+      
 
     });
 

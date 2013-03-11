@@ -1,10 +1,41 @@
 'use strict';
-
+var checkMarkName,checkMarkPw,loginMark;
 /*
 	loginOut controllers
 */
 
+/*
+	login controller
+*/
+function loginCtrl($scope, $http, $routeParams, $location){
 
+	$scope.loginForm = {};
+
+	//submit function
+	$scope.loginPost = function(){
+		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
+			//do something if return success
+			loginMark = data.data;
+			if(loginMark == 1){
+				$scope.userMsg = "User is not existed!";
+				document.getElementById("errorLoginOfName").style.backgroundColor = "#FA787E";
+			}else if(loginMark == 2){
+				$scope.userMsg = "Password is wrong!";
+				document.getElementById("errorLoginOfPw").style.backgroundColor = "#FA787E";
+			}else if(loginMark == 0){
+				window.location.href="/";
+			}
+		}).error(function(data, status, headers, config){
+			//do something if return error
+		});
+	};
+
+	
+}
+loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
+/*
+	loginOut controllers
+*/
 function loginOutController($scope, $http, $routeParams, $location) {
   $scope.loginOut = function(){
 		$http.get('/login/loginout').success(function(data, status, headers, config){
@@ -17,28 +48,6 @@ function loginOutController($scope, $http, $routeParams, $location) {
 	};
 }
 /*
-	login controller
-*/
-function loginCtrl($scope, $http, $routeParams, $location){
-
-	$scope.loginForm = {};
-
-	//submit function
-	$scope.loginPost = function(){
-		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
-			//do something if return success
-			$scope.userMsg = data.data;	
-			window.location.reload();
-		}).error(function(data, status, headers, config){
-			//do something if return error
-		});
-	};
-
-	
-}
-loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
-
-/*
 	register controller
 */
 function registerCtrl($scope, $http, $routeParams, $location){
@@ -47,13 +56,17 @@ function registerCtrl($scope, $http, $routeParams, $location){
 
 	//submit function
 	$scope.registerPost = function () {
-		$http.post('/register/post', $scope.registerForm).success(function(data, status, headers, config){
-			//do something if return success
-			$scope.successMsg = data.data;	
-			window.location.reload();
-		}).error(function(data, status, headers, config){
-			//do something if return error
-		});
+		if(checkMarkName==1&&checkMarkPw==0){
+			$http.post('/register/post', $scope.registerForm).success(function(data, status, headers, config){
+				//do something if return success
+				$scope.successMsg = data.data;	
+				window.location.reload();
+			}).error(function(data, status, headers, config){
+				//do something if return error
+			});
+		}else{
+			$scope.successMsg = "Please check your information!!";
+		}
 	}
 	
 	//check if the name is only
@@ -62,7 +75,18 @@ function registerCtrl($scope, $http, $routeParams, $location){
 		$http.post('/register/check', $scope.registerForm).success(function(data){
 			//do something if return success
 			//$scope.successMsg = data;	
-			$scope.usernameMsg = data.data;
+			checkMarkName = data.data;
+			if(checkMarkName == 0){
+				$scope.usernameMsg = "Username already exists!";
+				document.getElementById("errorTipsOfName").style.backgroundColor = "#FA787E";
+			}else if(checkMarkName == 1){
+				$scope.usernameMsg = "The username is available!";
+				document.getElementById("errorTipsOfName").style.backgroundColor = "#78FA89";
+			}else if(checkMarkName == 2){
+				$scope.usernameMsg = "Please fill in your name!";
+				document.getElementById("errorTipsOfName").style.backgroundColor = "#FA787E";
+			}	
+
 		}).error(function(data, status, headers, config){
 			//do something if return error
 			//$scope.errorMsg = error;
@@ -71,10 +95,14 @@ function registerCtrl($scope, $http, $routeParams, $location){
 	};
 	$scope.passwordCheck = function () {
 		//檢驗用戶兩次輸入的口令是否一致
-	    if ($scope.registerForm.passwordRepeat != $scope.registerForm.password) {	      
+	    if($scope.registerForm.passwordRepeat != $scope.registerForm.password) {
+	      document.getElementById("errorTipsOfPw").style.backgroundColor = "#FA787E";	      
 	      $scope.error = "uncorrect!";
+	      checkMarkPw = 1;
 	    }else{
+	      document.getElementById("errorTipsOfPw").style.backgroundColor = "#78FA89";
 	      $scope.error = "Yeah!";
+	      checkMarkPw = 0;
 	    }
 	}
 }
