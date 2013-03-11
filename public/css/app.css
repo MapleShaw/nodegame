@@ -41,13 +41,13 @@ img{border: none;}
 .chatDialog .c_cnt{word-break:break-all;}
 .chatDialog .c_name .username{color: #4183c4;}
 
-.friend_list{position: absolute;height:100%;padding: 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
+.friend_list{width: 160px;position: absolute;height:100%;padding: 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
 .friend_list li{padding: 10px 10px; border-bottom: 1px solid #ccc;}
 .friend_list li:hover{cursor: pointer;background: #eee;}
 .friend_list li:last-child{border-bottom: none;}
 
-.friend_tips{position: absolute;width: 150px;bottom: 0px;right: 158px;}
-.friend_tips .items{border-left: 2px solid #cb6d08;border-top: 2px solid #cb6d08;max-height: 209px;overflow: auto;}
+.friend_tips{position: absolute;width: 152px;bottom: 0px;right: 162px;}
+.friend_tips .items{border-left: 2px solid #cb6d08;border-top: 2px solid #cb6d08;border-right: 2px solid #cb6d08;max-height: 209px;overflow: auto;}
 .friend_tips li{padding: 4px 10px; border-bottom: 1px solid #ccc;background-color: #eee;}
 .friend_tips li:hover{cursor: pointer;color: #000;}
 .friend_tips li:last-child{border-bottom: none;}
