@@ -6,3 +6,8 @@ div.wrap
       li(ng-repeat='user in users', title='{{user.name}}', ng-click='initName(user)')
         span.face {{user.username}} : 
         span.username {{user.id}}
+  
+  div.friend_tips
+    ul.items(ng-show='msgCount && sT')
+      li.ellipsis(ng-repeat='tip in tipsMsg', title='{{tip.fromName}}', ng-click='showWin(tip.fromId)') {{tip.fromName}} ({{count[tip.fromId]}})
+    p.tip_title(ng-show='msgCount', ng-click='showTip()') 您收到{{msgCount}}条信息

@@ -3,6 +3,8 @@
 /*
 	loginOut controllers
 */
+
+
 function loginOutController($scope, $http, $routeParams, $location) {
   $scope.loginOut = function(){
 		$http.get('/login/loginout').success(function(data, status, headers, config){
@@ -83,8 +85,7 @@ registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 */
 function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 	//produce the only "id"
-	$scope.users = [];
-	$scope.users = [
+	var users = [
 		{
 			id : 'a1111111111',
 			username : 'zhoon_1'
@@ -105,7 +106,15 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 			id : 'a5555555555',
 			username : 'zhoon_5'
 		}
-	];
+	] || [];
+	
+	$scope.users = users;
+
+	//arr to obj
+	var usersObj = {};
+	for (var i = 0; i < users.length; i++) {
+		usersObj[users[i].id] = users[i];
+	};
 
 	//send id to server
 	var _hash = $location.hash();
@@ -123,9 +132,17 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
     $scope.sendToId = {};
     $scope.sendToName = {};
     $scope.msgs = {};
+    $scope.tipsMsg = [];
+    $scope.msgCount = 0;
+    $scope.count = {};
 
-    //the function of init message
-    $scope.initName = function (user) {
+    //init the msg arr
+    for(var i=0; i < $scope.users.length; i++) {
+    	$scope.msgs[$scope.users[i].id] = [];
+    	$scope.count[$scope.users[i].id] = 0;
+    }
+
+    function _template (user) {
 
     	var _dialog = document.getElementById("dialog_" + user.id);
     	if (_dialog) {
@@ -139,12 +156,12 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
     	$scope.msgFrom[user.id] = $scope.sendToName[user.id];
 
     	//template string
-    	var _html = ['<div class="chat chatDialog" id="dialog_', user.id, '" style="left:500px;top: 100px;" data-left="500" data-top="100">',
+    	var _html = ['<div class="chat chatDialog" id="dialog_', user.id, '" style="left:500px;top:100px;display:block;" data-left="500" data-top="100">',
     					'<div on-draggable="on-draggable" class="userMsgg">',
     						'<div class="title">',
     							'<h3>与{{msgFrom["', user.id, '"]}}聊天中</h3>',
-    							'<a href="javascript:;" class="close" ng-click="closeDialog(\'', user.id, '\')">关闭</a>',
-    							'<a href="javascript:;" class="min" ng-click="minDialog(\'', user.id, '\')">最小化</a>',
+    							'<a href="javascript:;" class="close", title="关闭", ng-click="closeDialog(\'', user.id, '\')">×</a>',
+    							'<a href="javascript:;" class="min", title="最小化", ng-click="minDialog(\'', user.id, '\')">-</a>',
     						'</div>',
     					'</div>',
     					'<div id="chatScorll_', user.id, '" class="content">',
@@ -175,7 +192,52 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
    		document.getElementById('chatTemplate').appendChild(chatTeml[0]);
     	
     	//get the data 
-	    $scope.msgs[user.id] = [];
+	    //$scope.msgs[user.id] = [];
+    }
+
+    function _showTips (fromId, fromName) {
+    	//
+    	$scope.msgCount++;
+    	if ($scope.count[fromId] === 0) {
+	    	$scope.tipsMsg.push({
+	    		fromId : fromId,
+	    		fromName : fromName
+	    	});
+	    }
+
+	    $scope.count[fromId]++;
+
+    }
+
+    $scope.sT = false;
+    $scope.showTip = function() {
+    	if ($scope.sT == false) {
+	    	$scope.sT = true;
+	    } else {
+	    	$scope.sT = false;
+	    }
+    }
+
+    //the function of init message
+    $scope.initName = function (user) {
+
+    	_template(user);
+
+	}
+
+	//see the msg tips
+	$scope.showWin = function (userId) {
+		
+		_template(usersObj[userId]);
+
+		$scope.msgCount -= $scope.count[userId];
+		$scope.count[userId] = 0;
+
+		for (var i = 0; i < $scope.tipsMsg.length; i++) {
+			if($scope.tipsMsg[i].fromId === userId) {
+				$scope.tipsMsg.splice(i, 1);
+			}
+		}
 
 	}
 
@@ -187,7 +249,7 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
         } else {
         	$scope.flag = true;
 	        if($scope.sendToId[_userId] == ''){
-	            chat_users[_userId].emit('chat_publicmsg',$scope.userTxt[_userId]);
+	            socket.emit('chat_publicmsg',$scope.userTxt[_userId]);
 	        }else{
 	            //chat_users[_userId].emit('chat_privatemsg',{
 	            socket.emit('chat_privatemsg', {
@@ -226,15 +288,45 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 
        //do something if someone send "data" to you
        var data = eval(data);
+       var isIdExist = document.getElementById("dialog_" + data.fromId);
 
-       $scope.msgs[data.fromId].push({
-			name : data.fromName + ' : ',
-			time : global._getTime(),
-			cnt : data.msg
-		});
+       if (usersObj[data.fromId] && isIdExist && isIdExist.style.display == "block") {
+       		//if the window is display=block
+	       	$scope.msgs[data.fromId].push({
+				name : data.fromName + ' : ',
+				time : global._getTime(),
+				cnt : data.msg
+			});
+       } else if (usersObj[data.fromId] && isIdExist && isIdExist.style.display == "none") {
+       		//if the window is display=none
+       		$scope.msgs[data.fromId].push({
+				name : data.fromName + ' : ',
+				time : global._getTime(),
+				cnt : data.msg
+			});
+
+			//tips
+			_showTips(data.fromId, data.fromName);
+
+       } else if (usersObj[data.fromId] && !isIdExist) {
+       		//if the window is not display yeat
+       		$scope.msgs[data.fromId].push({
+				name : data.fromName + ' : ',
+				time : global._getTime(),
+				cnt : data.msg
+			});
+
+       		//tips
+       		_showTips(data.fromId, data.fromName);
+
+       } else {
+       		console.log('the user is not exist...')
+       }
 
        clearTimeout(timeout);
-       _scrollTop(data.fromId);
+       if (isIdExist) {
+       		_scrollTop(data.fromId);
+       }
 
     });
 
@@ -261,18 +353,24 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
     var timeout;
     function _scrollTop (id) {
     	var chatScorll = document.getElementById('chatScorll_' + id);
-    	if (oldHeight != chatScorll.scrollHeight) {
-    		chatScorll.scrollTop = chatScorll.scrollHeight;
-    		oldHeight = chatScorll.scrollHeight;
-    	}
-    	timeout = setTimeout(function(){_scrollTop(id);}, 0);
+    	if (chatScorll) {
+	    	if (oldHeight != chatScorll.scrollHeight) {
+	    		chatScorll.scrollTop = chatScorll.scrollHeight;
+	    		oldHeight = chatScorll.scrollHeight;
+	    	}
+	    	timeout = setTimeout(function(){_scrollTop(id);}, 0);
+	    } else {
+	    	clearTimeout(timeout);
+	    }
     }
 
     // close the dialog
     $scope.closeDialog = function (userId) {
-
+    	debugger;
     	var dialog = document.getElementById("dialog_" + userId);
     	var dParent = document.getElementById("chatTemplate");
+
+    	$scope.msgs[userId] = [];
 
     	dParent.removeChild(dialog);
 

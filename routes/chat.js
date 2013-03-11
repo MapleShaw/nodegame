@@ -34,7 +34,7 @@ module.exports = function (socket) {
                     users_chat[user.id].emit('chat_errmsg', {
                         fromId : data.sendTo,
                         fromName : user.username,
-                        to : name,
+                        toId : name,
                         msg : 'error msg : network problem.'
                     });
                     users_chat[user.id].emit('chat_have_receive', {
@@ -43,9 +43,13 @@ module.exports = function (socket) {
                     });
                 } else {
                     users_chat[data.sendTo].emit('chat_usermsg', {
+                        //id of who send the msg
                         fromId : user.id,
+                        //name of who send the msg
                         fromName : user.username,
-                        to : name,
+                        //id of who receive the msg
+                        toId : name,
+                        //text of msg
                         msg : data.sendText,
                     });
                     users_chat[user.id].emit('chat_have_receive', {

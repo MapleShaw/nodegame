@@ -8,44 +8,55 @@ a:hover{text-decoration: underline;}
 img{border: none;}
 
 /*header*/
-.header{overflow: hidden;position: relative;height: 60px;box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);}
-.header h1{text-align: center;line-height: 60px;background-color: #a5bbb6;}
+.header{overflow: hidden;position: absolute;width: 100%;height: 60px;background-color: #a5bbb6;box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);z-index: 5;`}
+.header h1{text-align: center;line-height: 60px;}
 .header h1 a{color: #fff;font-size: 24px;text-decoration: none;}
 .header .ctrl{position: absolute;right: 0px;top: 0px;height: 60px;}
 .header .ctrl a{line-height: 60px;margin: 0 10px;color: #fff;}
 
 /*container*/
-.container{}
+.container{position: absolute;top: 60px;bottom: 40px;width: 100%;z-index: 4;}
 .container .index{text-align: center;padding: 40px 0;}
 
 /*chart*/
-.chatDialog{width: 400px;border: 1px solid #ccc;position: absolute;background-color: #fff;box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);}
+.chatDialog{width: 350px;border: 1px solid #ccc;position: absolute;background-color: #fff;z-index: 10;box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);}
 .chatDialog .userMsg{padding: 6px;border-bottom: 1px solid #ccc;}
 .chatDialog .title{height: 40px;line-height: 40px;text-align: center;background-color: #eee;border-bottom: 1px solid #ccc;cursor: move;position: relative;}
-.chatDialog .close{position: absolute;right: 10px;line-height: 40px;top: 0px;}
-.chatDialog .min{position: absolute;right: 40px;line-height: 40px;top: 0px;}
+.chatDialog .close,
+.chatDialog .min{position: absolute;right: 10px;line-height: 20px;top: 10px;font-size: 26px;width: 20px;height: 20px;text-decoration: none;font-weight: bold;color: #999;}
+.chatDialog .min{left: 10px;}
+.chatDialog .close:hover,
+.chatDialog .min:hover{background-color: #ccc;border-radius: 3px;color: #fff;}
 .chatDialog .clearTxt{position: absolute;right: 10px;line-height: 30px;}
 .chatDialog .yourId{margin: 0 0 0 20px;}
-.chatDialog .chat_msg{height: 60px;padding: 6px 6px;width: 388px;border: none;outline: none;display: block;}
+.chatDialog .chat_msg{height: 60px;padding: 6px 6px;width: 338px;border: none;outline: none;display: block;}
 .chatDialog .chat_msg:focus{box-shadow: none;}
 .chatDialog .user_id{padding: 6px;border-bottom: 1px solid #ccc;display: none;}
 .chatDialog .user_txt{border-bottom: 1px solid #ccc;}
 .chatDialog .user_ctrl{padding: 6px;background-color: #eee;position: relative;}
-.chatDialog .content{padding: 10px 6px;height: 200px;border-bottom: 1px solid #ccc;overflow: auto;}
+.chatDialog .content{padding: 10px 6px;height: 150px;border-bottom: 1px solid #ccc;overflow: auto;}
 .chatDialog .content .items li{overflow: hidden;margin: 0 6px 0 6px;padding: 0 0 10px 0;}
 .chatDialog .c_name{margin-bottom: 5px;} 
 .chatDialog .c_cnt{word-break:break-all;}
 .chatDialog .c_name .username{color: #4183c4;}
 
-.friend_list{position: absolute;padding: 2px 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
+.friend_list{position: absolute;height:100%;padding: 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
 .friend_list li{padding: 10px 10px; border-bottom: 1px solid #ccc;}
 .friend_list li:hover{cursor: pointer;background: #eee;}
 .friend_list li:last-child{border-bottom: none;}
 
+.friend_tips{position: absolute;width: 150px;bottom: 0px;right: 158px;}
+.friend_tips .items{border-left: 2px solid #cb6d08;border-top: 2px solid #cb6d08;max-height: 209px;overflow: auto;}
+.friend_tips li{padding: 4px 10px; border-bottom: 1px solid #ccc;background-color: #eee;}
+.friend_tips li:hover{cursor: pointer;color: #000;}
+.friend_tips li:last-child{border-bottom: none;}
+.friend_tips .tip_title{width: 150px;height: 24px;cursor: pointer;line-height: 24px;text-align: center;color: #fff;border: solid 1px #cb6d08;background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fc8646), color-stop(100%,#ea5507), color-stop(100%,#fb955e)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); /* Chrome10+,Safari5.1+ */}
+
 
 /*footer*/
-.footer{padding: 20px;text-align: center;}
-.footer a{margin: 0 10px;}
+.footer{text-align: center;width: 100%;height: 40px;line-height: 40px;position:absolute;bottom: 0px;z-index: 5;background-color: #a5bbb6;}
+.footer a{margin: 0 10px;color: #fff;}
 
 
 /*function*/
@@ -53,3 +64,5 @@ img{border: none;}
 .red{color: #c00;}
 .blue{color: #4183c4;}
 .black{color: #000;}
+
+.ellipsis{overflow: hidden;white-space: normal;text-overflow:ellipsis;}
