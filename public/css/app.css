@@ -41,7 +41,7 @@ img{border: none;}
 .chatDialog .c_cnt{word-break:break-all;}
 .chatDialog .c_name .username{color: #4183c4;}
 
-.friend_list{width: 160px;position: absolute;height:100%;padding: 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
+.friend_list{width: 160px;overflow: hidden;position: absolute;height:100%;padding: 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
 .friend_list li{padding: 10px 10px; border-bottom: 1px solid #ccc;}
 .friend_list li:hover{cursor: pointer;background: #eee;}
 .friend_list li:last-child{border-bottom: none;}
