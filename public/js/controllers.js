@@ -1,9 +1,4 @@
 'use strict';
-var checkMarkName,checkMarkPw,loginMark;
-/*
-	loginOut controllers
-*/
-
 /*
 	login controller
 */
@@ -14,8 +9,10 @@ function loginCtrl($scope, $http, $routeParams, $location){
 	//submit function
 	$scope.loginPost = function(){
 		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
-			//do something if return success
-			loginMark = data.data;
+			
+			var loginMark = data.err;
+			var friendToJson = JSON.stringify(data.friendList);
+			window.sessionStorage.setItem('friendList',friendToJson);
 			if(loginMark == 1){
 				$scope.userMsg = "User is not existed!";
 				document.getElementById("errorLoginOfName").style.backgroundColor = "#FA787E";
@@ -26,7 +23,7 @@ function loginCtrl($scope, $http, $routeParams, $location){
 				window.location.href="/";
 			}
 		}).error(function(data, status, headers, config){
-			//do something if return error
+			
 		});
 	};
 
@@ -39,11 +36,11 @@ loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 function loginOutController($scope, $http, $routeParams, $location) {
   $scope.loginOut = function(){
 		$http.get('/login/loginout').success(function(data, status, headers, config){
-			//do something if return success
+			
+			window.sessionStorage.clear();
 			window.location.reload();
 		}).error(function(data, status, headers, config){
-			//do something if return error
-			//$scope.errorMsg = error;
+			
 		});
 	};
 }
@@ -51,7 +48,7 @@ function loginOutController($scope, $http, $routeParams, $location) {
 	register controller
 */
 function registerCtrl($scope, $http, $routeParams, $location){
-
+    var checkMarkName,checkMarkPw;
 	$scope.registerForm = {};
 
 	//submit function
@@ -137,6 +134,10 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 	] || [];
 	
 	$scope.users = users;
+
+	//取出当前用户的好友列表
+	var getFriendList = window.sessionStorage.getItem('friendList');
+    
 
 	//arr to obj
 	var usersObj = {};
@@ -394,7 +395,6 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 
     // close the dialog
     $scope.closeDialog = function (userId) {
-    	debugger;
     	var dialog = document.getElementById("dialog_" + userId);
     	var dParent = document.getElementById("chatTemplate");
 

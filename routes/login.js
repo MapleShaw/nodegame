@@ -5,7 +5,7 @@ var User = require('../models/user');
 exports.login = function(req, res){
 	//
 	
-	var data = req.body , loginMark;
+	var data = req.body;
 	//生成口令的散列值
     var md5 = crypto.createHash('md5');
     var password = md5.update(data.password).digest('base64');
@@ -21,7 +21,7 @@ exports.login = function(req, res){
         }else{
           req.session.user = user;
           err = 0;
-          _callback (err);
+          _callback (err,user.friendList);
           
         }
       }
@@ -30,10 +30,11 @@ exports.login = function(req, res){
 
     });
 
-    function _callback (_data) {
+    function _callback (_err,_friendList) {
 		//do something of the return "_data"
 		res.json({
-			data : _data
+			err : _err,
+      friendList : _friendList
 		});
 	}
 }

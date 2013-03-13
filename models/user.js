@@ -4,7 +4,8 @@ function User(user) {
   this.name = user.name;
   this.email = user.email;
   this.password = user.password;
-  this.systemid =  user.id;
+  this.systemid =  user.systemid;
+  this.friendList = user.friendList;
 };
 module.exports = User;
 
