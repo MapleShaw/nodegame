@@ -6,6 +6,7 @@ function User(user) {
   this.password = user.password;
   this.systemid =  user.systemid;
   this.friendList = user.friendList;
+  this.mark = user.mark;
 };
 module.exports = User;
 
@@ -16,7 +17,16 @@ User.prototype.save = function save(callback) {
     email: this.email,
     password: this.password,
     systemid: this.systemid,
+    friendList: [],
+    mark: this.mark,
+    //isOnline
+    //isOnGame
   };
+
+  var myselfInfo = {
+    name: user.name,
+    systemid: user.systemid,
+  }
   mongodb.open(function(err, db) {
     if (err) {
       return callback(err);
@@ -29,7 +39,13 @@ User.prototype.save = function save(callback) {
       }
       // 爲 name 屬性添加索引
       collection.ensureIndex('name', {unique: true});
+      
+      //
+      collection.update({"mark":0},{$push:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
+      
+      });
       // 寫入 user 文檔
+      
       collection.insert(user, {safe: true}, function(err, user) {
         mongodb.close();
         callback(err, user);

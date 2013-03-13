@@ -60,7 +60,7 @@ function registerCtrl($scope, $http, $routeParams, $location){
 			$http.post('/register/post', $scope.registerForm).success(function(data, status, headers, config){
 				//do something if return success
 				$scope.successMsg = data.data;	
-				window.location.reload();
+				window.location.href='/';
 			}).error(function(data, status, headers, config){
 				//do something if return error
 			});

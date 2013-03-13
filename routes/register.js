@@ -22,18 +22,20 @@ exports.post = function(req, res){
     name: data.username,
     email: data.email,
     password: password,
-    id: _id,
+    systemid: _id, //名字要跟user.js里面的对象属性对应
+    friendList: [],
+    mark: 0,
   });
   
 	//next is doing with the database of MongoDB
   //新增用戶 
-  
   User.get(newUser.name, function(err, user) {
     newUser.save(function(err) {
       if (err) {
         
       }
       req.session.user = newUser;
+
       _callback("Succeed！！");
     });
   });
