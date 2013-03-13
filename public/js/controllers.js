@@ -41,6 +41,7 @@ function loginOutController($scope, $http, $routeParams, $location) {
 			
 			window.sessionStorage.clear();
 			window.location.reload();
+			
 		}).error(function(data, status, headers, config){
 			
 		});
@@ -111,55 +112,8 @@ registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 	index controller
 */
 function indexCtrl ($scope, $http, $location, $compile, socket, global) {
-	//produce the only "id"
-	var users = [
-		{
-			id : 'a1111111111',
-			username : 'zhoon_1'
-		},
-		{
-			id : 'a2222222222',
-			username : 'zhoon_2'
-		},
-		{
-			id : 'a3333333333',
-			username : 'zhoon_3'
-		},
-		{
-			id : 'a4444444444',
-			username : 'zhoon_4'
-		},
-		{
-			id : 'a5555555555',
-			username : 'zhoon_5'
-		}
-	] || [];
 	
-	$scope.users = users;
-
-	//取出当前用户的好友列表
-	var getFriendList = window.sessionStorage.getItem('friendList');
-	var getMyselfInfo = window.sessionStorage.getItem('myselfInfo');
-    
-
-	//arr to obj
-	var usersObj = {};
-	for (var i = 0; i < users.length; i++) {
-		usersObj[users[i].id] = users[i];
-	};
-
-	//send id to server
-	var _hash = $location.hash();
-	if(_hash) {
-		socket.emit('set nickname', $scope.users[_hash]);
-	}
-
-    socket.on('ready', function () {
-       //do something if server return ready
-    });
-
-    
-    $scope.msgFrom = {};
+	$scope.msgFrom = {};
     $scope.userTxt = {};
     $scope.sendToId = {};
     $scope.sendToName = {};
@@ -167,38 +121,75 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
     $scope.tipsMsg = [];
     $scope.msgCount = 0;
     $scope.count = {};
+    $scope.friendList = [];
 
-    //init the msg arr
-    for(var i=0; i < $scope.users.length; i++) {
-    	$scope.msgs[$scope.users[i].id] = [];
-    	$scope.count[$scope.users[i].id] = 0;
-    }
+    var usersObj = {};
 
-    function _template (user) {
+	// 取出当前用户的好友列表
+	var getFriendList = window.sessionStorage.getItem('friendList');
+	var getMyselfInfo = window.sessionStorage.getItem('myselfInfo');
+	
+	// the list of all friends and myself
+	if (getFriendList) {
 
-    	var _dialog = document.getElementById("dialog_" + user.id);
+		var _friendList = JSON.parse(getFriendList) || [];
+
+		// pass the friend list to $scope.users
+		$scope.friendList = _friendList;
+
+		// arr to obj
+		for (var i = 0; i < _friendList.length; i++) {
+			usersObj[_friendList[i].systemid] = _friendList[i];
+		};
+
+		// init the msg arr
+	    for(var i=0; i < $scope.friendList.length; i++) {
+	    	$scope.msgs[$scope.friendList[i].systemid] = [];
+	    	$scope.count[$scope.friendList[i].systemid] = 0;
+	    }
+
+	}
+
+	var _myself = JSON.parse(getMyselfInfo);
+
+	
+
+	//send id to server
+	if (_myself) {
+		socket.emit('set nickname', _myself);
+	} else {
+		// 
+	}
+
+    socket.on('ready', function () {
+       //do something if server return ready
+    });
+
+    function _template (friend) {
+
+    	var _dialog = document.getElementById("dialog_" + friend.systemid);
     	if (_dialog) {
     		_dialog.style.display = "block";
     		return ;
     	}
 
-    	//chat_users[user.id] = socket;
-    	$scope.sendToId[user.id] = user.id;
-    	$scope.sendToName[user.id] = user.username;
-    	$scope.msgFrom[user.id] = $scope.sendToName[user.id];
+    	//chat_users[friend.id] = socket;
+    	$scope.sendToId[friend.systemid] = friend.systemid;
+    	$scope.sendToName[friend.systemid] = friend.name;
+    	$scope.msgFrom[friend.systemid] = $scope.sendToName[friend.systemid];
 
     	//template string
-    	var _html = ['<div class="chat chatDialog" id="dialog_', user.id, '" style="left:500px;top:100px;display:block;" data-left="500" data-top="100">',
+    	var _html = ['<div class="chat chatDialog" id="dialog_', friend.systemid, '" style="left:500px;top:100px;display:block;" data-left="500" data-top="100">',
     					'<div on-draggable="on-draggable" class="userMsgg">',
     						'<div class="title">',
-    							'<h3>与{{msgFrom["', user.id, '"]}}聊天中</h3>',
-    							'<a href="javascript:;" class="close", title="关闭", ng-click="closeDialog(\'', user.id, '\')">×</a>',
-    							'<a href="javascript:;" class="min", title="最小化", ng-click="minDialog(\'', user.id, '\')">-</a>',
+    							'<h3>与{{msgFrom["', friend.systemid, '"]}}聊天中</h3>',
+    							'<a href="javascript:;" class="close", title="关闭", ng-click="closeDialog(\'', friend.systemid, '\')"></a>',
+    							'<a href="javascript:;" class="min", title="最小化", ng-click="minDialog(\'', friend.systemid, '\')"></a>',
     						'</div>',
     					'</div>',
-    					'<div id="chatScorll_', user.id, '" class="content">',
+    					'<div id="chatScorll_', friend.systemid, '" class="content">',
 							'<ul class="items">',
-								'<li ng-repeat="msg in msgs[\'', user.id, '\']">',
+								'<li ng-repeat="msg in msgs[\'', friend.systemid, '\']">',
 	            					'<div class="chatCnt">',
 		              					'<p class="c_name">',
 							                '<span class="username">{{msg.name}}</span>',
@@ -212,19 +203,17 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 							'<input id="firend_id" type="text" ng-model="userId" placeholder="input your friend\'s id..." class="">',
 							'<span class="yourId">Your ID : </span></p>',
 						'<p class="user_txt">',
-							'<textarea class="chat_msg" id="chat_msg_', user.id, '" ng-model="userTxt.', user.id, '" on-enter="sendMsg(\'', user.id, '\')" placeholder="input your message..." class=""></textarea>',
+							'<textarea class="chat_msg" id="chat_msg_', friend.systemid, '" ng-model="userTxt.', friend.systemid, '" on-enter="sendMsg(\'', friend.systemid, '\')" placeholder="input your message..." class=""></textarea>',
 						'</p>',
 						'<p class="user_ctrl">',
-							'<input type="button" value="send message" ng-click="sendMsg(\'', user.id, '\')" class="btn">',
+							'<input type="button" value="send message" ng-click="sendMsg(\'', friend.systemid, '\')" class="btn">',
 							'<span class="gray">&nbsp; or press "Enter" key</span>',
-							'<a href="javascript:;" class="clearTxt" ng-click="clearMsg(\'', user.id, '\')">清除记录</a>',
+							'<a href="javascript:;" class="clearTxt" ng-click="clearMsg(\'', friend.systemid, '\')">清除记录</a>',
 						'</p>',
 					'</div>'].join("");
     	var chatTeml = $compile(_html)($scope);
    		document.getElementById('chatTemplate').appendChild(chatTeml[0]);
     	
-    	//get the data 
-	    //$scope.msgs[user.id] = [];
     }
 
     function _showTips (fromId, fromName) {
@@ -251,9 +240,9 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
     }
 
     //the function of init message
-    $scope.initName = function (user) {
+    $scope.initName = function (friend) {
 
-    	_template(user);
+    	_template(friend);
 
 	}
 
@@ -273,20 +262,19 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 
 	}
 
-	$scope.sendMsg = function(_userId){
+	$scope.sendMsg = function(userId){
    		// send the message to server
-        if ($scope.userTxt[_userId] == undefined || $scope.userTxt[_userId] == "") {
+        if ($scope.userTxt[userId] == undefined || $scope.userTxt[userId] == "") {
         	document.getElementById('chat_msg').focus();
         	return false;
         } else {
         	$scope.flag = true;
-	        if($scope.sendToId[_userId] == ''){
-	            socket.emit('chat_publicmsg',$scope.userTxt[_userId]);
+	        if($scope.sendToId[userId] == ''){
+	            socket.emit('chat_publicmsg',$scope.userTxt[userId]);
 	        }else{
-	            //chat_users[_userId].emit('chat_privatemsg',{
 	            socket.emit('chat_privatemsg', {
-	            	'sendTo' : $scope.sendToId[_userId],
-	            	'sendText' : $scope.userTxt[_userId]
+	            	'sendTo' : $scope.sendToId[userId],
+	            	'sendText' : $scope.userTxt[userId]
 	            });
 	        }
         }
@@ -315,7 +303,6 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
         }
     });	
 
-	//chat_users[$scope.sendToId[user.id]].on('chat_usermsg', function (data) {
     socket.on('chat_usermsg', function (data) {
 
        //do something if someone send "data" to you

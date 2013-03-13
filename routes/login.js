@@ -35,7 +35,7 @@ exports.login = function(req, res){
 		res.json({
 			err : _err,
       myselfInfo : {name:_user.name,systemid:_user.systemid},
-      friendList : _user.friendList
+      friendList : _user.friendList ? _user.friendList : []
 		});
 	}
 }

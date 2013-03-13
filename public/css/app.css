@@ -24,10 +24,11 @@ img{border: none;}
 .chatDialog .userMsg{padding: 6px;border-bottom: 1px solid #ccc;}
 .chatDialog .title{height: 40px;line-height: 40px;text-align: center;background-color: #eee;border-bottom: 1px solid #ccc;cursor: move;position: relative;}
 .chatDialog .close,
-.chatDialog .min{position: absolute;right: 10px;line-height: 20px;top: 10px;font-size: 26px;width: 20px;height: 20px;text-decoration: none;font-weight: bold;color: #999;}
-.chatDialog .min{left: 10px;}
-.chatDialog .close:hover,
-.chatDialog .min:hover{background-color: #ccc;border-radius: 3px;color: #fff;}
+.chatDialog .min{position: absolute;right: 10px;line-height: 20px;top: 12px;width: 16px;height: 16px;text-decoration: none;background: url(../img/icons.png) no-repeat -108px -175px;}
+.chatDialog .min{right: 35px;background-position: -108px -152px;}
+.chatDialog .close:hover{background-position :-129px -175px;}
+.chatDialog .min:hover{background-position :-129px -152px;}
+
 .chatDialog .clearTxt{position: absolute;right: 10px;line-height: 30px;}
 .chatDialog .yourId{margin: 0 0 0 20px;}
 .chatDialog .chat_msg{height: 60px;padding: 6px 6px;width: 338px;border: none;outline: none;display: block;}
@@ -41,10 +42,9 @@ img{border: none;}
 .chatDialog .c_cnt{word-break:break-all;}
 .chatDialog .c_name .username{color: #4183c4;}
 
-.friend_list{width: 160px;overflow: hidden;position: absolute;height:100%;padding: 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
-.friend_list li{padding: 10px 10px; border-bottom: 1px solid #ccc;}
-.friend_list li:hover{cursor: pointer;background: #eee;}
-.friend_list li:last-child{border-bottom: none;}
+.friend_list{width: 160px;overflow: auto;position: absolute;height:100%;padding: 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
+.friend_list li{padding: 5px 10px 5px 50px;height: 40px;line-height: 40px; border-bottom: 1px solid #ccc;background: url(../img/on.png) no-repeat 6px 5px;}
+.friend_list li:hover{cursor: pointer;color: blue;word-break: break-all;word-wrap: break-word;}
 
 .friend_tips{position: absolute;width: 152px;bottom: 0px;right: 162px;}
 .friend_tips .items{border-left: 2px solid #cb6d08;border-top: 2px solid #cb6d08;border-right: 2px solid #cb6d08;max-height: 209px;overflow: auto;}
@@ -66,4 +66,4 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .blue{color: #4183c4;}
 .black{color: #000;}
 
-.ellipsis{overflow: hidden;white-space: normal;text-overflow:ellipsis;}
+.ellipsis{overflow: hidden;white-space: nowrap;text-overflow:ellipsis;display: block;}

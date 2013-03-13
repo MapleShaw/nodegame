@@ -3,9 +3,9 @@ div.wrap
 
   div.friend_list
     ul.iteams
-      li(ng-repeat='user in users', title='{{user.name}}', ng-click='initName(user)')
-        span.face {{user.username}} : 
-        span.username {{user.id}}
+      li.ellipsis(ng-repeat='friend in friendList', title='{{friend.name}}', ng-click='initName(friend)') {{friend.name}}
+      //
+        span.username {{friend.systemid}}
   
   div.friend_tips
     ul.items(ng-show='msgCount && sT')
