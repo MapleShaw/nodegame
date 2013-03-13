@@ -12,7 +12,9 @@ function loginCtrl($scope, $http, $routeParams, $location){
 			
 			var loginMark = data.err;
 			var friendToJson = JSON.stringify(data.friendList);
+			var myselfInfoToJson = JSON.stringify(data.myselfInfo);
 			window.sessionStorage.setItem('friendList',friendToJson);
+			window.sessionStorage.setItem('myselfInfo',myselfInfoToJson);
 			if(loginMark == 1){
 				$scope.userMsg = "User is not existed!";
 				document.getElementById("errorLoginOfName").style.backgroundColor = "#FA787E";
@@ -137,6 +139,7 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 
 	//取出当前用户的好友列表
 	var getFriendList = window.sessionStorage.getItem('friendList');
+	var getMyselfInfo = window.sessionStorage.getItem('myselfInfo');
     
 
 	//arr to obj

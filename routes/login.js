@@ -21,7 +21,7 @@ exports.login = function(req, res){
         }else{
           req.session.user = user;
           err = 0;
-          _callback (err,user.friendList);
+          _callback (err,user);
           
         }
       }
@@ -30,11 +30,12 @@ exports.login = function(req, res){
 
     });
 
-    function _callback (_err,_friendList) {
+    function _callback (_err,_user) {
 		//do something of the return "_data"
 		res.json({
 			err : _err,
-      friendList : _friendList
+      myselfInfo : {name:_user.name,systemid:_user.systemid},
+      friendList : _user.friendList
 		});
 	}
 }
