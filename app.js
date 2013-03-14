@@ -9,7 +9,7 @@ var express = require('express'),
 	login = require('./routes/login'),
 	MongoStore = require('connect-mongo')(express),
 	settings = require('./settings'),
-	socket = require('./routes/socket.js');
+	socketHandle	 = require('./routes/socket.js');
 
 var app = module.exports = express();
 var server = require('http').createServer(app);
@@ -72,7 +72,7 @@ app.get('*', routes.index);
 	chat socket
 */
 
-io.sockets.on('connection', socket.chat);
+io.sockets.on('connection', socketHandle.onConnect);
 
 
 
