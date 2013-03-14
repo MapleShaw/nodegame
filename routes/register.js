@@ -82,4 +82,5 @@ exports.check = function(req, res){
       data : _data
 		});
 	}
-} ;
+};
+

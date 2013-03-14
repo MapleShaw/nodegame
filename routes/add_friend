@@ -1,0 +1,26 @@
+var User = require('../models/user');
+
+//加好友
+exports.add = function(req, res){
+  var data = req.body;
+
+  var newFriend = new Friend({
+    name: data.username,
+    systemid: data.systemid, //名字要跟user.js里面的对象属性对应
+  });
+  //新增好友 
+    newFriend.addFriend(function(err) {
+      if (err) {
+        
+      }
+
+      _callback("Succeed！！");
+    });
+  //the callback function of database if return something
+  function _callback (_data) {
+    //do something of the return "_data"
+    res.json({
+      data : _data
+    });
+  }
+};

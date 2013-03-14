@@ -10,6 +10,13 @@ function User(user) {
 };
 module.exports = User;
 
+//加好友
+// function Friend(user) {
+//   this.name = user.name;
+//   this.systemid =  user.systemid;
+// };
+// module.exports = Friend;
+
 User.prototype.save = function save(callback) {
   // 存入 Mongodb 的文檔
   var user = {
@@ -40,8 +47,8 @@ User.prototype.save = function save(callback) {
       // 爲 name 屬性添加索引
       collection.ensureIndex('name', {unique: true});
       
-      //
-      collection.update({"mark":0},{$push:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
+      //用戶註冊時自動作為好友加入到其他用戶好友列表中
+      collection.update({},{$push:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
       
       });
       // 寫入 user 文檔
@@ -79,3 +86,31 @@ User.get = function get(username, callback) {
     });
   });
 };
+
+//加好友
+// Friend.prototype.addFriend = function addFriend(callback) {
+//   // 存入 Mongodb 的文檔
+
+//   var myselfInfo = {
+//     name: this.name,
+//     systemid: this.systemid,
+//   }
+//   mongodb.open(function(err, db) {
+//     if (err) {
+//       return callback(err);
+//     }
+//     // 讀取 users 集合
+//     db.collection('users', function(err, collection) {
+//       if (err) {
+//         mongodb.close();
+//         return callback(err);
+//       }
+//       //用戶註冊時自動作為好友加入到其他用戶好友列表中  myName用戶自己的名字
+//       collection.update({"name":myName},{$push:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
+      
+//       });
+//     });
+//   });
+// };
+
+
