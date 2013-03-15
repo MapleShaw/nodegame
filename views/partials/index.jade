@@ -9,3 +9,33 @@ div.wrap
     ul.items(ng-show='msgCount && sT')
       li.ellipsis(ng-repeat='tip in tipsMsg', title='{{tip.fromName}}', ng-click='showWin(tip.fromId)') {{tip.fromName}} ({{count[tip.fromId]}})
     p.tip_title(ng-show='msgCount', ng-click='showTip()') 您收到{{msgCount}}条信息
+
+  div(ng-click='getRoomList()') 获取房间列表
+
+  div
+    ul
+      li(ng-repeat='roomListItem in roomList') {{roomListItem}}
+
+  div(ng-click='createRoom(roomName)') 创建房间
+
+  p 房间名：
+  input(ng-model='roomName')
+  p 用户名：
+  input(ng-model='userName')
+
+  div(ng-click='joinRoom(roomName,userName)') 加入房间
+
+  div(ng-click='prepareForGame(roomName,userName)') 准备
+
+  p 词：{{word}} {{wordLength}}
+  p 发言：
+  input(ng-model='statement')
+  div(ng-click='makeStatement(roomName,userName,statement)') 发言
+
+  div
+    ul
+      li(ng-repeat='sysMessageItem in sysMessage') {{sysMessageItem}}
+
+  div
+    ul
+      li(ng-repeat='errMessageItem in errMessage') {{errMessageItem}}

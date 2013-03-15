@@ -5,18 +5,11 @@ block body
     h1.logo 
       a(ng-href="/")捉鬼游戏
     div.ctrl(ng-controller="loginOutController")
-      if user
-        a(ng-href='/') #{user.name}
-        a(ng-href='/login' , ng-click='loginOut()') 退出
-        a(ng-href='/gameRule') 游戏规则
-        a(ng-href='/contact') 联系我们
-        a(ng-href='/about') 关于我们
-      else
-        a(ng-href='/login') 登录
-        a(ng-href='/register') 注册
-        a(ng-href='/gameRule') 游戏规则
-        a(ng-href='/contact') 联系我们
-        a(ng-href='/about') 关于我们
+      a(ng-href='/login') 登录
+      a(ng-href='/register') 注册
+      a(ng-href='/gameRule') 游戏规则
+      a(ng-href='/contact') 联系我们
+      a(ng-href='/about') 关于我们
 
   div.container
     div(ng-view)

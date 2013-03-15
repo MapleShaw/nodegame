@@ -16,7 +16,7 @@ var rooms = {
 	//房间是否存在
 	isRoomExist : function(roomName){
 		var all_room = this.list;
-		if(typeof all_room[roomName] != 'undefined'){
+		if(typeof all_room[roomName] == 'object'){
 			return true;
 		}
 		else{
@@ -26,7 +26,8 @@ var rooms = {
 
 	//添加房间
 	addRoom : function(room){
-		this.list[room._roomName] = room;
+		var roomName = room._roomName ;
+		this.list[roomName] = room;
 	},
 
 	//删除房间
@@ -36,7 +37,7 @@ var rooms = {
 			delete this.list[roomName];
 		}
 		else{
-			return -1;
+			return false;
 		}
 	},
 
@@ -45,6 +46,7 @@ var rooms = {
 		var arr = [];
 		for(var item in this.list){
 			arr.push(item);
+			console.log(item);
 		}
 		return arr;
 	},
@@ -56,7 +58,7 @@ var rooms = {
 			return room;
 		}
 		else {
-			return -1;
+			return false;
 		}
 	},
 
@@ -83,7 +85,7 @@ var rooms = {
 };
 
 
-exports.onConnect = function(socket){
+exports.onConnect = function(socket,io){
 	/*
 		聊天逻辑
 	*/
@@ -92,10 +94,10 @@ exports.onConnect = function(socket){
 	/*
 		游戏逻辑
 	*/
-	Game(socket,rooms);
+	Game(socket,rooms,io);
 
 	/*
 		房间逻辑
 	*/
-	Room(socket,rooms);
+	Room(socket,rooms,io);
 };

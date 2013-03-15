@@ -2,7 +2,7 @@
 	deal with the logic of game
 	处理游戏过程的逻辑
 */
-module.exports = function(socket,rooms){
+module.exports = function(socket,rooms,io){
 	/*
 		prepare for game
 		准备
@@ -14,9 +14,12 @@ module.exports = function(socket,rooms){
 		if(typeof user.errType == "undefined"){
 			//所有玩家已经准备
 			if(room.userPrepare()){
+				io.sockets.in(data._roomName).emit('Message',{
+					msg : '玩家【'+data._userName+"】已准备",
+				});
 				if(room.isAllPrepare()){
 					//游戏开始
-					rooms[data._roomName].onGameStart();
+					room.onGameStart();
 					//广播
 					io.sockets.in(data._roomName).emit('gameStart',{});
 				}
@@ -36,13 +39,35 @@ module.exports = function(socket,rooms){
 	});
 
 	/*
+		get identity
+		获得身份，谜底等
+	*/
+	socket.on('getIdentity',function(data){
+		var roomName = data._roomName;
+		var userName = data._userName;
+		var user = rooms.getUser(roomName,userName);
+		if(user.errType){
+			return false;
+		}
+		else{
+			var data = {};
+			data._word = user.word;
+			if(user.wordLength){
+				data._wordLength = user.wordLength;
+			}
+			socket.emit('setIdentity',data);
+		}
+	});
+
+	/*
 		make a statement
 		发言
 	*/
 	socket.on('onMakeStatement',function(data){
 		//data 格式 {_userName : name, _roomName : name,}
 		var roomName = data._roomName,
-			userName = data._userName;
+			userName = data._userName,
+			statement = data._statement;
 		//检验
 		var user_temp = rooms.getUser(roomName,userName);
 		var room_temp = rooms.getRoom(roomName);
@@ -50,10 +75,14 @@ module.exports = function(socket,rooms){
 			socket.emit('err',{
 				msg : user_temp.err
 			});
-			return -1;
+			return false;
 		}
 		//玩家已发言
 		user_temp.makeStatement();
+		//广播
+		io.sockets.in(roomName).emit('Message',{
+			msg : '玩家【'+userName+'】：'+statement,
+		});
 		if (room_temp.isStatementOver()) {
 			//复位发言记录
 			room_temp.onStatementOver();
@@ -86,7 +115,7 @@ module.exports = function(socket,rooms){
 				io.sockets.in(roomName).emit('err',{
 					msg : 'system error'
 				});
-				return -1;	
+				return false;	
 			}
 		}
 	});
@@ -108,14 +137,14 @@ module.exports = function(socket,rooms){
 			socket.emit('err',{
 				msg : user_temp.err,
 			});
-			return -1;
+			return false;
 		}
 		if(user_temp.isVote){
 			//已经投过票
 			socket.emit('err',{
 				msg : '已经投过票不能重复投票'
 			});
-			return -2;
+			return false;
 		}
 
 		if(voteToName){
@@ -125,7 +154,7 @@ module.exports = function(socket,rooms){
 				socket.emit('err',{
 					msg : beVote_temp.errType
 				});
-				return -3;
+				return false;
 			}
 			beVote_temp.beVoted();
 		}
@@ -166,7 +195,7 @@ module.exports = function(socket,rooms){
 				room_temp.onPKTurn(vote_data.max_vote_name);
 			}
 			else{
-				return -1;
+				return false;
 			}
 		}
 	});

@@ -36,7 +36,7 @@ app.configure(function(){
 	app.use(function(req, res, next){
 	  res.locals.csrf = req.session ? req.session._csrf : '';
 	  res.locals.req = req;
-	  res.locals.user = req.session.user;  //想要什么值在这里补
+	  //res.locals.user = req.session.user;  //想要什么值在这里补
 	  next();
 	});
 	app.use(app.router);
@@ -72,7 +72,9 @@ app.get('*', routes.index);
 	chat socket
 */
 
-io.sockets.on('connection', socketHandle.onConnect);
+io.sockets.on('connection', function(socket){
+	socketHandle.onConnect(socket,io);
+});
 
 
 

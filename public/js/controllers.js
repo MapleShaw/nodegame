@@ -410,6 +410,62 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
 
     }
 
+
+
+    /*
+		房间
+    */
+    $scope.roomList = [];
+    $scope.sysMessage = [];
+    $scope.errMessage = [];
+    $scope.wordLength = null;
+    $scope.word = '';
+
+    $scope.createRoom = function(roomName){
+    	socket.emit('createRoom',{_roomName : roomName});
+    }
+    $scope.getRoomList = function(){
+    	socket.emit('getRoomList',{});
+    }
+    $scope.joinRoom = function(roomName,userName){
+    	socket.emit('joinRoom',{_roomName : roomName,_userName : userName});
+    }
+    $scope.prepareForGame = function(roomName,userName){
+    	socket.emit('prepareForGame',{
+    		_roomName : roomName,
+    		_userName : userName
+    	});
+    }
+    $scope.makeStatement = function(roomName,userName,statement){
+
+    }
+    socket.on('newRoom',function(data){
+    	$scope.roomList.push(data._roomName);
+    });
+    socket.on('onRoomList',function(data){
+    	$scope.roomList = data.list;
+    });
+    socket.on('gameStart',function(data){
+    	$scope.sysMessage.push('游戏开始');
+    	socket.emit('getIdentity',{_userName : $scope.userName,_roomName : $scope.roomName});
+    });
+    socket.on('setIdentity',function(data){
+    	$scope.word = data._word;
+    	if(data._wordLength){
+    		$scope.wordLength = data._wordLength;
+    	}
+    });
+    socket.on('Message',function(data){
+    	$scope.sysMessage.push(data.msg);
+    });
+    socket.on('err',function(data){
+    	$scope.errMessage.push(data.msg);
+    });
+    socket.on('rooms',function(data){
+    	//仅作测试用，可删除
+    	debugger ;
+    });
+
 }
 indexCtrl.$inject = ['$scope', '$http', '$location', '$compile', 'socket', 'global'];
 

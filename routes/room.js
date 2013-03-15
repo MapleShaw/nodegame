@@ -2,7 +2,7 @@
 	Manage the Rooms
 	房间管理逻辑
 */
-module.exports = function(socket,rooms){
+module.exports = function(socket,rooms,io){
 	/*
 		Room Constructor
 		房间构造
@@ -44,6 +44,8 @@ module.exports = function(socket,rooms){
 				return '该房间已经开始游戏';
 			}
 			else{
+				//将玩家顺序保存到数组中
+				this._sequence.push(userName);
 				this.addMember(userName);
 				return true;
 			}
@@ -52,13 +54,21 @@ module.exports = function(socket,rooms){
 		//添加成员
 		addMember : function(userName){
 			this._count ++;
-			this._roomMember.userName = {};
+			this._roomMember[userName] = {};
 		},
 
 		//删除成员
 		deleteMember : function(userName){
 			this._count --;
-			delete this._roomMember.userName;
+			//从保存的顺序中删除该用户
+			var sequence = this._sequence;
+			for(var i = 0;i < sequence.length;i ++){
+				if(sequence[i] == userName){
+					sequence.splice(i,1);
+					break ;
+				}
+			}
+			delete this._roomMember[userName];
 		},
 
 		//房间是否人满
@@ -111,15 +121,14 @@ module.exports = function(socket,rooms){
 		onGameStart : function(){
 			for(var item in this._roomMember){
 				this._roomMember[item] = new UserStructure();
-				//保存玩家顺序
-				this._sequence.push(item);				
 			}
 			//获取、分配题目
 			this.distributeSubject(this.getSubject(),this._roomMember);
 			//随机指定玩家开始发言
+			var arr = this._sequence;
 			var random = Math.floor(Math.random()*arr.length);
 			for(var i = 0;i < random;i ++){
-				this._sequence.push(this._sequence.shift());
+				arr.push(arr.shift());
 			}
 			//房间状态设为开始
 			this.setRoomState('start');
@@ -179,7 +188,7 @@ module.exports = function(socket,rooms){
 				var member = this._roomMember;
 				var sequence = this._sequence;
 				for (var i = 0;i < sequence.length;i ++){
-					if(member[sequence[i]].isSay || (!member[sequence[i]].isOut)){
+					if(member[sequence[i]].isSay || member[sequence[i]].isOut){
 						continue;
 					}
 					else{
@@ -422,8 +431,22 @@ module.exports = function(socket,rooms){
 			var _newRoom = new RoomStructure(roomName);	
 			//add to the roomlist
 			rooms.addRoom(_newRoom);
+			io.sockets.emit('newRoom',{
+				_roomName : roomName,
+			});
 			return 1;
 		}
+	});
+
+	/*
+		Get Room List
+		获得房间列表
+	*/
+	socket.on('getRoomList',function(data){
+		var list = rooms.getRoomList();
+		socket.emit('onRoomList',{
+			list : list,
+		});
 	});
 
 	/*
@@ -432,18 +455,28 @@ module.exports = function(socket,rooms){
 	*/
 	socket.on('joinRoom',function(data){
 		//data 格式 {_roomName : name , _userName : name}
-		var temp = rooms.list[data._roomName].userConnect(data._userName);
-		if (typeof temp == 'string') {
-			//人满或房间已开始游戏
-			socket.emit('err',{
-				msg : temp
-			});
+		var roomName = data._roomName;
+		var userName = data._userName;
+		var room_temp = rooms.getRoom(roomName);
+		if(room_temp){
+			var temp = room_temp.userConnect(userName);	
+			if (typeof temp == 'string') {
+				//人满或房间已开始游戏
+				socket.emit('err',{
+					msg : temp
+				});
+			}
+			else{
+				socket.join(data._roomName);
+				//广播
+				io.sockets.in(data._roomName).emit('Message',{
+					msg : '玩家【'+data._userName+'】加入了房间',
+				});
+			}
 		}
 		else{
-			socket.join(data._roomName);
-			//广播
-			io.sockets.in(data._roomName).emit('Message',{
-				msg : '玩家【'+data._userName+'】加入了房间',
+			socket.emit('err',{
+				msg : '房间不存在'
 			});
 		}
 	});
@@ -461,7 +494,6 @@ module.exports = function(socket,rooms){
 		if(typeof user.errType == 'undefined'){
 			room.deleteMember(userName);
 		}
-
 		//房间人数为0时删除房间
 		if(room.isEmpty()){
 			rooms.deleteRoom(roomName);
