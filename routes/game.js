@@ -22,6 +22,9 @@ module.exports = function(socket,rooms,io){
 					room.onGameStart();
 					//广播
 					io.sockets.in(data._roomName).emit('gameStart',{});
+					io.sockets.in(data._roomName).emit('Message',{
+						msg: '玩家【'+room._sequence[0]+'】开始发言'
+					});
 				}
 			}
 			else{
@@ -71,9 +74,16 @@ module.exports = function(socket,rooms,io){
 		//检验
 		var user_temp = rooms.getUser(roomName,userName);
 		var room_temp = rooms.getRoom(roomName);
-		if(user_temp.errType != 'undefined'){
+		if(user_temp.errType){
 			socket.emit('err',{
 				msg : user_temp.err
+			});
+			return false;
+		}
+		if(user_temp.isSay){
+			//已发过言
+			socket.emit('err',{
+				msg: '你已发过言'
 			});
 			return false;
 		}
@@ -86,14 +96,20 @@ module.exports = function(socket,rooms,io){
 		if (room_temp.isStatementOver()) {
 			//复位发言记录
 			room_temp.onStatementOver();
-			if(room_temp._turns != 0){
+			if(room_temp._turns != 1){
 				//回合结束，开始投票
+				io.sockets.in(roomName).emit('Message',{
+					msg: '请开始投票'
+				});
 				io.sockets.in(roomName).emit('startVote',{});
 				return 1;	
 			}
 			else{
 				var nextName = room_temp.getNextPlayer();
 				//下一个玩家发言
+				io.sockets.in(roomName).emit('Message',{
+					msg: '轮到玩家【'+nextName+'】发言'
+				});
 				io.sockets.in(roomName).emit('makeStatement',{
 					_userName : nextName
 				});
@@ -104,6 +120,10 @@ module.exports = function(socket,rooms,io){
 			//回合尚未结束,下一个玩家
 			var nextName = room_temp.getNextPlayer();
 			if(nextName){
+				//下一个玩家发言
+				io.sockets.in(roomName).emit('Message',{
+					msg: '轮到玩家【'+nextName+'】发言'
+				});				
 				//拿到下一个玩家的名字
 				io.sockets.in(roomName).emit('makeStatement',{
 					_userName : nextName
@@ -171,10 +191,13 @@ module.exports = function(socket,rooms,io){
 			var vote_data = room_temp.onVoteEnd();
 			if(vote_data.max_repeat == 1 && vote_data.max_vote_name.length != 0){
 				//只有一个玩家最高票
+				io.sockets.in(roomName).emit('Message',{
+					msg: '玩家【'+vote_data.max_vote_name[0]+'】获得最高票数出局'
+				});
 				io.sockets.in(roomName).emit('voteOut',{
 					_userName :　vote_data.max_vote_name[0],
 				});
-				//清楚pk状态
+				//清除pk状态
 				if(room_temp._isPK){
 					room_temp.endPKTurn();
 				}
@@ -184,6 +207,28 @@ module.exports = function(socket,rooms,io){
 					io.sockets.in(roomName).emit('gameOver',{
 						msg : gameover_temp[1]
 					});
+				}
+				else{
+					//游戏尚未结束
+					var nextName = room_temp.getNextPlayer();
+					if(nextName){
+						//下一个玩家发言
+						io.sockets.in(roomName).emit('Message',{
+							msg: '轮到玩家【'+nextName+'】发言'
+						});				
+						//拿到下一个玩家的名字
+						io.sockets.in(roomName).emit('makeStatement',{
+							_userName : nextName
+						});
+						return 1;
+					}
+					else{
+						//错误
+						io.sockets.in(roomName).emit('err',{
+							msg : 'system error'
+						});
+						return false;
+					}
 				}
 			}
 			else if(vote_data.max_repeat > 1){

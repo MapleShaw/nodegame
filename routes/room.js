@@ -51,6 +51,24 @@ module.exports = function(socket,rooms,io){
 			}
 		},
 
+		//获取房间成员列表,玩家放在数组第一个
+		getRoomMemberList : function(userName){
+			var sequence = this._sequence;
+			var newList = [];
+			for(var i = 0; i < sequence.length; i ++){
+				newList[i] = sequence[i];
+			}
+			for(var i = 0; i < sequence.length; i ++){
+				if (newList[i] == userName) {
+					return newList;
+				}
+				else{
+					newList.push(newList.shift());
+				}
+			}
+			return newList;
+		},
+
 		//添加成员
 		addMember : function(userName){
 			this._count ++;

@@ -421,43 +421,77 @@ function indexCtrl ($scope, $http, $location, $compile, socket, global) {
     $scope.wordLength = null;
     $scope.word = '';
 
+    //创建房间
     $scope.createRoom = function(roomName){
     	socket.emit('createRoom',{_roomName : roomName});
     }
+    //获取房间列表
     $scope.getRoomList = function(){
     	socket.emit('getRoomList',{});
     }
+    //加入房间
     $scope.joinRoom = function(roomName,userName){
     	socket.emit('joinRoom',{_roomName : roomName,_userName : userName});
     }
+    //准备游戏
     $scope.prepareForGame = function(roomName,userName){
     	socket.emit('prepareForGame',{
     		_roomName : roomName,
     		_userName : userName
     	});
     }
+    //发言
     $scope.makeStatement = function(roomName,userName,statement){
-
+    	socket.emit('onMakeStatement',{
+    		_roomName: roomName,
+    		_userName: userName,
+    		_statement: statement
+    	});
     }
+    //投票
+    $scope.voteOne = function(roomName,userName,voteToName){
+    	socket.emit('voteOne',{
+    		_roomName: roomName,
+    		_userName: userName,
+    		_voteToName: voteToName
+    	});
+    }
+    //其他人创建房间时
     socket.on('newRoom',function(data){
     	$scope.roomList.push(data._roomName);
     });
+    //收到房间列表时
     socket.on('onRoomList',function(data){
     	$scope.roomList = data.list;
     });
+    //游戏开始
     socket.on('gameStart',function(data){
     	$scope.sysMessage.push('游戏开始');
     	socket.emit('getIdentity',{_userName : $scope.userName,_roomName : $scope.roomName});
     });
+    //收到身份，词等
     socket.on('setIdentity',function(data){
     	$scope.word = data._word;
     	if(data._wordLength){
     		$scope.wordLength = data._wordLength;
     	}
     });
+    //轮到用户user发言时
+    socket.on('makeStatement',function(data){
+    	var userName = data._userName;
+    	if(userName == $scope.userName){
+
+    	}
+    });
+    //开始投票
+    socket.on('startVote',function(data){
+
+    });
+    //系统消息
     socket.on('Message',function(data){
     	$scope.sysMessage.push(data.msg);
     });
+    //错误消息
     socket.on('err',function(data){
     	$scope.errMessage.push(data.msg);
     });
