@@ -10,32 +10,66 @@ div.wrap
       li.ellipsis(ng-repeat='tip in tipsMsg', title='{{tip.fromName}}', ng-click='showWin(tip.fromId)') {{tip.fromName}} ({{count[tip.fromId]}})
     p.tip_title(ng-show='msgCount', ng-click='showTip()') 您收到{{msgCount}}条信息
 
-  div(ng-click='getRoomList()') 获取房间列表
+  div.gameArea
+    div.gameView
+      div.gameDisplay
+        div.player1.players.players_on
+        div.player2.players
+        div.player3.players
+        div.player4.players
+        div.player5.players.players_on
+        div.player6.players
+        div.player7.players
+        div.player8.players
+        div.player9.players
+        div.timeLeave 剩下 : 20s
+        div.playMsg 玩家三：大家好啦时间的了就是的法律就是了的积分 了手机铃声的积分了实际上大家方式了看到积分了速度快积分
+        p.bg_txt 游戏区
+        a.ctrlBtn.caici(href='javascript:;') 我要猜词
+        a.ctrlBtn.yiyan(href='javascript:;') 我要留遗言
+      div.gameSend
+        textarea.playTextarea()
+        input.playSubmit(type='button', value='发言')
 
-  div
-    ul
-      li(ng-repeat='roomListItem in roomList') {{roomListItem}}
+    div.gameCtrl
+      div.gameUserInfo.box_style
+        h3.title_mod 玩家信息
+        ul.items
+          li 昵称：{{mySelf.nickName}}
+          li 胜率：{{mySelf.winRate}}
+          li 等级：{{mySelf.level}}
+          li 房间：{{mySelf.level}}
+      div.gameUserCtrl.box_style
+        h3.title_mod 游戏操作
+        div.btn_list
+          a.ctrlBtn(href='javascript:;') 选择房间
+          a.ctrlBtn(href='javascript:;') 创建房间
+          a.ctrlBtn(href='javascript:;') 离开房间
+          a.ctrlBtn(href='javascript:;') 给词库添加词语
 
-  div(ng-click='createRoom(roomName)') 创建房间
-
-  p 房间名：
-  input(ng-model='roomName')
-  p 用户名：
-  input(ng-model='userName')
-
-  div(ng-click='joinRoom(roomName,userName)') 加入房间
-
-  div(ng-click='prepareForGame(roomName,userName)') 准备
-
-  p 词：{{word}} {{wordLength}}
-  p 发言：
-  input(ng-model='statement')
-  div(ng-click='makeStatement(roomName,userName,statement)') 发言
-
-  div
-    ul
-      li(ng-repeat='sysMessageItem in sysMessage') {{sysMessageItem}}
-
-  div
-    ul
-      li(ng-repeat='errMessageItem in errMessage') {{errMessageItem}}
+    div.gameSystem
+      div.gameSetting.box_style 
+        h3.title_mod 系统设置
+        ul.items
+          li
+      div.gameSystemInfo.box_style
+        h3.title_mod 系统信息
+        ul.items
+          li()
+            span.name ［系统信息］：
+            span.txt 玩家三已经加入了游戏，赶紧准备开始游戏吧哈哈．．．
+          li
+            span.name ［玩家三］：
+            span.txt 我这个词是来得及发牢骚的积分老师计算机范德萨
+          li()
+            span.name ［系统信息］：
+            span.txt 玩家三已经加入了游戏，赶紧准备开始游戏吧哈哈．．．
+          li
+            span.name ［玩家三］：
+            span.txt 我这个词是来得及发牢骚的积分老师计算机范德萨
+          li()
+            span.name ［系统信息］：
+            span.txt 玩家三已经加入了游戏，赶紧准备开始游戏吧哈哈．．．
+          li
+            span.name ［玩家三］：
+            span.txt 我这个词是来得及发牢骚的积分老师计算机范德萨
