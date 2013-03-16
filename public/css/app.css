@@ -9,14 +9,14 @@ img{border: none;}
 
 
 /*header*/
-.header{overflow: hidden;position: absolute;width: 100%;height: 60px;background-color: #a5bbb6;box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);z-index: 5;`}
-.header h1{text-align: center;line-height: 60px;}
+.header{overflow: hidden;position: absolute;width: 100%;height: 45px;background-color: #589bc6;box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);z-index: 5;border-top: 5px solid #ccc;}
+.header h1{text-align: center;line-height: 45px;font-family: "黑体";}
 .header h1 a{color: #fff;font-size: 24px;text-decoration: none;}
 .header .ctrl{position: absolute;right: 0px;top: 0px;height: 60px;}
-.header .ctrl a{line-height: 60px;margin: 0 10px;color: #fff;}
+.header .ctrl a{line-height: 45px;margin: 0 10px;color: #fff;}
 
 /*container*/
-.container{position: absolute;top: 60px;bottom: 40px;width: 100%;z-index: 4;}
+.container{position: absolute;top: 50px;bottom: 5px;width: 100%;z-index: 4;}
 .container .index{text-align: center;padding: 40px 0;}
 
 /*chart*/
@@ -43,6 +43,7 @@ img{border: none;}
 .chatDialog .c_name .username{color: #4183c4;}
 
 .friend_list{width: 160px;overflow: auto;position: absolute;z-index: 5;height:100%;padding: 0px; right: 0px;bottom: 0px;background-color: #fff;border: 1px solid #ccc;border-right: none;border-bottom: none;}
+.friend_list .title{width: 100%;text-align: center;font-weight: normal;padding: 5px 0;background-color: #eee;}
 .friend_list li{padding: 5px 10px 5px 50px;height: 40px;line-height: 40px; border-bottom: 1px solid #ccc;background: url(../img/on.png) no-repeat 6px 5px;}
 .friend_list li:hover{cursor: pointer;color: blue;word-break: break-all;word-wrap: break-word;}
 
@@ -81,8 +82,8 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameView .gameDisplay .playMsg{position: absolute;top: 120px;padding: 15px;background-color: #000;width: 320px;left: 130px;color: #fff;border-radius: 3px;max-height: 155px;overflow: auto;opacity: 0.8;}
 .gameArea .gameView .gameSend{position: absolute;bottom: 0px;left: 0px;}
 .gameView .playTextarea{width: 470px;height: 30px;vertical-align: middle;}
-.gameView .playSubmit{height: 40px;line-height: 40px;width: 112px;margin-left: 4px;vertical-align: middle;border-radius: 3px;cursor: pointer;background-image: -webkit-linear-gradient(top,#56bf0f,#50b909);background-image: linear-gradient(top,#56bf0f,#50b909);border: 1px solid #4aab09;font-size: 18px;color: #fff;}
-.gameView .playSubmit:hover{background-image: -webkit-linear-gradient(top,#6dd626,#58c111);background-image: linear-gradient(top,#6dd626,#58c111);}
+.gameView .playSubmit{height: 40px;line-height: 40px;width: 112px;margin-left: 4px;vertical-align: middle;border-radius: 3px;cursor: pointer;background-image: -webkit-linear-gradient(top,#589bc6,#5395bf);background-image: linear-gradient(top,#589bc6,#5395bf);border: 1px solid #5389af;font-size: 18px;color: #fff;}
+.gameView .playSubmit:hover{background-image:-webkit-linear-gradient(top,#76b1d7,#5a9dc7);background-image:linear-gradient(top,#76b1d7,#5a9dc7);}
 
 .gameArea .gameCtrl{float: left;width: 250px;margin-left: 10px;}
 .gameCtrl .gameUserInfo{margin-bottom: 10px;height: 160px;}
@@ -98,9 +99,47 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameSystem .gameSystemInfo .items{padding: 10px 0 0 0;height: 220px;overflow: auto;font-size: 12px;}
 .gameSystem .gameSystemInfo .items li{margin-bottom: 5px;}
 
+/*room*/
+.maskDiv{height: 100%;width: 100%;background-color: #000;opacity: 0.8;position: absolute;top: 0px;left: 0px;z-index: 8;}
+.roomBox{width: 1000px;height: 450px;background: #eee;border: 1px solid #ccc;border-radius: 5px;position: absolute;/*top: 40px;*/top: -510px;left: 50%;z-index: 20;margin-left: -500px;overflow: auto;padding-top: 50px;}
+.roomBox .items{overflow: auto;height: 450px;background-color: #fff;}
+.roomBox .roomItem{position: relative;height: 200px;width: 200px;padding: 2px 0;float: left;margin: 15px 0 0 100px;}
+.roomBox .roomItem .desk{position: absolute;display: block;height: 100px;width: 100px;border-radius: 50px;background-color: #ccc;top: 50px;left: 50px;text-align: center;line-height: 100px;overflow: hidden;}
+.roomBox .createBtn{height: 28px;width: 212px;background-image: -webkit-linear-gradient(top,#589bc6,#5395bf);background-image: linear-gradient(top,#589bc6,#5395bf);border: 1px solid #5389af;text-align: center;line-height: 28px;color: #fff;display: block;border-radius: 3px;}
+.roomBox .createBtn:hover{background-image:-webkit-linear-gradient(top,#76b1d7,#5a9dc7);background-image:linear-gradient(top,#76b1d7,#5a9dc7);text-decoration: none;}
+.editingName .createBtn{display: none;}
+.roomBox .editRoomName{display: none;width: 200px;}
+.editingName .editRoomName{display: block;}
+
+.roomBox .rp1, .roomBox .rp2,
+.roomBox .rp3, .roomBox .rp4,
+.roomBox .rp5, .roomBox .rp6,
+.roomBox .rp7, .roomBox .rp8,
+.roomBox .rp9{height: 40px;width: 34px;background: url(../img/off.png) no-repeat;position: absolute;cursor: pointer;}
+.roomBox .rp1.on, .roomBox .rp2.on,
+.roomBox .rp3.on, .roomBox .rp4.on,
+.roomBox .rp5.on, .roomBox .rp6.on,
+.roomBox .rp7.on, .roomBox .rp8.on,
+.roomBox .rp9.on{background: url(../img/on.png) no-repeat;}
+.roomBox .rp1{top: 0px;left: 85px;}
+.roomBox .rp2{top: 15px;left: 138px;}
+.roomBox .rp3{top: 65px;left: 160px;}
+.roomBox .rp4{top: 120px;left: 155px;}
+.roomBox .rp5{top: 155px;left: 110px;}
+.roomBox .rp6{top: 155px;left: 59px;}
+.roomBox .rp7{top: 120px;left: 12px;}
+.roomBox .rp8{top: 65px;left: 5px;}
+.roomBox .rp9{top: 15px;left: 30px;}
+
+.roomBox .roomTop{position: absolute;left: 50%;margin-left: -107px;width: 214px;top: 10px;}
+.roomBox .roomClose{position: absolute;right: 20px;line-height: 20px;top: 15px;width: 16px;height: 16px;text-decoration: none;background: url(../img/icons.png) no-repeat -108px -175px;text-indent: -9999px;}
+.roomBox .roomClose:hover{background-position :-129px -175px;}
+
+.systemTips{width: 230px;background-color: #000;border-radius: 3px;opacity: 0.8;text-align: center;padding: 10px;position: absolute;left: 50%;margin-left: -125px;top: 100px;z-index: 50;color: #fff;}
+
+
 /*footer*/
-.footer{text-align: center;width: 100%;height: 40px;line-height: 40px;position:absolute;bottom: 0px;z-index: 5;background-color: #a5bbb6;}
-.footer a{margin: 0 10px;color: #fff;}
+.footer{height: 5px;width: 100%;background-color: #50b909;position: absolute;bottom: 0px;left: 0px;overflow: hidden;}
 
 
 /*function*/
