@@ -204,9 +204,12 @@ module.exports = function(socket,rooms,io){
 				//是否满足游戏结束条件
 				var gameover_temp = room_temp.isGameOver();
 				if(gameover_temp){
+					//发送游戏结束
 					io.sockets.in(roomName).emit('gameOver',{
 						msg : gameover_temp[1]
 					});
+					//游戏结束复位处理
+					room_temp.onGameOver();
 				}
 				else{
 					//游戏尚未结束
@@ -244,4 +247,101 @@ module.exports = function(socket,rooms,io){
 			}
 		}
 	});
+
+	/*
+		guess word
+		猜词
+	*/
+	socket.on('guessWord',function(data){
+		//data 格式 {_word: word,_roomName:name,_userName:name}
+		var word_temp = data._word;
+		var roomName = data._roomName;
+		var userName = data._userName;
+		//获取房间对象
+		var room_temp = rooms.getRoom(roomName);
+		if(!room_temp){
+			socket.emit('err',{
+				//获取不到房间，即该房间不存在
+				type: 1,
+				msg: '房间不存在'
+			});
+			return;
+		}
+		var user_temp = rooms.getUser(userName);
+		if(user_temp.errType){
+			//获取不到用户，即用户不在该房间内
+			socket.emit('err',{
+				type: 3,
+				msg: '并未加入该房间'
+			});
+			return;
+		}
+		if(!user_temp.isGhost()){
+			//玩家不是鬼身份
+			socket.emit('err',{
+				type: 4,
+				msg: '身份并不是鬼'
+			});
+			return;
+		}
+		//向房间发送猜词信息
+		io.sockets.in(roomName).emit('Message'{
+			msg: '玩家【'+userName+'】进行猜词'
+		});
+		//有参数代表猜词
+		var gameover_temp = room_temp.isGameOver(word_temp);
+		if(gameover_temp){
+			//猜对词
+			io.sockets.in(roomName).emit('gameOver',{
+				type: 1,
+				msg: '玩家猜对词'
+			});
+			//复位处理
+			room_temp.onGameOver();
+			return;
+		}
+		else{
+			//猜错词,玩家出局
+			user_temp.outGame();
+			io.sockets.in(roomName).emit('guessWordFail',{
+				_userName: userName,
+				msg: '玩家【'+userName+'】猜词错误，出局'
+			});
+			//游戏是否结束
+			var temp = room_temp.isGameOver();
+			if(temp){
+				io.sockets.in(roomName).emit('gameOver',{
+					type: temp[0],
+					msg: temp[1]
+				});
+				room_temp.onGameOver();
+				return;
+			}
+			else{
+				//继续下一个玩家
+				if(room_temp.getNextPlayer() == userName){
+					//玩家在自己的发言回合猜词
+					//相当于直接跳过发言
+					user_temp.makeStatement();
+					var name = room_temp.getNextPlayer();
+					io.sockets.emit('Message',{
+						msg: '轮到玩家【'+name+"】发言",
+					});
+					io.sockets.emit('makeStatement',{
+						_userName: name,
+					});
+					return;
+				}
+			}
+		}
+	});
 }
+
+/*
+	gameover type
+	游戏结束类型
+	type:1	msg:猜对词
+	type:2	msg:未能在3轮内票死一个，根据规则，鬼胜利
+	type:3	鬼已全部出局，平民胜利
+	type:4	平民和白痴总和人数等于鬼的人数，鬼胜利
+*/

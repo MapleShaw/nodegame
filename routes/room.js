@@ -60,12 +60,11 @@ module.exports = function(socket,rooms,io){
 
 		//设置房间桌子是否有人的状态
 		toggleDeskStatus : function(index){
-			var temp = this._indexLocation[index];
-			if(temp){
-				temp = 0;
+			if(this._indexLocation[index]){
+				this._indexLocation[index] = 0;
 			}
 			else{
-				temp = 1;
+				this._indexLocation[index] = 1;
 			}
 		},
 
@@ -370,11 +369,11 @@ module.exports = function(socket,rooms,io){
 
 		//是否满足游戏结束条件
 		isGameOver : function(word){
-			if(this._isPK && this._pkTurns == 3){
-				return [true,'未能在3轮内票死一个，根据规则，鬼胜利'];
-			}
-			//有参数代表是猜词
+			//有参数代表是猜词,无参数按正常逻辑处理
 			if(!word){
+				if(this._isPK && this._pkTurns == 3){
+					return [2,'未能在3轮内票死一个，根据规则，鬼胜利'];
+				}
 				var member = this._roomMember;
 				//人阵营人数
 				var human_count = 0;
@@ -394,12 +393,21 @@ module.exports = function(socket,rooms,io){
 					}
 				}
 				if (ghost_count == 0) {
-					return [true,'鬼已全部出局，平民胜利'];
+					return [3,'鬼已全部出局，平民胜利'];
 				}
 				if (ghost_count == human_count && ghost_count != 0) {
-					return [true,'平民和白痴总和人数等于鬼的人数，鬼胜利'];
+					return [4,'平民和白痴总和人数等于鬼的人数，鬼胜利'];
 				}
 				return false;
+			}
+			else{
+				//猜词
+				if(this._answer = word){
+					return true;
+				}
+				else{
+					return false;
+				}
 			}
 		},
 
@@ -456,6 +464,21 @@ module.exports = function(socket,rooms,io){
 		//被投票
 		beVoted : function(){
 			this.voteCount ++ ;
+		},
+
+		//是否为鬼身份
+		isGhost : function(){
+			if(this.identity == 2){
+				return true;
+			}
+			else{
+				return false;
+			}
+		},
+
+		//玩家出局
+		outGame : function(){
+			this.isOut = false;
 		},
 	};
 

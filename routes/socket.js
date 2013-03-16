@@ -101,3 +101,14 @@ exports.onConnect = function(socket,io){
 	*/
 	Room(socket,rooms,io);
 };
+
+
+
+/*
+	err
+	错误
+	type:1	msg:房间不存在,在游戏时候,data中的roomName不对
+	type:2  msg:房间已存在,在创建房间的时候
+	type:3	msg:用户并不在某个房间内,但是却向该房间发送了消息
+	type:4	msg:玩家不是鬼身份却进行猜词
+*/
