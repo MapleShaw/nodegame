@@ -285,7 +285,7 @@ module.exports = function(socket,rooms,io){
 			return;
 		}
 		//向房间发送猜词信息
-		io.sockets.in(roomName).emit('Message'{
+		io.sockets.in(roomName).emit('Message', {
 			msg: '玩家【'+userName+'】进行猜词'
 		});
 		//有参数代表猜词
