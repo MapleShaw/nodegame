@@ -493,7 +493,7 @@ module.exports = function(socket,rooms,io){
 	socket.on('getRoomList',function(data){
 		var list = rooms.getRoomListAndIndex();
 		socket.emit('onRoomList',{
-			//list的格式 {roomName:[location]}
+			//list的格式 [{roomName:name,index:[location]},{},{}]
 			_list : list,
 		});
 	});

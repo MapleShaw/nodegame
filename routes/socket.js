@@ -43,10 +43,10 @@ var rooms = {
 
 	//获取房间列表
 	getRoomListAndIndex : function(){
-		var arr = {};
-		var list_temp = this.list
+		var arr = [];
+		var list_temp = this.list;
 		for(var item in list_temp){
-			arr[item] = list_temp[item].getDeskStatus();
+			arr.push({roomName: item, index: list_temp[item].getDeskStatus()});
 		}
 		return arr;
 	},
