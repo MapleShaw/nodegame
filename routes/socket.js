@@ -42,11 +42,11 @@ var rooms = {
 	},
 
 	//获取房间列表
-	getRoomList : function(){
-		var arr = [];
-		for(var item in this.list){
-			arr.push(item);
-			console.log(item);
+	getRoomListAndIndex : function(){
+		var arr = {};
+		var list_temp = this.list
+		for(var item in list_temp){
+			arr[item] = list_temp[item].getDeskStatus();
 		}
 		return arr;
 	},
