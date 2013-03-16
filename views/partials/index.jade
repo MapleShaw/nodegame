@@ -12,15 +12,15 @@ div.wrap
     div.items
       div.roomItem(ng-repeat='room in roomList')
         div.desk.ellipsis(title='{{room.roomName}}') {{room.roomName}}
-        div.rp1(title='点击进入房间')
-        div.rp2(title='点击进入房间', ng-click='joinRoom(room.roomName, 2)')
-        div.rp3(title='点击进入房间', ng-click='joinRoom(room.roomName, 3)')
-        div.rp4(title='点击进入房间', ng-click='joinRoom(room.roomName, 4)')
-        div.rp5(title='点击进入房间', ng-click='joinRoom(room.roomName, 5)')
-        div.rp6(title='点击进入房间', ng-click='joinRoom(room.roomName, 6)')
-        div.rp7(title='点击进入房间', ng-click='joinRoom(room.roomName, 7)')
-        div.rp8(title='点击进入房间', ng-click='joinRoom(room.roomName, 8)')
-        div.rp9(title='点击进入房间', ng-click='joinRoom(room.roomName, 9)')
+        div.rp1(title='点击进入房间', ng-click='joinRoom(room.roomName, 0)', ng-class='{on:hovePeople[room.roomName][0]==1}')
+        div.rp2(title='点击进入房间', ng-click='joinRoom(room.roomName, 1)', ng-class='{on:hovePeople[room.roomName][1]==1}')
+        div.rp3(title='点击进入房间', ng-click='joinRoom(room.roomName, 2)', ng-class='{on:hovePeople[room.roomName][2]==1}')
+        div.rp4(title='点击进入房间', ng-click='joinRoom(room.roomName, 3)', ng-class='{on:hovePeople[room.roomName][3]==1}')
+        div.rp5(title='点击进入房间', ng-click='joinRoom(room.roomName, 4)', ng-class='{on:hovePeople[room.roomName][4]==1}')
+        div.rp6(title='点击进入房间', ng-click='joinRoom(room.roomName, 5)', ng-class='{on:hovePeople[room.roomName][5]==1}')
+        div.rp7(title='点击进入房间', ng-click='joinRoom(room.roomName, 6)', ng-class='{on:hovePeople[room.roomName][6]==1}')
+        div.rp8(title='点击进入房间', ng-click='joinRoom(room.roomName, 7)', ng-class='{on:hovePeople[room.roomName][7]==1}')
+        div.rp9(title='点击进入房间', ng-click='joinRoom(room.roomName, 8)', ng-class='{on:hovePeople[room.roomName][8]==1}')
 
   div#chatTemplate
   div.friend_list
@@ -57,17 +57,18 @@ div.wrap
       div.gameUserInfo.box_style
         h3.title_mod 玩家信息
         ul.items
-          li 昵称：{{mySelf.nickName}}
-          li 胜率：{{mySelf.winRate}}
-          li 等级：{{mySelf.level}}
-          li 房间：{{mySelf.level}}
+          li 昵称：{{_myself.name}}
+          li 胜率：{{_myself.winRate}}
+          li 等级：{{_myself.level}}
+          li 房间：{{curRoom}}
       div.gameUserCtrl.box_style
         h3.title_mod 游戏操作
         div.btn_list
           a.ctrlBtn#chooseRoom(href='javascript:;', ng-click='getRoomList()') 选择房间
-          a.ctrlBtn(href='javascript:;') 创建房间
-          a.ctrlBtn(href='javascript:;') 离开房间
+          a.ctrlBtn.prepareGame(href='javascript:;', ng-click='prepareForGame(curRoom)') 准备游戏
+          a.ctrlBtn(href='javascript:;', ng-click='leaveRoom(curRoom)') 离开房间
           a.ctrlBtn(href='javascript:;') 给词库添加词语
+          div.wordArea {{word}} {{wordLength}}
 
     div.gameSystem
       div.gameSetting.box_style 

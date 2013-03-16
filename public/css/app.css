@@ -60,6 +60,8 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .ctrlBtn:hover{background-image: -webkit-linear-gradient(top, #ffffff,#efefef);text-decoration: none;}
 .ctrlBtn.caici{position: absolute;bottom: 10px;right: 10px;width: 80px;margin-bottom: 0;}
 .ctrlBtn.yiyan{position: absolute;bottom: 10px;right: 100px;width: 80px;margin-bottom: 0;}
+.prepareGame{background-image: -webkit-linear-gradient(top,#589bc6,#5395bf);background-image: linear-gradient(top,#589bc6,#5395bf);border: 1px solid #5389af;color: #fff;}
+.prepareGame:hover{background-image:-webkit-linear-gradient(top,#76b1d7,#5a9dc7);background-image:linear-gradient(top,#76b1d7,#5a9dc7);}
 
 .gameArea{overflow: hidden;position: absolute;top: 0px;bottom: 0px;padding: 20px;}
 .gameArea .box_style{border: 2px solid #ccc;padding: 5px;}
@@ -137,6 +139,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 
 .systemTips{width: 230px;background-color: #000;border-radius: 3px;opacity: 0.8;text-align: center;padding: 10px;position: absolute;left: 50%;margin-left: -125px;top: 100px;z-index: 50;color: #fff;}
 
+.wordArea{text-align: center;font-size: 24px;padding: 10px 0 0 0;}
 
 /*footer*/
 .footer{height: 5px;width: 100%;background-color: #50b909;position: absolute;bottom: 0px;left: 0px;overflow: hidden;}

@@ -148,6 +148,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
 
 	// get the info of yourself
 	var _myself = JSON.parse(getMyselfInfo);
+    $scope._myself = _myself;
 
 	//send id to server
 	if (_myself) {
@@ -407,14 +408,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     $scope.isFirstGet = 0;
     $scope.createRoomName = "";
     $scope.hovePeople = {};
-
-    function initJoinOn () {
-        for (var i = 0; i < roomList.length; i++) {
-            for (var j = 0; j < j; i++) {
-                hovePeople[roomList[i]][j] = false;
-            }
-        }
-    }
+    $scope.isAddRoom = 0;
+    $scope.curRoom = "";
 
     $scope.editRoomName = function () {
     	$scope.isEditing = true;
@@ -436,15 +431,25 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     var closeSystemTips = function () {
         $timeout(function () {
             $scope.systemTips = 0;
-        }, 2000)
+        }, 1000)
     }
 
     //以下是socket相关函数和操作
 
     var createRoom = function(roomName){
-    	socket.emit('createRoom',{_roomName : roomName});
-        //join the room you create when you create it.(play1)
-        socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0});
+        if ($scope.isAddRoom == 0) {
+            $scope.isAddRoom = 1;
+        	socket.emit('createRoom',{_roomName : roomName});
+            //tip : succeed (should be wrote in callback socket)
+            $scope.systemTips = "创建房间成功";
+            closeSystemTips();
+            $scope.curRoom = roomName;
+            //join the room you create when you create it.(play1)
+            socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0});
+        } else {
+            $scope.systemTips = "你已经加入了一个房间，不能创建房间";
+            closeSystemTips();
+        }
     }
     //获取房间列表
     $scope.getRoomList = function(){
@@ -455,15 +460,39 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     }
 
     $scope.joinRoom = function(roomName, roomIndex){
-        var _jName = _myself.name;
-        var _jRoom = roomName;
-    	socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex});
+        if (!$scope.hovePeople[roomName][roomIndex]) {
+            if ($scope.isAddRoom == 0) {
+                $scope.isAddRoom = 1;
+                var _jName = _myself.name;
+                var _jRoom = roomName;
+            	socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex});
+                //tips
+                $scope.systemTips = "加入房间成功";
+                closeSystemTips();
+                $scope.curRoom = roomName;
+                //hide the dialog
+                $timeout(function(){
+                    $("#roomBox").animate({"top" : "-510px"}, 300, "ease");
+                    $(".maskDiv").hide();
+                }, 2000)
+                
+            } else {
+                $scope.systemTips = "你已经加入了一个房间，不能再加入一个房间";
+                closeSystemTips();
+            }
+        } else {
+            $scope.systemTips = "此桌子已经有人，请选择其他桌子";
+            closeSystemTips();
+        }
+    }
+    $scope.leaveRoom = function (room) {
+        
     }
     //准备游戏
-    $scope.prepareForGame = function(roomName,userName){
+    $scope.prepareForGame = function(roomName){
     	socket.emit('prepareForGame',{
     		_roomName : roomName,
-    		_userName : userName
+    		_userName : _myself.name
     	});
     }
     //发言
@@ -490,39 +519,41 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     });
     //收到房间列表时
     socket.on('onRoomList',function(data){
-        console.log(data);
-        var list= data._list;
-        console.log(list);
-    	for (var name in list) {
-    		$scope.roomList.push({
-    			roomName : name
-    		});
-    	}
-        /*
-        for (var index in data) {
-            for (var i = 0; i < $scope.roomList.length; i++) {
-                for (var j = 0; j < j; i++) {
-                    if (data._roomName == roomList[i].roomName) {
-                        hovePeople[roomList[i]][j] = true;
-                    }
+        var _roomList = data._list;
+        console.log(_roomList);
+        $scope.roomList = [];
+        //push the room list to the view
+        for (var i = 0; i < _roomList.length; i++) {
+            $scope.roomList.push({
+                roomName : _roomList[i].roomName
+            });
+        }
+        //set desk status
+        for (var i = 0; i < _roomList.length; i++) {
+            if (!$scope.hovePeople[_roomList[i].roomName]) 
+            {
+                $scope.hovePeople[_roomList[i].roomName] = [];
+            }
+            for (var j =0; j < _roomList[i].index.length; j++) {
+                if (_roomList[i].index[j] == 1) {
+                    $scope.hovePeople[_roomList[i].roomName][j] = 1;
                 }
             }
         }
-        */
     });
+    //
     socket.on('updateRoomStatus',function(data){
-        for (var i = 0; i < $scope.roomList.length; i++) {
-            for (var j = 0; j < j; i++) {
-                if (data._roomName == roomList[i].roomName) {
-                    hovePeople[roomList[i]][j] = true;
-                }
-            }
+        var _room = data;
+        if (!$scope.hovePeople[_room._roomName]) 
+        {
+            $scope.hovePeople[_room._roomName] = [];
         }
+        $scope.hovePeople[_room._roomName][_room._location] = 1;
     });
     //游戏开始
     socket.on('gameStart',function(data){
     	$scope.sysMessage.push('游戏开始');
-    	socket.emit('getIdentity',{_userName : $scope.userName,_roomName : $scope.roomName});
+    	socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom});
     });
     //收到身份，词等
     socket.on('setIdentity',function(data){
@@ -535,12 +566,10 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     socket.on('makeStatement',function(data){
     	var userName = data._userName;
     	if(userName == $scope.userName){
-
     	}
     });
     //开始投票
     socket.on('startVote',function(data){
-
     });
     //系统消息
     socket.on('Message',function(data){
