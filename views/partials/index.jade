@@ -1,10 +1,32 @@
 div.wrap
-  div#chatTemplate
 
+  div.maskDiv(style='display:none;')
+
+  div.systemTips(ng-show='systemTips') {{systemTips}}
+
+  div.roomBox#roomBox(ng-class='{editingName : isEditing == true}')
+    a.roomClose(href='javascript:;') 关闭
+    div.roomTop
+      a.createBtn(href='javascript:;', ng-click='editRoomName()') 创建一个房间
+      input.editRoomName(type='text', ng-model='createRoomName', on-enter='roomNameBlur()', room-name-focus='isEditing == true', placeholder='输入房间名并回车...')
+    div.items
+      div.roomItem(ng-repeat='room in roomList')
+        div.desk.ellipsis(title='{{room.roomName}}') {{room.roomName}}
+        div.rp1(title='点击进入房间')
+        div.rp2(title='点击进入房间', ng-click='joinRoom(room.roomName, 2)')
+        div.rp3(title='点击进入房间', ng-click='joinRoom(room.roomName, 3)')
+        div.rp4(title='点击进入房间', ng-click='joinRoom(room.roomName, 4)')
+        div.rp5(title='点击进入房间', ng-click='joinRoom(room.roomName, 5)')
+        div.rp6(title='点击进入房间', ng-click='joinRoom(room.roomName, 6)')
+        div.rp7(title='点击进入房间', ng-click='joinRoom(room.roomName, 7)')
+        div.rp8(title='点击进入房间', ng-click='joinRoom(room.roomName, 8)')
+        div.rp9(title='点击进入房间', ng-click='joinRoom(room.roomName, 9)')
+
+  div#chatTemplate
   div.friend_list
+    h3.title 好友列表
     ul.iteams
       li.ellipsis(ng-repeat='friend in friendList', title='{{friend.name}}', ng-click='initName(friend)') {{friend.name}}
-  
   div.friend_tips
     ul.items(ng-show='msgCount && sT')
       li.ellipsis(ng-repeat='tip in tipsMsg', title='{{tip.fromName}}', ng-click='showWin(tip.fromId)') {{tip.fromName}} ({{count[tip.fromId]}})
@@ -42,7 +64,7 @@ div.wrap
       div.gameUserCtrl.box_style
         h3.title_mod 游戏操作
         div.btn_list
-          a.ctrlBtn(href='javascript:;') 选择房间
+          a.ctrlBtn#chooseRoom(href='javascript:;', ng-click='getRoomList()') 选择房间
           a.ctrlBtn(href='javascript:;') 创建房间
           a.ctrlBtn(href='javascript:;') 离开房间
           a.ctrlBtn(href='javascript:;') 给词库添加词语
@@ -55,21 +77,6 @@ div.wrap
       div.gameSystemInfo.box_style
         h3.title_mod 系统信息
         ul.items
-          li()
+          li(ng-repeat='msg in sysMessage')
             span.name ［系统信息］：
-            span.txt 玩家三已经加入了游戏，赶紧准备开始游戏吧哈哈．．．
-          li
-            span.name ［玩家三］：
-            span.txt 我这个词是来得及发牢骚的积分老师计算机范德萨
-          li()
-            span.name ［系统信息］：
-            span.txt 玩家三已经加入了游戏，赶紧准备开始游戏吧哈哈．．．
-          li
-            span.name ［玩家三］：
-            span.txt 我这个词是来得及发牢骚的积分老师计算机范德萨
-          li()
-            span.name ［系统信息］：
-            span.txt 玩家三已经加入了游戏，赶紧准备开始游戏吧哈哈．．．
-          li
-            span.name ［玩家三］：
-            span.txt 我这个词是来得及发牢骚的积分老师计算机范德萨
+            span.txt {{msg}}
