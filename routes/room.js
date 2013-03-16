@@ -14,6 +14,8 @@ module.exports = function(socket,rooms,io){
 		this._state = false;
 		//房间已加入人数
 		this._count = 0;
+		//房间桌子加入的位置状态
+		this._indexLocation = [0,0,0,0,0,0,0,0,0];
 		//房间已准备人数
 		this._prepareCount = 0;
 		//房间成员
@@ -48,6 +50,22 @@ module.exports = function(socket,rooms,io){
 				this._sequence.push(userName);
 				this.addMember(userName);
 				return true;
+			}
+		},
+
+		//获取房间桌子是否有人的状态
+		getDeskStatus : function(){
+			return this._indexLocation;
+		},
+
+		//设置房间桌子是否有人的状态
+		toggleDeskStatus : function(index){
+			var temp = this._indexLocation[index];
+			if(temp){
+				temp = 0;
+			}
+			else{
+				temp = 1;
 			}
 		},
 
@@ -321,6 +339,17 @@ module.exports = function(socket,rooms,io){
 			//最高票数者出局（唯一最高票数的情况下）
 			if(max_repeat == 1){
 				member[max_vote_name[0]].isOut = true;
+				//最高票数者出局后，发言的第一位从出局的下一位开始
+				var sequence = this._sequence;
+				var name = max_vote_name[0];
+				for(var i = 0; i < sequence.length; i ++){
+					if(sequence[i] == name){
+						break;
+					}
+					else{
+						sequence.push(sequence.shift());
+					}
+				}
 			}
 			return {max_vote_name : max_vote_name , max_vote : max_vote , max_repeat : max_repeat};					
 		},
@@ -441,6 +470,7 @@ module.exports = function(socket,rooms,io){
 		if(rooms.isRoomExist(roomName)){
 			//房间已存在
 			socket.emit('err',{
+				type: 2,
 				msg : '房间已存在'
 			});
 			return -1;
@@ -461,9 +491,10 @@ module.exports = function(socket,rooms,io){
 		获得房间列表
 	*/
 	socket.on('getRoomList',function(data){
-		var list = rooms.getRoomList();
+		var list = rooms.getRoomListAndIndex();
 		socket.emit('onRoomList',{
-			list : list,
+			//list的格式 {roomName:[location]}
+			_list : list,
 		});
 	});
 
@@ -475,25 +506,36 @@ module.exports = function(socket,rooms,io){
 		//data 格式 {_roomName : name , _userName : name}
 		var roomName = data._roomName;
 		var userName = data._userName;
+		var roomIndex = data._location;
 		var room_temp = rooms.getRoom(roomName);
 		if(room_temp){
 			var temp = room_temp.userConnect(userName);	
 			if (typeof temp == 'string') {
 				//人满或房间已开始游戏
 				socket.emit('err',{
+					type: -1,
 					msg : temp
 				});
 			}
 			else{
 				socket.join(data._roomName);
+				//设置桌子状态
+				room_temp.toggleDeskStatus(roomIndex);
 				//广播
 				io.sockets.in(data._roomName).emit('Message',{
 					msg : '玩家【'+data._userName+'】加入了房间',
+				});
+				//更新房间状态
+				io.sockets.emit('updateRoomStatus',{
+					_roomName: roomName,
+					_userName: userName,
+					_location: roomIndex
 				});
 			}
 		}
 		else{
 			socket.emit('err',{
+				type: 1,
 				msg : '房间不存在'
 			});
 		}
@@ -516,5 +558,10 @@ module.exports = function(socket,rooms,io){
 		if(room.isEmpty()){
 			rooms.deleteRoom(roomName);
 		}
+		//用户离开房间
+		io.sockets.emit('userLeaveRoom',{
+			_roomName: roomName,
+			_userName: userName
+		});
 	});
 }
