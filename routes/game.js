@@ -15,6 +15,7 @@ module.exports = function(socket,rooms,io){
 			//所有玩家已经准备
 			if(room.userPrepare()){
 				io.sockets.in(data._roomName).emit('Message',{
+					type: 2,
 					msg : '玩家【'+data._userName+"】已准备",
 				});
 				if(room.isAllPrepare()){
@@ -23,6 +24,7 @@ module.exports = function(socket,rooms,io){
 					//广播
 					io.sockets.in(data._roomName).emit('gameStart',{});
 					io.sockets.in(data._roomName).emit('Message',{
+						type: 3,
 						msg: '玩家【'+room._sequence[0]+'】开始发言'
 					});
 				}
@@ -91,6 +93,7 @@ module.exports = function(socket,rooms,io){
 		user_temp.makeStatement();
 		//广播
 		io.sockets.in(roomName).emit('Message',{
+			type: 4,
 			msg : '玩家【'+userName+'】：'+statement,
 		});
 		if (room_temp.isStatementOver()) {
@@ -99,6 +102,7 @@ module.exports = function(socket,rooms,io){
 			if(room_temp._turns != 1){
 				//回合结束，开始投票
 				io.sockets.in(roomName).emit('Message',{
+					type: 5, 
 					msg: '请开始投票'
 				});
 				io.sockets.in(roomName).emit('startVote',{});
@@ -108,7 +112,8 @@ module.exports = function(socket,rooms,io){
 				var nextName = room_temp.getNextPlayer();
 				//下一个玩家发言
 				io.sockets.in(roomName).emit('Message',{
-					msg: '轮到玩家【'+nextName+'】发言'
+					type: 6,
+					msg: '轮到玩家【'+nextName+'】发言',
 				});
 				io.sockets.in(roomName).emit('makeStatement',{
 					_userName : nextName
@@ -122,6 +127,7 @@ module.exports = function(socket,rooms,io){
 			if(nextName){
 				//下一个玩家发言
 				io.sockets.in(roomName).emit('Message',{
+					type: 6,
 					msg: '轮到玩家【'+nextName+'】发言'
 				});				
 				//拿到下一个玩家的名字
@@ -182,6 +188,7 @@ module.exports = function(socket,rooms,io){
 
 		//广播
 		io.sockets.in(roomName).emit('Message',{
+			type: 7,
 			msg : '玩家【'+userName+'】投给了玩家【'+voteToName+'】',
 		});
 
@@ -192,6 +199,7 @@ module.exports = function(socket,rooms,io){
 			if(vote_data.max_repeat == 1 && vote_data.max_vote_name.length != 0){
 				//只有一个玩家最高票
 				io.sockets.in(roomName).emit('Message',{
+					type: 8,
 					msg: '玩家【'+vote_data.max_vote_name[0]+'】获得最高票数出局'
 				});
 				io.sockets.in(roomName).emit('voteOut',{
@@ -217,6 +225,7 @@ module.exports = function(socket,rooms,io){
 					if(nextName){
 						//下一个玩家发言
 						io.sockets.in(roomName).emit('Message',{
+							type: 6,
 							msg: '轮到玩家【'+nextName+'】发言'
 						});				
 						//拿到下一个玩家的名字
@@ -286,6 +295,7 @@ module.exports = function(socket,rooms,io){
 		}
 		//向房间发送猜词信息
 		io.sockets.in(roomName).emit('Message', {
+			type: 9,
 			msg: '玩家【'+userName+'】进行猜词'
 		});
 		//有参数代表猜词
@@ -325,6 +335,7 @@ module.exports = function(socket,rooms,io){
 					user_temp.makeStatement();
 					var name = room_temp.getNextPlayer();
 					io.sockets.emit('Message',{
+						type: 6,
 						msg: '轮到玩家【'+name+"】发言",
 					});
 					io.sockets.emit('makeStatement',{
@@ -344,4 +355,18 @@ module.exports = function(socket,rooms,io){
 	type:2	msg:未能在3轮内票死一个，根据规则，鬼胜利
 	type:3	鬼已全部出局，平民胜利
 	type:4	平民和白痴总和人数等于鬼的人数，鬼胜利
+*/
+
+/*
+	Message type
+	消息类型
+	type:1	msg:玩家加入或离开房间
+	type:2	msg:玩家准备游戏
+	type:3	msg:XX玩家开始发言
+	type:4	msg:玩家发言陈述：内容
+	type:5	msg:开始投票
+	type:6	msg:轮到XX玩家发言
+	type:7	msg:玩家XX投给了XX
+	type:8	msg:玩家XX出局
+	type:9	msg:玩家猜词
 */

@@ -546,6 +546,7 @@ module.exports = function(socket,rooms,io){
 				room_temp.toggleDeskStatus(roomIndex);
 				//广播
 				io.sockets.in(data._roomName).emit('Message',{
+					type: 1,
 					msg : '玩家【'+data._userName+'】加入了房间',
 				});
 				//更新房间状态
@@ -571,6 +572,7 @@ module.exports = function(socket,rooms,io){
 	socket.on('leaveRoom',function(data){
 		var roomName = data._roomName;
 		var userName = data._userName;
+		var roomIndex = data._location;
 		socket.leave(roomName);
 		var room = rooms.getRoom(roomName);
 		var user = rooms.getUser(userName);
@@ -582,9 +584,14 @@ module.exports = function(socket,rooms,io){
 			rooms.deleteRoom(roomName);
 		}
 		//用户离开房间
-		io.sockets.emit('userLeaveRoom',{
+		io.sockets.in(roomName).emit('Message',{
+			type: 1,
+			msg: '用户【'+userName+'】离开了房间',
+		});
+		io.sockets.emit('updateRoomStatus',{
 			_roomName: roomName,
-			_userName: userName
+			_userName: userName,
+			_location: roomIndex,
 		});
 	});
 }
