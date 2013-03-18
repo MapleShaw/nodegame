@@ -25,34 +25,15 @@ div.wrap
   div#chatTemplate
   div.friend_list
     h3.title 好友列表
-    ul.iteams
+    ul.items
       li.ellipsis(ng-repeat='friend in friendList', title='{{friend.name}}', ng-click='initName(friend)') {{friend.name}}
+    p.fl_popup
   div.friend_tips
     ul.items(ng-show='msgCount && sT')
       li.ellipsis(ng-repeat='tip in tipsMsg', title='{{tip.fromName}}', ng-click='showWin(tip.fromId)') {{tip.fromName}} ({{count[tip.fromId]}})
     p.tip_title(ng-show='msgCount', ng-click='showTip()') 您收到{{msgCount}}条信息
 
   div.gameArea
-    div.gameView
-      div.gameDisplay
-        div.player1.players.players_on
-        div.player2.players
-        div.player3.players
-        div.player4.players
-        div.player5.players.players_on
-        div.player6.players
-        div.player7.players
-        div.player8.players
-        div.player9.players
-        div.timeLeave 剩下 : 20s
-        div.playMsg 玩家三：大家好啦时间的了就是的法律就是了的积分 了手机铃声的积分了实际上大家方式了看到积分了速度快积分
-        p.bg_txt 游戏区
-        a.ctrlBtn.caici(href='javascript:;') 我要猜词
-        a.ctrlBtn.yiyan(href='javascript:;') 我要留遗言
-      div.gameSend
-        textarea.playTextarea()
-        input.playSubmit(type='button', value='发言')
-
     div.gameCtrl
       div.gameUserInfo.box_style
         h3.title_mod 玩家信息
@@ -69,15 +50,36 @@ div.wrap
           a.ctrlBtn(href='javascript:;', ng-click='leaveRoom(curRoom)') 离开房间
           a.ctrlBtn(href='javascript:;') 给词库添加词语
           div.wordArea {{word}} {{wordLength}}
-
+    div.gameView
+      div.gameDisplay
+        div.player1.players.players_on
+        div.player2.players
+        div.player3.players
+        div.player4.players
+        div.player5.players.players_on
+        div.player6.players
+        div.player7.players
+        div.player8.players
+        div.player9.players
+        div.timeLeave 剩下 : {{timeLeave}}s
+        div.playMsg(ng-show='sayMessageTip') {{sayMessageTip}}
+        p.bg_txt 游戏区
+        a.ctrlBtn.caici(href='javascript:;') 我要猜词
+        a.ctrlBtn.yiyan(href='javascript:;') 我要留遗言
+      div.gameSend
+        textarea.playTextarea(ng-model='sayMessage')
+        input.playSubmit(type='button', value='发言', ng-click='makeStatement(curRoom, _myself.name, sayMessage)')
     div.gameSystem
+      div.gameSystemInfo.box_style
+        h3.title_mod 系统信息
+        ul.items(on-scroller='sysMessage')
+          li(ng-repeat='msg in sysMessage')
+            span.name ［系统信息］：
+            span.txt {{msg}}
       div.gameSetting.box_style 
         h3.title_mod 系统设置
         ul.items
           li
-      div.gameSystemInfo.box_style
-        h3.title_mod 系统信息
-        ul.items
-          li(ng-repeat='msg in sysMessage')
-            span.name ［系统信息］：
-            span.txt {{msg}}
+            label
+              input(type='checkbox', checked='checked', style='vertical-align:middle;margin-right:3px;')
+              span(style='vertical-align:middle') 开启声音

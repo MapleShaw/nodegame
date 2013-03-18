@@ -6,23 +6,35 @@
 angular.module('myApp.directives', []).
   //game version
   directive('gameVersion', ['gameVersion', function(gameVersion) {
-      return function(scope, elm, attrs) {
-          //elm.text(gameVersion);
-      };
-    }]).
-    //on-enter
-    directive('onEnter', function() {
-      //debugger;
-      return function(scope, element, attrs) {
-          element.bind("keydown", function(event) {
-              if (event.which === 13) {
-                  scope.$apply(function() {
-                      scope.$eval(attrs.onEnter);
-                  });
-                  event.preventDefault();
-              }
-          });
-      };
+    return function(scope, elm, attrs) {
+        //elm.text(gameVersion);
+    };
+  }]).
+  //on-enter
+  directive('onEnter', function() {
+    //debugger;
+    return function(scope, element, attrs) {
+        element.bind("keydown", function(event) {
+            if (event.which === 13) {
+                scope.$apply(function() {
+                    scope.$eval(attrs.onEnter);
+                });
+                event.preventDefault();
+            }
+        });
+    };
+  }).
+  directive('onScroller', function ($timeout) {
+    return function (scope, element, attrs) {
+      debugger;
+      scope.$watch(attrs.onScroller, function (newval, olderval) {
+        if (newval != olderval) {
+          if (element) {
+              element[0].scrollTop = element[0].scrollHeight;
+          }      
+        }
+      }, true);
+    }
   }).
   //edit roomName blur event
   directive('roomNameBlur', function () {

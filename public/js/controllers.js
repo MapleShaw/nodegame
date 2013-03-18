@@ -1,18 +1,20 @@
 'use strict';
+
+
 /*
 	login controller
 */
-function loginCtrl($scope, $http, $routeParams, $location){
-
+function loginCtrl($scope, $http, $routeParams, $location, localStorage){
+    //var 
 	$scope.loginForm = {};
-
 	//submit function
 	$scope.loginPost = function(){
 		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
-			
+			//var 
 			var loginMark = data.err;
 			var friendToJson = JSON.stringify(data.friendList);
 			var myselfInfoToJson = JSON.stringify(data.myselfInfo);
+            localStorage.put('nodeGameIsFirstLoad', true);
 			window.sessionStorage.setItem('friendList',friendToJson);
 			window.sessionStorage.setItem('myselfInfo',myselfInfoToJson);
 			if(loginMark == 1){
@@ -31,14 +33,16 @@ function loginCtrl($scope, $http, $routeParams, $location){
 
 	
 }
-loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
+loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStorage'];
+
 /*
 	loginOut controllers
 */
-function loginOutController($scope, $http, $routeParams, $location) {
+function loginOutController($scope, $http, $routeParams, $location, localStorage) {
   $scope.loginOut = function(){
 		$http.get('/login/loginout').success(function(data, status, headers, config){
-			
+			//set storage
+            localStorage.put('nodeGameIsFirstLoad', false)
 			window.sessionStorage.clear();
 			window.location.reload();
 			
@@ -47,6 +51,8 @@ function loginOutController($scope, $http, $routeParams, $location) {
 		});
 	};
 }
+loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStorage'];
+
 /*
 	register controller
 */
@@ -68,7 +74,6 @@ function registerCtrl($scope, $http, $routeParams, $location){
 			$scope.successMsg = "Please check your information!!";
 		}
 	}
-	
 	//check if the name is only
 	//use with the "ng-change" of input=text
 	$scope.registerCheck = function () {
@@ -111,7 +116,7 @@ registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 /*
 	index controller
 */
-function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global) {
+function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localStorage, global) {
 	
 	$scope.msgFrom = {};
     $scope.userTxt = {};
@@ -181,7 +186,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     							'<a href="javascript:;" class="min", title="最小化", ng-click="minDialog(\'', friend.systemid, '\')"></a>',
     						'</div>',
     					'</div>',
-    					'<div id="chatScorll_', friend.systemid, '" class="content">',
+    					'<div id="chatScorll_', friend.systemid, '" class="content" on-scroller="msgs[\'', friend.systemid, '\']">',
 							'<ul class="items">',
 								'<li ng-repeat="msg in msgs[\'', friend.systemid, '\']">',
 	            					'<div class="chatCnt">',
@@ -201,7 +206,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
 						'</p>',
 						'<p class="user_ctrl">',
 							'<input type="button" value="send message" ng-click="sendMsg(\'', friend.systemid, '\')" class="btn">',
-							'<span class="gray">&nbsp; or press "Enter" key</span>',
+							'<span class="gray">&nbsp; or "Enter" key</span>',
 							'<a href="javascript:;" class="clearTxt" ng-click="clearMsg(\'', friend.systemid, '\')">清除记录</a>',
 						'</p>',
 					'</div>'].join("");
@@ -285,9 +290,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
 				time : global._getTime(),
 				cnt : $scope.userTxt[data.fromId]
 			});
-        	// scroll
-        	clearTimeout(timeout);
-			_scrollTop(data.fromId);
 			// clear
 			$scope.userTxt[data.fromId] = '';
 			document.getElementById('chat_msg_' + data.fromId).focus();
@@ -335,11 +337,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
        else {
        		console.log('the user is not exist...')
        }
-       // scroll
-       clearTimeout(timeout);
-       if (isIdExist) {
-       		_scrollTop(data.fromId);
-       }
     });
 
     socket.on('chat_errmsg', function (data) {
@@ -350,26 +347,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
 			time : global._getTime(),
 			cnt : data.msg
 		});
-       	// scroll
-       	clearTimeout(timeout);
-		_scrollTop(data.fromId);
     });
-    
-    //scroll
-    var oldHeight = -1;    
-    var timeout;
-    function _scrollTop (id) {
-    	var chatScorll = document.getElementById('chatScorll_' + id);
-    	if (chatScorll) {
-	    	if (oldHeight != chatScorll.scrollHeight) {
-	    		chatScorll.scrollTop = chatScorll.scrollHeight;
-	    		oldHeight = chatScorll.scrollHeight;
-	    	}
-	    	timeout = $timeout(function(){_scrollTop(id);}, 0);
-	    } else {
-	    	clearTimeout(timeout);
-	    }
-    }
 
     // close the dialog
     $scope.closeDialog = function (userId) {
@@ -401,15 +379,29 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     $scope.wordLength = null;
     $scope.word = '';
 
-
-    //以下是angular相关函数和操作
-
     $scope.isEditing = false;
     $scope.isFirstGet = 0;
     $scope.createRoomName = "";
     $scope.hovePeople = {};
     $scope.isAddRoom = 0;
     $scope.curRoom = "";
+    $scope.sayMessage = "";
+    $scope.sayMessageTip = 0;
+    $scope.timeLeave = 0;
+
+    //if is first into the index page,display the room box
+    if (localStorage.get('nodeGameIsFirstLoad') == true) {
+        if ($scope.isFirstGet === 0) {
+            socket.emit('getRoomList',{});
+            $scope.isFirstGet = 1;
+        }
+        $(".maskDiv").show();
+        $("#roomBox").animate({"top" : "40px"}, 200, "ease");
+        localStorage.put('nodeGameIsFirstLoad', false)
+    }
+
+
+    //以下是angular相关函数和操作
 
     $scope.editRoomName = function () {
     	$scope.isEditing = true;
@@ -428,10 +420,39 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     	}
     }
     //close tips div
+    var _closeSystemTips;
     var closeSystemTips = function () {
-        $timeout(function () {
+        clearTimeout(_closeSystemTips);
+        _closeSystemTips = $timeout(function () {
             $scope.systemTips = 0;
-        }, 1000)
+        }, 1000);
+    }
+    var _closeSayTips;
+    var closeSayTips = function () {
+        clearTimeout(_closeSayTips);
+        _closeSayTips = $timeout(function () {
+            $scope.sayMessageTip = 0;
+        }, 3000);
+    }
+    var _timeLeave;
+    var timeLimit = 20;
+    var timeLeave = function () {
+        _timeLeave = $timeout(function () {
+            timeLimit --;
+            $scope.timeLeave = timeLimit;
+            if (timeLimit <= 0) {
+                timeLimit = 20;
+                $timeout.cancel(_timeLeave);
+                //callback
+                socket.emit('onMakeStatement',{
+                    _roomName: $scope.curRoom,
+                    _userName: _myself.name,
+                    _statement: "规定时间内没有发言!!!"
+                });
+            } else {
+                timeLeave();
+            }
+        }, 1000);
     }
 
     //以下是socket相关函数和操作
@@ -444,6 +465,12 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
             $scope.systemTips = "创建房间成功";
             closeSystemTips();
             $scope.curRoom = roomName;
+            //
+            $timeout(function(){
+                $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
+                    $(".maskDiv").hide();
+                });
+            }, 1200);
             //join the room you create when you create it.(play1)
             socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0});
         } else {
@@ -472,9 +499,10 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
                 $scope.curRoom = roomName;
                 //hide the dialog
                 $timeout(function(){
-                    $("#roomBox").animate({"top" : "-510px"}, 300, "ease");
-                    $(".maskDiv").hide();
-                }, 2000)
+                    $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
+                        $(".maskDiv").hide();
+                    });
+                }, 1200);
                 
             } else {
                 $scope.systemTips = "你已经加入了一个房间，不能再加入一个房间";
@@ -502,6 +530,10 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     		_userName: userName,
     		_statement: statement
     	});
+        $timeout.cancel(_timeLeave);
+        timeLimit = 20;
+        $scope.timeLeave = 0;
+        $scope.sayMessage = "";
     }
     //投票
     $scope.voteOne = function(roomName,userName,voteToName){
@@ -520,7 +552,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     //收到房间列表时
     socket.on('onRoomList',function(data){
         var _roomList = data._list;
-        console.log(_roomList);
         $scope.roomList = [];
         //push the room list to the view
         for (var i = 0; i < _roomList.length; i++) {
@@ -565,7 +596,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     //轮到用户user发言时
     socket.on('makeStatement',function(data){
     	var userName = data._userName;
-    	if(userName == $scope.userName){
+    	if(userName == _myself.name){
+            //time leave
+            timeLeave();
     	}
     });
     //开始投票
@@ -573,6 +606,10 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     });
     //系统消息
     socket.on('Message',function(data){
+        if (data.type == 4) {
+            $scope.sayMessageTip = data.msg;
+            closeSayTips();
+        }
     	$scope.sysMessage.push(data.msg);
     });
     //错误消息
@@ -589,7 +626,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, global
     });
 
 }
-indexCtrl.$inject = ['$scope', '$http', '$location', '$timeout', '$compile', 'socket', 'global'];
+indexCtrl.$inject = ['$scope', '$http', '$location', '$timeout', '$compile', 'socket', 'localStorage', 'global'];
 
 
 

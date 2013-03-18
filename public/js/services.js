@@ -90,4 +90,15 @@ angular.module('myApp.services', []).
         return _time;
       }
     }
+  }).
+  factory('localStorage', function () {
+    var STORAGE_ID = 'nodeGameIsFirstLoad';
+    return {
+      get: function (storageName) {
+        return JSON.parse(localStorage.getItem(storageName) || false);
+      },
+      put: function (storageName, isFirstLoad) {
+        localStorage.setItem(storageName, JSON.stringify(isFirstLoad));
+      }
+    };
   });

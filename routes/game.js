@@ -27,6 +27,9 @@ module.exports = function(socket,rooms,io){
 						type: 3,
 						msg: '玩家【'+room._sequence[0]+'】开始发言'
 					});
+					io.sockets.in(data._roomName).emit('makeStatement',{
+						_userName : room._sequence[0]
+					});
 				}
 			}
 			else{
