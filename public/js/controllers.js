@@ -1,5 +1,57 @@
 'use strict';
+/*
+    addfriend controller
+*/
+function gameRuleCtrl($scope, $http, $routeParams, $location){//friendCtrl目前借用gameRule那个页面
 
+    $scope.topicForm = {};
+
+    //submit function
+    $scope.addPost = function(){
+        var friendInfo = document.getElementById("getInfo");
+        var yourFriend = {
+            username : friendInfo.getAttribute("friendName"),
+            systemid : friendInfo.getAttribute("friendId"),
+            selfName : JSON.parse(window.sessionStorage.getItem('myselfInfo')).name, //把字符串先转换成json
+        };
+
+        $http.post('/add_friend/add', yourFriend).success(function(data, status, headers, config){
+            console.log(data.data);
+            
+        }).error(function(data, status, headers, config){
+            
+        });
+    };
+
+    $scope.removePost = function(){
+        var friendInfo = document.getElementById("getInfoRemove");
+        var yourFriend = {
+            username : friendInfo.getAttribute("friendName"),
+            systemid : friendInfo.getAttribute("friendId"),
+            selfName : JSON.parse(window.sessionStorage.getItem('myselfInfo')).name, //把字符串先转换成json
+        };
+
+        $http.post('/add_friend/remove', yourFriend).success(function(data, status, headers, config){
+            console.log(data.data);
+            
+        }).error(function(data, status, headers, config){
+            
+        });
+    };
+    //加题目
+    $scope.topicPost = function(){
+        $scope.topicForm.words=$scope.topicForm.words.split(",")
+        console.log(typeof $scope.topicForm.words);
+        $http.post('/subjects/addSubject', $scope.topicForm).success(function(data, status, headers, config){
+            console.log(data.data);
+            $scope.msgTips = "You have sucessfully insert a kinds of words!!";
+        }).error(function(data, status, headers, config){
+            
+        });
+    };
+
+}
+gameRuleCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];//friendCtrl
 
 /*
 	login controller
@@ -689,8 +741,8 @@ chatCtrl.$inject = ['$scope'];
 /*
 	gameRule controller
 */
-function gameRuleCtrl ($scope) {}
-gameRuleCtrl.$inject = ['$scope'];
+// function gameRuleCtrl ($scope) {}
+// gameRuleCtrl.$inject = ['$scope'];
 
 /*
 	contact controller

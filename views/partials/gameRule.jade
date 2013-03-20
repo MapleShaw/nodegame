@@ -1,2 +1,16 @@
 div.index
   h2 this is the gameRule page.
+
+ul
+  li(ng-click="addPost()" , id="getInfo" , friendName="maple" , friendId="1990521") add
+  li(ng-click="removePost()" , id="getInfoRemove" , friendName="maple" , friendId="1990521") remove
+
+
+div
+  p words:
+  input(type="text" , ng-model="topicForm.words" , placeholder="Type like 篮球,足球,....逗号在英文状态下")
+  p feature:
+  input(type="text" , ng-model="topicForm.feature")
+  p
+    button.btn(type="submit" , ng-click="topicPost()") submit
+  p {{msgTips}}

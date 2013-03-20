@@ -171,7 +171,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .wordArea{text-align: center;font-size: 24px;padding: 10px 0 0 0;}
 
 /*footer*/
-.footer{height: 5px;width: 100%;background-color: #50b909;position: absolute;bottom: 0px;left: 0px;overflow: hidden;}
+.footer{height: 5px;width: 100%;background-color: #50b909;position: absolute;bottom: 0px;left: 0px;overflow: hidden; z-index: 100;}
 
 
 /*function*/

@@ -1,6 +1,6 @@
 
 var crypto = require('crypto');
-var User = require('../models/user');
+var user = require('../models/user');
 
 exports.login = function(req, res){
 	//
@@ -10,7 +10,7 @@ exports.login = function(req, res){
     var md5 = crypto.createHash('md5');
     var password = md5.update(data.password).digest('base64');
     
-    User.get(data.username, function(err, user) {
+    user.User.get(data.username, function(err, user) {
       if (!user) {
         err = 1;
         _callback (err);
@@ -21,6 +21,7 @@ exports.login = function(req, res){
         }else{
           req.session.user = user;
           err = 0;
+          //console.log(user);
           _callback (err,user);
           
         }
@@ -32,11 +33,18 @@ exports.login = function(req, res){
 
     function _callback (_err,_user) {
 		//do something of the return "_data"
-		res.json({
-			err : _err,
-      myselfInfo : {name:_user.name,systemid:_user.systemid},
-      friendList : _user.friendList ? _user.friendList : []
-		});
+    if(_err==1||_err==2){
+      res.json({
+        err : _err
+      });
+    }else if(_err==0){
+      res.json({
+        err : _err,
+        myselfInfo : {name:_user.name,systemid:_user.systemid},
+        friendList : _user.friendList ? _user.friendList : []
+      });
+    }
+		
 	}
 }
 

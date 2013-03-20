@@ -7,9 +7,11 @@ var express = require('express'),
 	routes = require('./routes'),
 	register = require('./routes/register'),
 	login = require('./routes/login'),
+	add_friend = require('./routes/add_friend'),
+	subjects = require('./routes/subjects');
 	MongoStore = require('connect-mongo')(express),
 	settings = require('./settings'),
-	socketHandle	 = require('./routes/socket.js');
+	socketHandle = require('./routes/socket.js');
 
 var app = module.exports = express();
 var server = require('http').createServer(app);
@@ -25,7 +27,6 @@ app.configure(function(){
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(express.cookieParser());
-	//app.use(express.cookieSession());
 	app.use(express.session({
 		secret: settings.cookieSecret,
 		store: new MongoStore({
@@ -36,7 +37,7 @@ app.configure(function(){
 	app.use(function(req, res, next){
 	  res.locals.csrf = req.session ? req.session._csrf : '';
 	  res.locals.req = req;
-	  //res.locals.user = req.session.user;  //想要什么值在这里补
+	  res.locals.user = req.session.user;  //想要什么值在这里补
 	  next();
 	});
 	app.use(app.router);
@@ -65,6 +66,12 @@ app.post('/register/post', register.post);
 app.post('/login/login', login.login);
 
 app.get('/login/loginout', login.loginout);
+//add subjects
+app.post('/subjects/addSubject', subjects.addSubject);
+//add friends
+app.post('/add_friend/add', add_friend.add);
+//remove friends
+app.post('/add_friend/remove', add_friend.remove);
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
 
@@ -76,7 +83,10 @@ io.sockets.on('connection', function(socket){
 	socketHandle.onConnect(socket,io);
 });
 
-
+//test
+// subjects.getSubject("球类",function(_data){
+//   console.log(_data);
+// });
 
 // Start server
 
