@@ -69,19 +69,13 @@ module.exports = function(socket,rooms,io){
 		},
 
 		//获取房间成员列表,玩家放在数组第一个
-		getRoomMemberList : function(userID){
+		getRoomMemberList : function(){
 			var sequence = this._sequence;
 			var newList = [];
 			for(var i = 0; i < sequence.length; i ++){
-				newList[i] = sequence[i];
-			}
-			for(var i = 0; i < sequence.length; i ++){
-				if (newList[i] == userID) {
-					return newList;
-				}
-				else{
-					newList.push(newList.shift());
-				}
+				var temp = this._roomMember[sequence[i]].userInfo;
+				newList[i] = temp;
+				newList[i].systemID = sequence[i];
 			}
 			return newList;
 		},
@@ -425,18 +419,40 @@ module.exports = function(socket,rooms,io){
 			}
 		},
 
-		//计算分数等级
-		calculateScores : function(){
-
+		//更新房间内用户的分数等级
+		updateScores : function(){
+			for(var item in this._roomMember){
+				this._roomMember[item].calculateScores();
+			}
 		},
 
-		//房间游戏结束
-		onGameOver : function(){
+		//房间游戏结束,type为胜利的某一方
+		onGameOver : function(type){
 			var member = this._roomMember;
-			//玩家复位
+			//玩家复位,记录游戏结果
 			for(var item in member){
-				member[item] = {};
+				member[item].resetState();
+				if(type == 3){
+					//人阵营胜利
+					if(member[item].identity < 2){
+						member[item].gameResult = true;
+					}
+					else{
+						member[item].gameResult = false;
+					}
+				}
+				else{
+					//鬼阵营胜利
+					if(member[item].identity == 2){
+						member[item].gameResult = true;
+					}
+					else{
+						member[item].gameResult = false;
+					}
+				}
 			}
+			//更新分数
+			this.updateScores();
 			//房间复位
 			this._state = false;
 			this._prepareCount = 0;
@@ -466,6 +482,8 @@ module.exports = function(socket,rooms,io){
 		this.voteCount = 0;
 		//是否已被票出局
 		this.isOut = false;
+		//游戏结果
+		this.gameResult = null;
 		//玩家资料
 		this.userInfo = {
 			// winRate : null,
@@ -509,6 +527,22 @@ module.exports = function(socket,rooms,io){
 		//玩家出局
 		outGame : function(){
 			this.isOut = false;
+		},
+
+		//重置游戏记录的相关数据
+		resetState : function(){
+			this.identity = null;
+			this.word = null;
+			this.wordLength = null;
+			this.isSay = false;
+			this.isVote = false;
+			this.voteCount = 0;
+			this.isOut = false;
+		},
+
+		//计算玩家分数
+		calculateScores : function(){
+			var info = this._userInfo();
 		},
 	};
 
@@ -589,6 +623,11 @@ module.exports = function(socket,rooms,io){
 					_roomName: roomName,
 					_userName: userName,
 					_location: roomIndex
+				});
+				//给该房间的所有用户发送用户列表信息
+				var list_temp = room_temp.getRoomMemberList();
+				io.sockets.in(roomName).emit('updateRoomMember',{
+					_list: list_temp,
 				});
 			}
 		}

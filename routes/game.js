@@ -246,7 +246,7 @@ module.exports = function(socket,rooms,io){
 						msg : gameover_temp[1]
 					});
 					//游戏结束复位处理
-					room_temp.onGameOver();
+					room_temp.onGameOver(gameover_temp[0]);
 				}
 				else{
 					//游戏尚未结束
@@ -337,7 +337,7 @@ module.exports = function(socket,rooms,io){
 				msg: '玩家猜对词'
 			});
 			//复位处理
-			room_temp.onGameOver();
+			room_temp.onGameOver(1);
 			return;
 		}
 		else{
@@ -354,7 +354,7 @@ module.exports = function(socket,rooms,io){
 					type: temp[0],
 					msg: temp[1]
 				});
-				room_temp.onGameOver();
+				room_temp.onGameOver(temp[0]);
 				return;
 			}
 			else{
