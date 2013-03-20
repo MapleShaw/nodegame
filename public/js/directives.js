@@ -26,7 +26,6 @@ angular.module('myApp.directives', []).
   }).
   directive('onScroller', function ($timeout) {
     return function (scope, element, attrs) {
-      debugger;
       scope.$watch(attrs.onScroller, function (newval, olderval) {
         if (newval != olderval) {
           if (element) {
@@ -53,6 +52,22 @@ angular.module('myApp.directives', []).
             elem[0].focus();
           }, 0, false);
         }
+      });
+    };
+  }).
+  //mouseover
+  directive('mouseOver', function () {
+    return function (scope, elem, attrs) {
+      elem.bind('mouseover', function () {
+        scope.$apply(attrs.mouseOver);
+      });
+    };
+  }).
+  //mouseout
+  directive('mouseOut', function () {
+    return function (scope, elem, attrs) {
+      elem.bind('mouseout', function () {
+        scope.$apply(attrs.mouseOut);
       });
     };
   }).

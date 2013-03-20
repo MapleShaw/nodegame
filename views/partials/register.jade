@@ -3,7 +3,7 @@ div.index
 	form.cssForm
 		div.eachItem
 			label Username
-			input(type="text" , id="errorTipsOfName" , name="username" , ng-model="registerForm.username", ng-change="registerCheck()", placeholder="Type your name…" , required , checkUsername)
+			input(type="text" , id="errorTipsOfName" , name="username" , ng-model="registerForm.username", ng-change="registerCheck()", placeholder="Type your name…" , autofocus='autofocus', required , checkUsername)
 			p {{usernameMsg}}
 		div.eachItem
 			label Email

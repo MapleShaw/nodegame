@@ -62,7 +62,7 @@ module.exports = function (socket) {
                 users_chat[user.systemid].emit('chat_errmsg', {
                     fromId : data.sendTo,
                     fromName : 'system : ',
-                    msg : 'error msg : the user is not exist.',
+                    msg : 'error msg : the user is not online...',
                 });
                 users_chat[user.systemid].emit('chat_have_receive', {
                     flag : false

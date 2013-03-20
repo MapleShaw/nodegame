@@ -335,7 +335,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
        } 
        // err
        else {
-       		console.log('the user is not exist...')
+       		console.log('the user is not online...')
        }
     });
 
@@ -388,6 +388,10 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.sayMessage = "";
     $scope.sayMessageTip = 0;
     $scope.timeLeave = 0;
+    $scope.isYourTurn = 1;
+    $scope.isReady = 1;
+    $scope.isDisplayVote = 0;
+    $scope.isDisplayInfo = {};
 
     //if is first into the index page,display the room box
     if (localStorage.get('nodeGameIsFirstLoad') == true) {
@@ -435,13 +439,13 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         }, 3000);
     }
     var _timeLeave;
-    var timeLimit = 20;
+    var timeLimit = 30;
     var timeLeave = function () {
         _timeLeave = $timeout(function () {
             timeLimit --;
             $scope.timeLeave = timeLimit;
             if (timeLimit <= 0) {
-                timeLimit = 20;
+                timeLimit = 30;
                 $timeout.cancel(_timeLeave);
                 //callback
                 socket.emit('onMakeStatement',{
@@ -465,7 +469,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             $scope.systemTips = "创建房间成功";
             closeSystemTips();
             $scope.curRoom = roomName;
-            //
+            if ($scope.isReady == 1) {
+                $scope.isReady = 0;
+            }
             $timeout(function(){
                 $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
                     $(".maskDiv").hide();
@@ -493,17 +499,22 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 var _jName = _myself.name;
                 var _jRoom = roomName;
             	socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex});
-                //tips
+                /*
+                    when succeed join the room
+                */
                 $scope.systemTips = "加入房间成功";
                 closeSystemTips();
                 $scope.curRoom = roomName;
+                if ($scope.isReady == 1) {
+                    $scope.isReady = 0;
+                }
                 //hide the dialog
                 $timeout(function(){
                     $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
                         $(".maskDiv").hide();
                     });
                 }, 1200);
-                
+                //
             } else {
                 $scope.systemTips = "你已经加入了一个房间，不能再加入一个房间";
                 closeSystemTips();
@@ -522,6 +533,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     		_roomName : roomName,
     		_userName : _myself.name
     	});
+        if ($scope.isReady == 0) {
+            $scope.isReady = 1;
+        }
     }
     //发言
     $scope.makeStatement = function(roomName,userName,statement){
@@ -531,17 +545,46 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     		_statement: statement
     	});
         $timeout.cancel(_timeLeave);
-        timeLimit = 20;
+        timeLimit = 30;
         $scope.timeLeave = 0;
         $scope.sayMessage = "";
+        $scope.isYourTurn = 1;
     }
     //投票
+    $scope.playerList = [
+        {"index":0,username:"zhoonchen",winRate:"50%",level:"5"},
+        {"index":1,username:"junlin",winRate:"10%",level:"2"},
+        {"index":2,username:"dingge",winRate:"40%",level:"1"},
+        {"index":3,username:"maple",winRate:"30%",level:"4"},
+        {"index":4,username:"shaw",winRate:"20%",level:"3"},
+        {"index":5,username:"zhihong",winRate:"70%",level:"5"},
+        {"index":6,username:"chen",winRate:"70%",level:"10"},
+        {"index":7,username:"china",winRate:"50%",level:"5"},
+        {"index":8,username:"eana",winRate:"10%",level:"0"}
+    ];
+    for (var i = 0; i < $scope.playerList.length; i++) {
+        $scope.isDisplayInfo[$scope.playerList[i].username] = 0;
+    };
     $scope.voteOne = function(roomName,userName,voteToName){
+        //debugger;
     	socket.emit('voteOne',{
     		_roomName: roomName,
     		_userName: userName,
     		_voteToName: voteToName
     	});
+        $scope.isDisplayVote = 0;
+    }
+    //mouse over
+    $scope.faceMouseOver = function (username) {
+        $scope.isDisplayInfo[username] = 1;
+    }
+    //mouse over
+    $scope.faceMouseOut = function (username) {
+        $scope.isDisplayInfo[username] = 0;
+    }
+    //add frind
+    $scope.addFriend = function (username) {
+        
     }
     //其他人创建房间时
     socket.on('newRoom',function(data){
@@ -599,6 +642,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     	if(userName == _myself.name){
             //time leave
             timeLeave();
+            $scope.isYourTurn = 0;
     	}
     });
     //开始投票
@@ -609,6 +653,12 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         if (data.type == 4) {
             $scope.sayMessageTip = data.msg;
             closeSayTips();
+        }
+        if (data.type == 6) {
+            $timeout(function () {
+                $scope.sayMessageTip = data.msg;
+                closeSayTips();
+            }, 4000)
         }
     	$scope.sysMessage.push(data.msg);
     });

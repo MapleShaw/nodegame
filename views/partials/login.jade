@@ -3,7 +3,7 @@ div.index
 	form(method="post")
 		div.eachItem
 			label Username
-			input(type="text" , id="errorLoginOfName" , name="username" , ng-model="loginForm.username" , placeholder="Type your name…" , required)
+			input(type="text" , id="errorLoginOfName" , name="username" , ng-model="loginForm.username" , placeholder="Type your name…", autofocus='autofocus', required)
 		div.eachItem
 			label Password
 			input(type="password" , id="errorLoginOfPw" , name="password" , ng-model="loginForm.password" , placeholder="Type your password…" , required)
