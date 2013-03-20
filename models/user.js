@@ -25,10 +25,10 @@ exports.User.prototype.save = function save(callback) {
     //isOnGame
   };
 
-  var myselfInfo = {
-    name: user.name,
-    systemid: user.systemid,
-  }
+  // var myselfInfo = {
+  //   name: user.name,
+  //   systemid: user.systemid,
+  // }
   mongodb.open(function(err, db) {
     if (err) {
       return callback(err);
@@ -43,9 +43,9 @@ exports.User.prototype.save = function save(callback) {
       collection.ensureIndex('name', {unique: true});
       
       //用戶註冊時自動作為好友加入到其他用戶好友列表中
-      collection.update({},{$push:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
+      // collection.update({},{$push:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
       
-      });
+      // });
       // 寫入 user 文檔      
       collection.insert(user, {safe: true}, function(err, user) {
         mongodb.close();

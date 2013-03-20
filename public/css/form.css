@@ -90,7 +90,6 @@ textarea:focus
 }
 
 .btn {
-  width:315px; /*maple*/
   display: inline-block;
   padding: 4px 15px;
   margin-bottom: 0;
@@ -159,7 +158,8 @@ textarea:focus
   filter: alpha(opacity=65);
   box-shadow: none;
 }
-
+/*登录表单按钮样式*/
+.formBtn{width:315px; /*maple*/}
 .cssForm input.ng-invalid.ng-dirty {
   background-color: #FA787E;
 }
