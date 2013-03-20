@@ -38,7 +38,7 @@ module.exports = function(socket,rooms,io){
 		constructor : RoomStructure,
 
 		//玩家加进房间
-		userConnect : function(userName){
+		userConnect : function(userID){
 			if(this.isRoomFull()){
 				return '该房间人数已满';
 			}
@@ -47,8 +47,8 @@ module.exports = function(socket,rooms,io){
 			}
 			else{
 				//将玩家顺序保存到数组中
-				this._sequence.push(userName);
-				this.addMember(userName);
+				this._sequence.push(userID);
+				this.addMember(userID);
 				return true;
 			}
 		},
@@ -69,14 +69,14 @@ module.exports = function(socket,rooms,io){
 		},
 
 		//获取房间成员列表,玩家放在数组第一个
-		getRoomMemberList : function(userName){
+		getRoomMemberList : function(userID){
 			var sequence = this._sequence;
 			var newList = [];
 			for(var i = 0; i < sequence.length; i ++){
 				newList[i] = sequence[i];
 			}
 			for(var i = 0; i < sequence.length; i ++){
-				if (newList[i] == userName) {
+				if (newList[i] == userID) {
 					return newList;
 				}
 				else{
@@ -87,23 +87,23 @@ module.exports = function(socket,rooms,io){
 		},
 
 		//添加成员
-		addMember : function(userName){
+		addMember : function(userID){
 			this._count ++;
-			this._roomMember[userName] = {};
+			this._roomMember[userID] = new UserStructure();
 		},
 
 		//删除成员
-		deleteMember : function(userName){
+		deleteMember : function(userID){
 			this._count --;
 			//从保存的顺序中删除该用户
 			var sequence = this._sequence;
 			for(var i = 0;i < sequence.length;i ++){
-				if(sequence[i] == userName){
+				if(sequence[i] == userID){
 					sequence.splice(i,1);
 					break ;
 				}
 			}
-			delete this._roomMember[userName];
+			delete this._roomMember[userID];
 		},
 
 		//房间是否人满
@@ -154,9 +154,6 @@ module.exports = function(socket,rooms,io){
 
 		//房间开始游戏
 		onGameStart : function(){
-			for(var item in this._roomMember){
-				this._roomMember[item] = new UserStructure();
-			}
 			//获取、分配题目
 			this.distributeSubject(this.getSubject(),this._roomMember);
 			//随机指定玩家开始发言
@@ -214,7 +211,7 @@ module.exports = function(socket,rooms,io){
 					var item = this._pkMember[i];
 					var user = this._roomMember[item];
 					if(!user.isSay && !user.isOut){
-						return user;
+						return this.getNameByID(item);
 					}
 				}
 				return -1;
@@ -227,11 +224,16 @@ module.exports = function(socket,rooms,io){
 						continue;
 					}
 					else{
-						return sequence[i];
+						return this.getNameByID(sequence[i]);
 					}
 				}
 				return -1;
 			}
+		},
+
+		//通过ID获取用户名
+		getNameByID : function(userID){
+			return this._roomMember[userID].userInfo.userName;
 		},
 
 		//判断是否所有玩家发过言
@@ -299,7 +301,7 @@ module.exports = function(socket,rooms,io){
 		//投票回合结束,返回最高票数者的名字,票数
 		onVoteEnd : function(){
 			//最高票数名字
-			var max_vote_name = [];
+			var max_vote_id = [];
 			//最高票数
 			var max_vote = 0;
 			//最高票数重复次数
@@ -307,14 +309,14 @@ module.exports = function(socket,rooms,io){
 			//获得最高票数
 			var getHighest = function(user){
 				if(user.voteCount > max_vote && user.isOut == false){
-					max_vote_name = [];
+					max_vote_id = [];
 					max_vote = user.voteCount;
-					max_vote_name.push(item);
+					max_vote_id.push(item);
 					max_repeat = 1;
 				}
 				else if(user.voteCount == max_vote && user.isOut == false){
 					max_repeat ++;
-					max_vote_name.push(item);
+					max_vote_id.push(item);
 				}
 				user.isVote = false;
 				user.voteCount = 0;
@@ -337,10 +339,10 @@ module.exports = function(socket,rooms,io){
 			}
 			//最高票数者出局（唯一最高票数的情况下）
 			if(max_repeat == 1){
-				member[max_vote_name[0]].isOut = true;
+				member[max_vote_id[0]].isOut = true;
 				//最高票数者出局后，发言的第一位从出局的下一位开始
 				var sequence = this._sequence;
-				var name = max_vote_name[0];
+				var name = max_vote_id[0];
 				for(var i = 0; i < sequence.length; i ++){
 					if(sequence[i] == name){
 						break;
@@ -350,7 +352,7 @@ module.exports = function(socket,rooms,io){
 					}
 				}
 			}
-			return {max_vote_name : max_vote_name , max_vote : max_vote , max_repeat : max_repeat};					
+			return {max_vote_id : max_vote_id , max_vote : max_vote , max_repeat : max_repeat};					
 		},
 
 		//进入pk环节
@@ -447,10 +449,21 @@ module.exports = function(socket,rooms,io){
 		this.voteCount = 0;
 		//是否已被票出局
 		this.isOut = false;
+		//玩家资料
+		this.userInfo = {
+			// winRate : null,
+			// level : null,
+			// userName : null,
+		};
 	}
 	UserStructure.prototype = {
 		//构造指针
 		constructor : UserStructure,
+
+		//获取玩家资料
+		getUserInfo : function(userID){
+			return this.userInfo;
+		},
 
 		//发言
 		makeStatement : function(){
@@ -526,13 +539,15 @@ module.exports = function(socket,rooms,io){
 		加入房间
 	*/
 	socket.on('joinRoom',function(data){
-		//data 格式 {_roomName : name , _userName : name}
+		//data 格式 {_roomName : name , _userName : name,_userID: userID}
 		var roomName = data._roomName;
 		var userName = data._userName;
+		var userID = data._userID;
 		var roomIndex = data._location;
 		var room_temp = rooms.getRoom(roomName);
+		var userInfo = data._userInfo;
 		if(room_temp){
-			var temp = room_temp.userConnect(userName);	
+			var temp = room_temp.userConnect(userID);	
 			if (typeof temp == 'string') {
 				//人满或房间已开始游戏
 				socket.emit('err',{
@@ -542,12 +557,15 @@ module.exports = function(socket,rooms,io){
 			}
 			else{
 				socket.join(data._roomName);
+				//添加用户信息
+				var user_temp = rooms.getUser(roomName,userID);
+				user_temp.userInfo = userInfo;
 				//设置桌子状态
 				room_temp.toggleDeskStatus(roomIndex);
 				//广播
-				io.sockets.in(data._roomName).emit('Message',{
+				io.sockets.in(roomName).emit('Message',{
 					type: 1,
-					msg : '玩家【'+data._userName+'】加入了房间',
+					msg : '玩家【'+userName+'】加入了房间',
 				});
 				//更新房间状态
 				io.sockets.emit('updateRoomStatus',{
@@ -572,12 +590,13 @@ module.exports = function(socket,rooms,io){
 	socket.on('leaveRoom',function(data){
 		var roomName = data._roomName;
 		var userName = data._userName;
+		var userID = data._userID;
 		var roomIndex = data._location;
 		socket.leave(roomName);
 		var room = rooms.getRoom(roomName);
-		var user = rooms.getUser(userName);
+		var user = rooms.getUser(roomName,userID);
 		if(typeof user.errType == 'undefined'){
-			room.deleteMember(userName);
+			room.deleteMember(userID);
 		}
 		//房间人数为0时删除房间
 		if(room.isEmpty()){

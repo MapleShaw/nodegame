@@ -63,7 +63,7 @@ var rooms = {
 	},
 
 	//获取用户对象
-	getUser : function(roomName,userName){
+	getUser : function(roomName,userID){
 		var room_temp = this.list[roomName];
 		if(typeof room_temp != 'object'){
 			return {
@@ -72,7 +72,7 @@ var rooms = {
 			};
 		}
 
-		var user_temp = room_temp._roomMember[userName];
+		var user_temp = room_temp._roomMember[userID];
 		if(typeof user_temp != 'object'){
 			return {
 				errType : -2,

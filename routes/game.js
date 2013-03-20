@@ -4,31 +4,42 @@
 */
 module.exports = function(socket,rooms,io){
 	/*
+		Get User Info
+		获取玩家信息
+	*/
+	socket.on('getUserInfo',function(data){
+		var roomName = data._roomName;
+	});
+
+	/*
 		prepare for game
 		准备
 	*/
 	socket.on('prepareForGame',function(data){
-		//data 格式 {_roomName : name,_userName : name}
-		var user = rooms.getUser(data._roomName,data._userName);
-		var room = rooms.getRoom(data._roomName);
+		//data 格式 {_roomName : name,_userName : name,_userID:userID}
+		var roomName = data._roomName;
+		var userName = data._userName;
+		var userID = data._userID;
+		var user = rooms.getUser(roomName,userID);
+		var room = rooms.getRoom(roomName);
 		if(typeof user.errType == "undefined"){
 			//所有玩家已经准备
 			if(room.userPrepare()){
-				io.sockets.in(data._roomName).emit('Message',{
+				io.sockets.in(roomName).emit('Message',{
 					type: 2,
-					msg : '玩家【'+data._userName+"】已准备",
+					msg : '玩家【'+userName+"】已准备",
 				});
 				if(room.isAllPrepare()){
 					//游戏开始
 					room.onGameStart();
 					//广播
-					io.sockets.in(data._roomName).emit('gameStart',{});
-					io.sockets.in(data._roomName).emit('Message',{
+					io.sockets.in(roomName).emit('gameStart',{});
+					io.sockets.in(roomName).emit('Message',{
 						type: 3,
-						msg: '玩家【'+room._sequence[0]+'】开始发言'
+						msg: '玩家【'+room.getNameByID(userID)+'】开始发言'
 					});
-					io.sockets.in(data._roomName).emit('makeStatement',{
-						_userName : room._sequence[0]
+					io.sockets.in(roomName).emit('makeStatement',{
+						_userName : room.getNameByID(userID)
 					});
 				}
 			}
@@ -53,7 +64,8 @@ module.exports = function(socket,rooms,io){
 	socket.on('getIdentity',function(data){
 		var roomName = data._roomName;
 		var userName = data._userName;
-		var user = rooms.getUser(roomName,userName);
+		var userID = data._userID;
+		var user = rooms.getUser(roomName,userID);
 		if(user.errType){
 			return false;
 		}
@@ -75,9 +87,10 @@ module.exports = function(socket,rooms,io){
 		//data 格式 {_userName : name, _roomName : name,}
 		var roomName = data._roomName,
 			userName = data._userName,
+			userID = data._userID,
 			statement = data._statement;
 		//检验
-		var user_temp = rooms.getUser(roomName,userName);
+		var user_temp = rooms.getUser(roomName,userID);
 		var room_temp = rooms.getRoom(roomName);
 		if(user_temp.errType){
 			socket.emit('err',{
@@ -157,9 +170,11 @@ module.exports = function(socket,rooms,io){
 		//data 格式 {_voteFrom : _userName,_voteToName : name,_roomName : name},放弃投票可将_voteToName置为null
 		var roomName = data._roomName;
 		var userName = data._userName;
+		var userID = data._userID;
 		var voteToName = data._voteToName;
+		var voteToID = data._voteToID;
 
-		var user_temp = rooms.getUser(roomName,userName);
+		var user_temp = rooms.getUser(roomName,userID);
 		var room_temp = rooms.getRoom(roomName);
 		if(typeof user_temp.errType != 'undefined'){
 			//房间不存在
@@ -176,8 +191,8 @@ module.exports = function(socket,rooms,io){
 			return false;
 		}
 
-		if(voteToName){
-			var beVote_temp = rooms.getUser(roomName,voteToName);
+		if(voteToID){
+			var beVote_temp = rooms.getUser(roomName,voteToID);
 			if(typeof beVote_temp.errType != 'undefined'){
 				//所投的用户并未在该房间内
 				socket.emit('err',{
@@ -197,16 +212,16 @@ module.exports = function(socket,rooms,io){
 
 		//所有玩家投过票
 		if(room_temp.isAllVote()){
-			//onVoteEnd返回的数据如下{max_vote_name:max_vote_name,max_vote:max_vote,max_repeat:max_repeat}
+			//onVoteEnd返回的数据如下{max_vote_id:max_vote_id,max_vote:max_vote,max_repeat:max_repeat}
 			var vote_data = room_temp.onVoteEnd();
-			if(vote_data.max_repeat == 1 && vote_data.max_vote_name.length != 0){
+			if(vote_data.max_repeat == 1 && vote_data.max_vote_id.length != 0){
 				//只有一个玩家最高票
 				io.sockets.in(roomName).emit('Message',{
 					type: 8,
-					msg: '玩家【'+vote_data.max_vote_name[0]+'】获得最高票数出局'
+					msg: '玩家【'+vote_data.max_vote_id[0]+'】获得最高票数出局'
 				});
 				io.sockets.in(roomName).emit('voteOut',{
-					_userName :　vote_data.max_vote_name[0],
+					_userName :　vote_data.max_vote_id[0],
 				});
 				//清除pk状态
 				if(room_temp._isPK){
@@ -249,10 +264,10 @@ module.exports = function(socket,rooms,io){
 			else if(vote_data.max_repeat > 1){
 				//有多人最高票数，进入Pk环节
 				io.sockets.in(roomName).emit('pkTurn',{
-					_userName : vote_data.max_vote_name
+					_userName : vote_data.max_vote_id
 				});
 				//进入pk状态
-				room_temp.onPKTurn(vote_data.max_vote_name);
+				room_temp.onPKTurn(vote_data.max_vote_id);
 			}
 			else{
 				return false;
@@ -269,6 +284,7 @@ module.exports = function(socket,rooms,io){
 		var word_temp = data._word;
 		var roomName = data._roomName;
 		var userName = data._userName;
+		var userID = data._userID;
 		//获取房间对象
 		var room_temp = rooms.getRoom(roomName);
 		if(!room_temp){
@@ -279,7 +295,7 @@ module.exports = function(socket,rooms,io){
 			});
 			return;
 		}
-		var user_temp = rooms.getUser(userName);
+		var user_temp = rooms.getUser(roomName,userID);
 		if(user_temp.errType){
 			//获取不到用户，即用户不在该房间内
 			socket.emit('err',{
