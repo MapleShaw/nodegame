@@ -8,7 +8,18 @@ module.exports = function(socket,rooms,io){
 		获取玩家信息
 	*/
 	socket.on('getUserInfo',function(data){
+		//获取某个用户的信息
 		var roomName = data._roomName;
+		var userID = data._userID;
+		var user_temp = rooms.getUser(roomName,userID);
+		if(typeof user_temp.errType == "undefined"){
+			socket.emit('setUserInfo',{
+				_userInfo: user_temp.getUserInfo(),
+			});
+		}
+		else{
+			return;
+		}
 	});
 
 	/*
@@ -212,16 +223,16 @@ module.exports = function(socket,rooms,io){
 
 		//所有玩家投过票
 		if(room_temp.isAllVote()){
-			//onVoteEnd返回的数据如下{max_vote_id:max_vote_id,max_vote:max_vote,max_repeat:max_repeat}
+			//onVoteEnd返回的数据如下{max_vote_name:max_vote_id,max_vote:max_vote,max_repeat:max_repeat}
 			var vote_data = room_temp.onVoteEnd();
-			if(vote_data.max_repeat == 1 && vote_data.max_vote_id.length != 0){
+			if(vote_data.max_repeat == 1 && vote_data.max_vote_name.length != 0){
 				//只有一个玩家最高票
 				io.sockets.in(roomName).emit('Message',{
 					type: 8,
-					msg: '玩家【'+vote_data.max_vote_id[0]+'】获得最高票数出局'
+					msg: '玩家【'+vote_data.max_vote_name[0]+'】获得最高票数出局'
 				});
 				io.sockets.in(roomName).emit('voteOut',{
-					_userName :　vote_data.max_vote_id[0],
+					_userName :　vote_data.max_vote_name[0],
 				});
 				//清除pk状态
 				if(room_temp._isPK){
@@ -264,10 +275,10 @@ module.exports = function(socket,rooms,io){
 			else if(vote_data.max_repeat > 1){
 				//有多人最高票数，进入Pk环节
 				io.sockets.in(roomName).emit('pkTurn',{
-					_userName : vote_data.max_vote_id
+					_userName : vote_data.max_vote_name
 				});
 				//进入pk状态
-				room_temp.onPKTurn(vote_data.max_vote_id);
+				room_temp.onPKTurn(vote_data.max_vote_name);
 			}
 			else{
 				return false;

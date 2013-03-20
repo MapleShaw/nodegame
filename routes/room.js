@@ -300,7 +300,10 @@ module.exports = function(socket,rooms,io){
 
 		//投票回合结束,返回最高票数者的名字,票数
 		onVoteEnd : function(){
+			var result = {};
 			//最高票数名字
+			var max_vote_name = [];
+			//最高票数ID
 			var max_vote_id = [];
 			//最高票数
 			var max_vote = 0;
@@ -352,7 +355,16 @@ module.exports = function(socket,rooms,io){
 					}
 				}
 			}
-			return {max_vote_id : max_vote_id , max_vote : max_vote , max_repeat : max_repeat};					
+			for(var j = 0; j < max_vote_id.length; j++){
+				max_vote_name[j] = this.getNameByID(max_vote_id[j]);
+			}
+			result = {
+				max_vote_id: max_vote_id,
+				max_vote: max_vote,
+				max_repeat: max_repeat,
+				max_vote_name: max_vote_name,
+			};
+			return result;
 		},
 
 		//进入pk环节
@@ -411,6 +423,11 @@ module.exports = function(socket,rooms,io){
 					return false;
 				}
 			}
+		},
+
+		//计算分数等级
+		calculateScores : function(){
+
 		},
 
 		//房间游戏结束
