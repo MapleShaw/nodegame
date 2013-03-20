@@ -67,7 +67,7 @@ exports.User.get = function get(username, callback) {
         return callback(err);
       }
       // 查找 name 屬性爲 username 的文檔
-      collection.findOne({name: username}, function(err, doc) {
+      collection.findOne({name: username}, function(err, doc) {console.log(doc);
         mongodb.close();
         if (doc) {
           // 封裝文檔爲 User 對象
@@ -82,7 +82,7 @@ exports.User.get = function get(username, callback) {
 };
 
 //加好友
-exports.Friend.prototype.addFriend = function addFriend(hostName,callback) {
+exports.Friend.prototype.addFriend = function addFriend(hostId,callback) {
   // 存入 Mongodb 的文檔
 
   var myselfInfo = {
@@ -96,9 +96,9 @@ exports.Friend.prototype.addFriend = function addFriend(hostName,callback) {
     // 讀取 users 集合
     db.collection('users', function(err, collection) {
       
-      collection.update({"name":hostName},{$push:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
+      collection.update({"systemid":hostId},{$push:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
         mongodb.close();
-        return callback("succeed!");
+        return callback(myselfInfo);
       });
     });
   });
@@ -125,7 +125,7 @@ exports.Friend.prototype.removeFriend = function removeFriend(hostName,callback)
   });
 };
 
-exports.Friend.get = function get(username, callback) {
+exports.Friend.get = function get(systemid, callback) {
   mongodb.open(function(err, db) {
     if (err) {
       return callback(err);
@@ -137,14 +137,17 @@ exports.Friend.get = function get(username, callback) {
         return callback(err);
       }
       // 查找 name 屬性爲 username 的文檔
-      collection.findOne({name: username}, function(err, doc) {
+      collection.findOne({friendList: {$elemMatch :{systemid:systemid}}},function(err,doc){
         mongodb.close();
         if (doc) {
+          err = 0;
           callback(err);
         } else {
           callback(err, null);
         }
       });
+      
+      
     });
   });
 };

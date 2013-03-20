@@ -12,7 +12,7 @@ function gameRuleCtrl($scope, $http, $routeParams, $location){//friendCtrl目前
         var yourFriend = {
             username : friendInfo.getAttribute("friendName"),
             systemid : friendInfo.getAttribute("friendId"),
-            selfName : JSON.parse(window.sessionStorage.getItem('myselfInfo')).name, //把字符串先转换成json
+            selfId : JSON.parse(window.sessionStorage.getItem('myselfInfo')).systemid, //把字符串先转换成json
         };
 
         $http.post('/add_friend/add', yourFriend).success(function(data, status, headers, config){

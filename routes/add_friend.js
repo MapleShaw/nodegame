@@ -10,13 +10,20 @@ exports.add = function(req, res){
   });
   
   //新增好友 
-  user.Friend.get(data.selfName, function(err) {
-    newFriend.addFriend(data.selfName,function(err) {
-      if (err) {
-        _callback(err);
-      }
+  user.Friend.get(data.systemid, function(err) {
+    if(err==0){
+      err="那位童鞋已经是你的好友了！！你妹！！";
+      _callback(err);
+    }else{
       
-    });
+      newFriend.addFriend(data.selfId,function(err) {
+        if (err) {
+          _callback(err);
+        }
+        
+      });
+    }
+    
   });
 
   function _callback (_data) {
