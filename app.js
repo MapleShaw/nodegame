@@ -84,9 +84,9 @@ io.sockets.on('connection', function(socket){
 });
 
 //test
-// subjects.getSubject("球类",function(_data){
-//   console.log(_data);
-// });
+subjects.getSubject("球类",function(_data){
+  console.log(_data);
+});
 
 // Start server
 

@@ -6,6 +6,8 @@ exports.User = function(user) {
   this.password = user.password;
   this.systemid =  user.systemid;
   this.friendList = user.friendList;
+  this.winRate = user.winRate;
+  this.level = user.level;
 };
 
 exports.Friend = function(user) {
@@ -21,6 +23,8 @@ exports.User.prototype.save = function save(callback) {
     password: this.password,
     systemid: this.systemid,
     friendList: [],
+    winRate:this.winRate,
+    level:this.level,
     //isOnline
     //isOnGame
   };
@@ -104,7 +108,7 @@ exports.Friend.prototype.addFriend = function addFriend(hostId,callback) {
   });
 };
 //删除好友
-exports.Friend.prototype.removeFriend = function removeFriend(hostName,callback) {
+exports.Friend.prototype.removeFriend = function removeFriend(hostId,callback) {
   // 存入 Mongodb 的文檔
 
   var myselfInfo = {
@@ -117,15 +121,15 @@ exports.Friend.prototype.removeFriend = function removeFriend(hostName,callback)
     }
     // 讀取 users 集合
     db.collection('users', function(err, collection) {
-      collection.update({"name":hostName},{$pull:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
+      collection.update({"systemid":hostId},{$pull:{"friendList":myselfInfo}},{multi:true},function (err, cursor) {
         mongodb.close();
-        return callback("succeed!");
+        return callback(myselfInfo);
       });
     });
   });
 };
 
-exports.Friend.get = function get(systemid, callback) {
+exports.Friend.get = function get(systemid, selfId, callback) {
   mongodb.open(function(err, db) {
     if (err) {
       return callback(err);
@@ -137,16 +141,17 @@ exports.Friend.get = function get(systemid, callback) {
         return callback(err);
       }
       // 查找 name 屬性爲 username 的文檔
-      collection.findOne({friendList: {$elemMatch :{systemid:systemid}}},function(err,doc){
+      collection.findOne({systemid:selfId},function(err,doc){console.log(systemid);
+        for (var i = 0; i < doc.friendList.length; i++) {
+          if(doc.friendList[i].systemid==systemid){
+            err = 0;           
+          }
+        };
         mongodb.close();
-        if (doc) {
-          err = 0;
-          callback(err);
-        } else {
-          callback(err, null);
-        }
+        callback(err);
+        
       });
-      
+     
       
     });
   });

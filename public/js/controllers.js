@@ -28,7 +28,7 @@ function gameRuleCtrl($scope, $http, $routeParams, $location){//friendCtrl目前
         var yourFriend = {
             username : friendInfo.getAttribute("friendName"),
             systemid : friendInfo.getAttribute("friendId"),
-            selfName : JSON.parse(window.sessionStorage.getItem('myselfInfo')).name, //把字符串先转换成json
+            selfId : JSON.parse(window.sessionStorage.getItem('myselfInfo')).systemid, //把字符串先转换成json
         };
 
         $http.post('/add_friend/remove', yourFriend).success(function(data, status, headers, config){
@@ -118,7 +118,7 @@ function registerCtrl($scope, $http, $routeParams, $location){
 			$http.post('/register/post', $scope.registerForm).success(function(data, status, headers, config){
 				//do something if return success
 				$scope.successMsg = data.data;	
-				window.location.href='/';
+				window.location.href='/login';
 			}).error(function(data, status, headers, config){
 				//do something if return error
 			});

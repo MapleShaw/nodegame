@@ -24,6 +24,8 @@ exports.post = function(req, res){
     password: password,
     systemid: _id, //名字要跟user.js里面的对象属性对应
     friendList: [],
+    winRate:"50%",
+    level:2,
   });
   
 	//next is doing with the database of MongoDB

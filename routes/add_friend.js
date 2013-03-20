@@ -10,15 +10,15 @@ exports.add = function(req, res){
   });
   
   //新增好友 
-  user.Friend.get(data.systemid, function(err) {
+  user.Friend.get(data.systemid, data.selfId, function(err) {
     if(err==0){
-      err="那位童鞋已经是你的好友了！！你妹！！";
-      _callback(err);
+      var errTips="那位童鞋已经是你的好友了！！你妹！！";
+      _callback(errTips);
     }else{
       
-      newFriend.addFriend(data.selfId,function(err) {
-        if (err) {
-          _callback(err);
+      newFriend.addFriend(data.selfId,function(friend) {
+        if (friend) {
+          _callback(friend);
         }
         
       });
@@ -40,15 +40,20 @@ exports.remove = function(req, res){
     name: data.username,
     systemid: data.systemid,
   });
-  
+  console.log(data);
   //新增好友 
-  user.Friend.get(data.selfName, function(err) {
-    newFriend.removeFriend(data.selfName,function(err) {
-      if (err) {
-        _callback(err);
-      }
-      
-    });
+  user.Friend.get(data.systemid, data.selfId, function(err) {
+    if(err==0){
+      newFriend.removeFriend(data.selfId,function(friend) {
+        if (friend) {
+          _callback(friend);
+        }       
+      });
+    }else{
+      var errTips = "删你妹啊，他又不是你好友！！";
+      _callback(errTips);
+    }
+    
   });
   function _callback (_data) {
     res.json({
