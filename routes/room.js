@@ -151,10 +151,10 @@ module.exports = function(socket,rooms,io){
 			//获取、分配题目
 			this.distributeSubject(this.getSubject(),this._roomMember);
 			//随机指定玩家开始发言
-			var arr = this._sequence;
-			var random = Math.floor(Math.random()*arr.length);
+			var _length = this._sequence.length;
+			var random = Math.floor(Math.random()*_length);
 			for(var i = 0;i < random;i ++){
-				arr.push(arr.shift());
+				this._sequence.push(this._sequence.shift());
 			}
 			//房间状态设为开始
 			this.setRoomState('start');
@@ -208,7 +208,7 @@ module.exports = function(socket,rooms,io){
 						return this.getNameByID(item);
 					}
 				}
-				return -1;
+				return false;
 			}
 			else{
 				var member = this._roomMember;
@@ -221,7 +221,7 @@ module.exports = function(socket,rooms,io){
 						return this.getNameByID(sequence[i]);
 					}
 				}
-				return -1;
+				return false;
 			}
 		},
 
@@ -605,6 +605,7 @@ module.exports = function(socket,rooms,io){
 					type: -1,
 					msg : temp
 				});
+				return ;
 			}
 			else{
 				socket.join(data._roomName);
@@ -636,6 +637,7 @@ module.exports = function(socket,rooms,io){
 				type: 1,
 				msg : '房间不存在'
 			});
+			return ;
 		}
 	});
 
