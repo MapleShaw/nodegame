@@ -169,8 +169,8 @@ registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 	index controller
 */
 function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localStorage, global) {
-	
-	$scope.msgFrom = {};
+    
+    $scope.msgFrom = {};
     $scope.userTxt = {};
     $scope.sendToId = {};
     $scope.sendToName = {};
@@ -182,171 +182,175 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
 
     var usersObj = {};
 
-	// 取出当前用户的好友列表
-	var getFriendList = window.sessionStorage.getItem('friendList');
-	var getMyselfInfo = window.sessionStorage.getItem('myselfInfo');
-	
-	// the list of all friends and myself
-	if (getFriendList) {
-		// get the friendList
-		var _friendList = JSON.parse(getFriendList) || [];
-		// pass the friend list to $scope.users
-		$scope.friendList = _friendList;
-		// arr to obj
-		for (var i = 0; i < _friendList.length; i++) {
-			usersObj[_friendList[i].systemid] = _friendList[i];
-		};
-		// init the msg arr
-	    for(var i=0; i < $scope.friendList.length; i++) {
-	    	$scope.msgs[$scope.friendList[i].systemid] = [];
-	    	$scope.count[$scope.friendList[i].systemid] = 0;
-	    }
-	}
+    // 取出当前用户的好友列表
+    var getFriendList = window.sessionStorage.getItem('friendList');
+    var getMyselfInfo = window.sessionStorage.getItem('myselfInfo');
+    
+    var initFrientMsg = function () {
+        //arr to obj
+        for (var i = 0; i < $scope.friendList.length; i++) {
+            usersObj[$scope.friendList[i].systemid] = $scope.friendList[i];
+        };
+        // init the msg arr
+        for(var i=0; i < $scope.friendList.length; i++) {
+            $scope.msgs[$scope.friendList[i].systemid] = [];
+            $scope.count[$scope.friendList[i].systemid] = 0;
+        }
+    }
 
-	// get the info of yourself
-	var _myself = JSON.parse(getMyselfInfo);
+    // the list of all friends and myself
+    if (getFriendList) {
+        // get the friendList
+        $scope.friendList = JSON.parse(getFriendList) || [];
+        // arr to obj
+        // init the msg arr
+        initFrientMsg();
+    }
+
+    // get the info of yourself
+    var _myself = JSON.parse(getMyselfInfo);
     $scope._myself = _myself;
 
-	//send id to server
-	if (_myself) {
-		socket.emit('set nickname', _myself);
-	} else {
-	}
+    //send id to server
+    if (_myself) {
+        socket.emit('set nickname', _myself);
+    } else {
+    }
     socket.on('ready', function () {
        //do something if server return ready
     });
 
     function _template (friend) {
-    	// check if the dialog is exist
-    	var _dialog = document.getElementById("dialog_" + friend.systemid);
-    	if (_dialog) {
-    		_dialog.style.display = "block";
-    		return ;
-    	}
+        // check if the dialog is exist
+        var _dialog = document.getElementById("dialog_" + friend.systemid);
+        if (_dialog) {
+            _dialog.style.display = "block";
+            return ;
+        }
 
-    	// init info
-    	$scope.sendToId[friend.systemid] = friend.systemid;
-    	$scope.sendToName[friend.systemid] = friend.name;
-    	$scope.msgFrom[friend.systemid] = $scope.sendToName[friend.systemid];
+        // init info
+        $scope.sendToId[friend.systemid] = friend.systemid;
+        $scope.sendToName[friend.systemid] = friend.name;
+        $scope.msgFrom[friend.systemid] = $scope.sendToName[friend.systemid];
 
-    	//template string
-    	var _html = ['<div class="chat chatDialog" id="dialog_', friend.systemid, '" style="left:500px;top:100px;display:block;" data-left="500" data-top="100">',
-    					'<div on-draggable="on-draggable" class="userMsgg">',
-    						'<div class="title">',
-    							'<h3>与{{msgFrom["', friend.systemid, '"]}}聊天中</h3>',
-    							'<a href="javascript:;" class="close", title="关闭", ng-click="closeDialog(\'', friend.systemid, '\')"></a>',
-    							'<a href="javascript:;" class="min", title="最小化", ng-click="minDialog(\'', friend.systemid, '\')"></a>',
-    						'</div>',
-    					'</div>',
-    					'<div id="chatScorll_', friend.systemid, '" class="content" on-scroller="msgs[\'', friend.systemid, '\']">',
-							'<ul class="items">',
-								'<li ng-repeat="msg in msgs[\'', friend.systemid, '\']">',
-	            					'<div class="chatCnt">',
-		              					'<p class="c_name">',
-							                '<span class="username">{{msg.name}}</span>',
-		                					'<span class="gray">{{msg.time}}</span>',
-		              					'<p class="c_cnt">{{msg.cnt}}</p>',
-		              				'</div>',
-	              				'</li>',
-							'</ul>',
-						'</div>',
-						'<p class="user_id">',
-							'<input id="firend_id" type="text" ng-model="userId" placeholder="input your friend\'s id..." class="">',
-							'<span class="yourId">Your ID : </span></p>',
-						'<p class="user_txt">',
-							'<textarea class="chat_msg" id="chat_msg_', friend.systemid, '" ng-model="userTxt.', friend.systemid, '" on-enter="sendMsg(\'', friend.systemid, '\')" placeholder="input your message..." class=""></textarea>',
-						'</p>',
-						'<p class="user_ctrl">',
-							'<input type="button" value="send message" ng-click="sendMsg(\'', friend.systemid, '\')" class="btn">',
-							'<span class="gray">&nbsp; or "Enter" key</span>',
-							'<a href="javascript:;" class="clearTxt" ng-click="clearMsg(\'', friend.systemid, '\')">清除记录</a>',
-						'</p>',
-					'</div>'].join("");
-		// compile the template
-    	var chatTeml = $compile(_html)($scope);
-   		document.getElementById('chatTemplate').appendChild(chatTeml[0]);
+        //template string
+        var _html = ['<div class="chat chatDialog" id="dialog_', friend.systemid, '" style="left:500px;top:100px;display:block;" data-left="500" data-top="100">',
+                        '<div on-draggable="on-draggable" class="userMsgg">',
+                            '<div class="title">',
+                                '<h3>与{{msgFrom["', friend.systemid, '"]}}聊天中</h3>',
+                                '<a href="javascript:;" class="close", title="关闭", ng-click="closeDialog(\'', friend.systemid, '\')"></a>',
+                                '<a href="javascript:;" class="min", title="最小化", ng-click="minDialog(\'', friend.systemid, '\')"></a>',
+                            '</div>',
+                        '</div>',
+                        '<div id="chatScorll_', friend.systemid, '" class="content" on-scroller="msgs[\'', friend.systemid, '\']">',
+                            '<ul class="items">',
+                                '<li ng-repeat="msg in msgs[\'', friend.systemid, '\']">',
+                                    '<div class="chatCnt">',
+                                        '<p class="c_name">',
+                                            '<span class="username">{{msg.name}}</span>',
+                                            '<span class="gray">{{msg.time}}</span>',
+                                        '<p class="c_cnt">{{msg.cnt}}</p>',
+                                    '</div>',
+                                '</li>',
+                            '</ul>',
+                        '</div>',
+                        '<p class="user_id">',
+                            '<input id="firend_id" type="text" ng-model="userId" placeholder="input your friend\'s id..." class="">',
+                            '<span class="yourId">Your ID : </span></p>',
+                        '<p class="user_txt">',
+                            '<textarea class="chat_msg" id="chat_msg_', friend.systemid, '" ng-model="userTxt.', friend.systemid, '" on-enter="sendMsg(\'', friend.systemid, '\')" placeholder="input your message..." class=""></textarea>',
+                        '</p>',
+                        '<p class="user_ctrl">',
+                            '<input type="button" value="send message" ng-click="sendMsg(\'', friend.systemid, '\')" class="btn">',
+                            '<span class="gray">&nbsp; or "Enter" key</span>',
+                            '<a href="javascript:;" class="clearTxt" ng-click="clearMsg(\'', friend.systemid, '\')">清除记录</a>',
+                        '</p>',
+                    '</div>'].join("");
+        // compile the template
+        var chatTeml = $compile(_html)($scope);
+        document.getElementById('chatTemplate').appendChild(chatTeml[0]);
     }
 
     function _showTips (fromId, fromName) {
-    	// show tips
-    	$scope.msgCount++;
-    	if ($scope.count[fromId] === 0) {
-	    	$scope.tipsMsg.push({
-	    		fromId : fromId,
-	    		fromName : fromName
-	    	});
-	    }
-	    $scope.count[fromId]++;
+        // show tips
+        $scope.msgCount++;
+        if ($scope.count[fromId] === 0) {
+            $scope.tipsMsg.push({
+                fromId : fromId,
+                fromName : fromName
+            });
+        }
+        $scope.count[fromId]++;
     }
 
     $scope.sT = false;
     $scope.showTip = function() {
-    	if ($scope.sT == false) {
-	    	$scope.sT = true;
-	    } else {
-	    	$scope.sT = false;
-	    }
+        if ($scope.sT == false) {
+            $scope.sT = true;
+        } else {
+            $scope.sT = false;
+        }
     }
 
     //the function of init message
     $scope.initName = function (friend) {
-    	// get _template to show the dialog
-    	_template(friend);
-	}
+        // get _template to show the dialog
+        _template(friend);
+    }
 
-	//see the msg tips
-	$scope.showWin = function (userId) {
-		// get _template to show the dialog
-		_template(usersObj[userId]);
-		// rewrite the info
-		$scope.msgCount -= $scope.count[userId];
-		$scope.count[userId] = 0;
+    //see the msg tips
+    $scope.showWin = function (userId) {
+        // get _template to show the dialog
+        _template(usersObj[userId]);
+        // rewrite the info
+        $scope.msgCount -= $scope.count[userId];
+        $scope.count[userId] = 0;
 
-		for (var i = 0; i < $scope.tipsMsg.length; i++) {
-			if($scope.tipsMsg[i].fromId === userId) {
-				$scope.tipsMsg.splice(i, 1);
-			}
-		}
+        for (var i = 0; i < $scope.tipsMsg.length; i++) {
+            if($scope.tipsMsg[i].fromId === userId) {
+                $scope.tipsMsg.splice(i, 1);
+            }
+        }
 
-	}
+    }
 
-	$scope.sendMsg = function(userId){
-   		// send the message to server
+    $scope.sendMsg = function(userId){
+        // send the message to server
         if ($scope.userTxt[userId] == undefined || $scope.userTxt[userId] == "") {
-        	// if err
-        	document.getElementById('chat_msg').focus();
-        	return false;
+            // if err
+            document.getElementById('chat_msg').focus();
+            return false;
         } else {
-        	$scope.flag = true;
-	        if($scope.sendToId[userId] == ''){
-	            socket.emit('chat_publicmsg',$scope.userTxt[userId]);
-	        }else{
-	            socket.emit('chat_privatemsg', {
-	            	'sendTo' : $scope.sendToId[userId],
-	            	'sendText' : $scope.userTxt[userId]
-	            });
-	        }
+            $scope.flag = true;
+            if($scope.sendToId[userId] == ''){
+                socket.emit('chat_publicmsg',$scope.userTxt[userId]);
+            }else{
+                socket.emit('chat_privatemsg', {
+                    'sendTo' : $scope.sendToId[userId],
+                    'sendText' : $scope.userTxt[userId]
+                });
+            }
         }
- 	}
+    }
 
-	//chat_users[$scope.sendToId[user.id]].on('chat_have_receive', function (data) {
- 	socket.on('chat_have_receive', function (data) {
-    	// if return error
-    	var data = eval(data);
-    	// init info 
-    	$scope.flag = data.flag;
-    	// update info to plane of yourself
+    //chat_users[$scope.sendToId[user.id]].on('chat_have_receive', function (data) {
+    socket.on('chat_have_receive', function (data) {
+        // if return error
+        var data = eval(data);
+        // init info 
+        $scope.flag = data.flag;
+        // update info to plane of yourself
         if ($scope.flag && $scope.userTxt[data.fromId] != "") {
-        	$scope.msgs[data.fromId].push({
-				name : 'Me : ',
-				time : global._getTime(),
-				cnt : $scope.userTxt[data.fromId]
-			});
-			// clear
-			$scope.userTxt[data.fromId] = '';
-			document.getElementById('chat_msg_' + data.fromId).focus();
+            $scope.msgs[data.fromId].push({
+                name : 'Me : ',
+                time : global._getTime(),
+                cnt : $scope.userTxt[data.fromId]
+            });
+            // clear
+            $scope.userTxt[data.fromId] = '';
+            document.getElementById('chat_msg_' + data.fromId).focus();
         }
-    });	
+    }); 
 
     socket.on('chat_usermsg', function (data) {
        // do something if someone send "data" to you
@@ -354,96 +358,100 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
        var isIdExist = document.getElementById("dialog_" + data.fromId);
        // if dialog is exist and bolck
        if (usersObj[data.fromId] && isIdExist && isIdExist.style.display == "block") {
-       		//if the window is display=block
-	       	$scope.msgs[data.fromId].push({
-				name : data.fromName + ' : ',
-				time : global._getTime(),
-				cnt : data.msg
-			});
+            //if the window is display=block
+            $scope.msgs[data.fromId].push({
+                name : data.fromName + ' : ',
+                time : global._getTime(),
+                cnt : data.msg
+            });
        } 
        // if dialog is exist and none
        else if (usersObj[data.fromId] && isIdExist && isIdExist.style.display == "none") {
-       		//if the window is display=none
-       		$scope.msgs[data.fromId].push({
-				name : data.fromName + ' : ',
-				time : global._getTime(),
-				cnt : data.msg
-			});
-			//tips
-			_showTips(data.fromId, data.fromName);
+            //if the window is display=none
+            $scope.msgs[data.fromId].push({
+                name : data.fromName + ' : ',
+                time : global._getTime(),
+                cnt : data.msg
+            });
+            //tips
+            _showTips(data.fromId, data.fromName);
 
        } 
        // if dialog is not exist
        else if (usersObj[data.fromId] && !isIdExist) {
-       		//if the window is not display yeat
-       		$scope.msgs[data.fromId].push({
-				name : data.fromName + ' : ',
-				time : global._getTime(),
-				cnt : data.msg
-			});
-       		//tips
-       		_showTips(data.fromId, data.fromName);
+            //if the window is not display yeat
+            $scope.msgs[data.fromId].push({
+                name : data.fromName + ' : ',
+                time : global._getTime(),
+                cnt : data.msg
+            });
+            //tips
+            _showTips(data.fromId, data.fromName);
 
        } 
        // err
        else {
-       		console.log('the user is not online...')
+            console.log('the user is not online...')
        }
     });
 
     socket.on('chat_errmsg', function (data) {
-    	// if the user is not exist
-    	var data = eval(data);
-       	$scope.msgs[data.fromId].push({
-			name : data.fromName,
-			time : global._getTime(),
-			cnt : data.msg
-		});
+        // if the user is not exist
+        var data = eval(data);
+        $scope.msgs[data.fromId].push({
+            name : data.fromName,
+            time : global._getTime(),
+            cnt : data.msg
+        });
     });
 
     // close the dialog
     $scope.closeDialog = function (userId) {
-    	var dialog = document.getElementById("dialog_" + userId);
-    	var dParent = document.getElementById("chatTemplate");
-    	$scope.msgs[userId] = [];
-    	dParent.removeChild(dialog);
+        var dialog = document.getElementById("dialog_" + userId);
+        var dParent = document.getElementById("chatTemplate");
+        $scope.msgs[userId] = [];
+        dParent.removeChild(dialog);
     }
 
     // clear the msg
     $scope.clearMsg = function (userId) {
-    	// clear
-    	$scope.msgs[userId] = [];
+        // clear
+        $scope.msgs[userId] = [];
     }
 
     // minimize the window
     $scope.minDialog = function (userId) {
-    	// min dialog
-    	var dialog = document.getElementById("dialog_" + userId);
-    	dialog.style.display = "none";
+        // min dialog
+        var dialog = document.getElementById("dialog_" + userId);
+        dialog.style.display = "none";
     }
 
     /*
-		房间
+        房间
     */
     $scope.roomList = [];
     $scope.sysMessage = [];
+    //success msg tip
     $scope.systemTips = 0;
+    //error msg tip
+    $scope.errorTips = 0;
+    //user say msg tip
+    $scope.sayMessageTips = 0;
+    $scope.sayMessage = "";
     $scope.wordLength = null;
     $scope.word = '';
-
     $scope.isEditing = false;
     $scope.isFirstGet = 0;
     $scope.createRoomName = "";
     $scope.hovePeople = {};
     $scope.isAddRoom = 0;
     $scope.curRoom = "";
-    $scope.sayMessage = "";
-    $scope.sayMessageTip = 0;
     $scope.timeLeave = 0;
     $scope.isYourTurn = 1;
     $scope.isReady = 1;
     $scope.isDisplayVote = 0;
     $scope.isDisplayInfo = {};
+    $scope.isYourFriend = {};
 
     //if is first into the index page,display the room box
     if (localStorage.get('nodeGameIsFirstLoad') == true) {
@@ -456,40 +464,47 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         localStorage.put('nodeGameIsFirstLoad', false)
     }
 
-
     //以下是angular相关函数和操作
 
     $scope.editRoomName = function () {
-    	$scope.isEditing = true;
+        $scope.isEditing = true;
     }
     $scope.roomNameBlur = function () {
-    	if ($scope.createRoomName == '') {
-    		//tip : not exist
-            $scope.systemTips = "房间名不能为空";
-            closeSystemTips();
-    		$scope.isEditing = false;
-    	} else {
-    		// create room
-    		createRoom($scope.createRoomName);
-    		$scope.isEditing = false;
+        if ($scope.createRoomName == '') {
+            //tip : not exist
+            $scope.errorTips = "房间名不能为空";
+            closeErrTips();
+            $scope.isEditing = false;
+        } else {
+            // create room
+            createRoom($scope.createRoomName);
+            $scope.isEditing = false;
             $scope.createRoomName = "";
-    	}
+        }
     }
     //close tips div
     var _closeSystemTips;
     var closeSystemTips = function () {
-        clearTimeout(_closeSystemTips);
+        $timeout.cancel(_closeSystemTips);
         _closeSystemTips = $timeout(function () {
             $scope.systemTips = 0;
-        }, 1000);
-    }
+        }, 1500);
+    };
+    var _closeErrTips;
+    var closeErrTips = function () {
+        $timeout.cancel(_closeErrTips);
+        _closeErrTips = $timeout(function () {
+            $scope.errorTips = 0;
+        }, 1500);
+    };
     var _closeSayTips;
     var closeSayTips = function () {
-        clearTimeout(_closeSayTips);
+        $timeout.cancel(_closeSayTips);
         _closeSayTips = $timeout(function () {
-            $scope.sayMessageTip = 0;
+            $scope.sayMessageTips = 0;
         }, 3000);
-    }
+    };
+
     var _timeLeave;
     var timeLimit = 30;
     var timeLeave = function () {
@@ -516,7 +531,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var createRoom = function(roomName){
         if ($scope.isAddRoom == 0) {
             $scope.isAddRoom = 1;
-        	socket.emit('createRoom',{_roomName : roomName});
+            socket.emit('createRoom',{_roomName : roomName});
             //tip : succeed (should be wrote in callback socket)
             $scope.systemTips = "创建房间成功";
             closeSystemTips();
@@ -530,18 +545,20 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 });
             }, 1200);
             //join the room you create when you create it.(play1)
-            socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0});
+            var _jID = _myself.systemid;
+            var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
+            socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0, _userID : _jID, _userInfo : _jUserInfo});
         } else {
-            $scope.systemTips = "你已经加入了一个房间，不能创建房间";
-            closeSystemTips();
+            $scope.errorTips = "你已经加入了一个房间，不能创建房间";
+            closeErrTips();
         }
     }
     //获取房间列表
     $scope.getRoomList = function(){
-    	if ($scope.isFirstGet === 0) {
-    		socket.emit('getRoomList',{});
-    		$scope.isFirstGet = 1;
-    	}
+        if ($scope.isFirstGet === 0) {
+            socket.emit('getRoomList',{});
+            $scope.isFirstGet = 1;
+        }
     }
 
     $scope.joinRoom = function(roomName, roomIndex){
@@ -550,7 +567,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 $scope.isAddRoom = 1;
                 var _jName = _myself.name;
                 var _jRoom = roomName;
-            	socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex});
+                var _jID = _myself.systemid;
+                var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
+                socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex, _userID : _jID, _userInfo : _jUserInfo});
                 /*
                     when succeed join the room
                 */
@@ -568,12 +587,12 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 }, 1200);
                 //
             } else {
-                $scope.systemTips = "你已经加入了一个房间，不能再加入一个房间";
-                closeSystemTips();
+                $scope.errorTips = "你已经加入了一个房间，不能再加入一个房间";
+                closeErrTips();
             }
         } else {
-            $scope.systemTips = "此桌子已经有人，请选择其他桌子";
-            closeSystemTips();
+            $scope.errorTips = "此桌子已经有人，请选择其他桌子";
+            closeErrTips();
         }
     }
     $scope.leaveRoom = function (room) {
@@ -581,21 +600,23 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     }
     //准备游戏
     $scope.prepareForGame = function(roomName){
-    	socket.emit('prepareForGame',{
-    		_roomName : roomName,
-    		_userName : _myself.name
-    	});
+        socket.emit('prepareForGame',{
+            _roomName : roomName,
+            _userID : _myself.systemid,
+            _userName : _myself.name
+        });
         if ($scope.isReady == 0) {
             $scope.isReady = 1;
         }
     }
     //发言
-    $scope.makeStatement = function(roomName,userName,statement){
-    	socket.emit('onMakeStatement',{
-    		_roomName: roomName,
-    		_userName: userName,
-    		_statement: statement
-    	});
+    $scope.makeStatement = function(roomName,statement){
+        socket.emit('onMakeStatement',{
+            _roomName: roomName,
+            _userID : _myself.systemid,
+            _userName: _myself.name,
+            _statement: statement
+        });
         $timeout.cancel(_timeLeave);
         timeLimit = 30;
         $scope.timeLeave = 0;
@@ -603,46 +624,151 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isYourTurn = 1;
     }
     //投票
-    $scope.playerList = [
-        {"index":0,username:"zhoonchen",winRate:"50%",level:"5"},
-        {"index":1,username:"junlin",winRate:"10%",level:"2"},
-        {"index":2,username:"dingge",winRate:"40%",level:"1"},
-        {"index":3,username:"maple",winRate:"30%",level:"4"},
-        {"index":4,username:"shaw",winRate:"20%",level:"3"},
-        {"index":5,username:"zhihong",winRate:"70%",level:"5"},
-        {"index":6,username:"chen",winRate:"70%",level:"10"},
-        {"index":7,username:"china",winRate:"50%",level:"5"},
-        {"index":8,username:"eana",winRate:"10%",level:"0"}
-    ];
+    $scope.playerList = [];
+    var initPlayerList = function () {
+        $scope.playerList = [
+            {isOn : 0, info : {}},
+            {isOn : 0, info : {}},
+            {isOn : 0, info : {}},
+            {isOn : 0, info : {}},
+            {isOn : 0, info : {}},
+            {isOn : 0, info : {}},
+            {isOn : 0, info : {}},
+            {isOn : 0, info : {}},
+            {isOn : 0, info : {}}
+        ];
+    }
+    initPlayerList();
+    //updateRoomMember
+    socket.on('updateRoomMember',function (data) {
+        var _member = data._list;
+        initPlayerList();
+        var _length = _member.length;
+        for (var i = 0; i < _length; i++) {
+            $scope.playerList[i].isOn = 1;
+            $scope.playerList[i].info = _member[i];
+        }
+        for (var i = 0; i < _member.length; i++) {
+            if ($scope.playerList[i].info.systemID != _myself.systemid) {
+                $scope.playerList.push($scope.playerList.shift());
+                i--;
+            } else {
+                break;
+            }
+        }
+        //$scope.playerList = _member;
+    });
+    //is your friend
     for (var i = 0; i < $scope.playerList.length; i++) {
-        $scope.isDisplayInfo[$scope.playerList[i].username] = 0;
-    };
-    $scope.voteOne = function(roomName,userName,voteToName){
-        //debugger;
-    	socket.emit('voteOne',{
-    		_roomName: roomName,
-    		_userName: userName,
-    		_voteToName: voteToName
-    	});
+        $scope.isDisplayInfo[$scope.playerList[i].info.systemID] = 0;
+    }
+    for (var i = 0; i < $scope.friendList.length; i++) {
+        $scope.isYourFriend[$scope.friendList[i].systemid] = 1;
+    }
+    $scope.voteOne = function(roomName,voteToName){
+        socket.emit('voteOne',{
+            _roomName: roomName,
+            _userID : _myself.systemid,
+            _userName: _myself.name,
+            _voteToName: voteToName
+        });
         $scope.isDisplayVote = 0;
     }
     //mouse over
-    $scope.faceMouseOver = function (username) {
-        $scope.isDisplayInfo[username] = 1;
+    $scope.faceMouseOver = function (userID) {
+        $scope.isDisplayInfo[userID] = 1;
     }
     //mouse over
-    $scope.faceMouseOut = function (username) {
-        $scope.isDisplayInfo[username] = 0;
+    $scope.faceMouseOut = function (userID) {
+        $scope.isDisplayInfo[userID] = 0;
     }
     //add frind
-    $scope.addFriend = function (username) {
-        
+    $scope.addFriend = function (systemid, username) {
+        var yourFriend = {
+            username : username,
+            systemid : systemid,
+            selfName : _myself.name,
+            selfId : _myself.systemid
+        };
+        $http.post('/add_friend/add', yourFriend).success(function(data, status, headers, config){
+            console.log(data.data); //{userName : "zhoonchen", "systemid" : "nodegame232232323"}
+            var _data = data.data;
+            if (typeof _data == "string") {
+                $scope.errorTips = _data;
+                closeErrTips();
+            } else {
+                if (_data.name && _data.systemid) {
+                    $scope.friendList.push({
+                        "name" : _data.name,
+                        "systemid" : data.systemid
+                    });
+                } else {
+                    $scope.errorTips = "添加好友失败";
+                    closeErrTips();
+                }
+                //rewrite the friend msg
+                initFrientMsg();
+                //tips
+                $scope.systemTips = "成功添加" + _data.name + "为好友";
+                closeSystemTips();
+                //session storage
+                window.sessionStorage.setItem('friendList',JSON.stringify($scope.friendList));
+                //update status
+                $scope.isYourFriend[_data.systemid] = 1;
+            }
+        }).error(function(data, status, headers, config){
+            //tip
+            $scope.errorTips = "添加好友失败";
+            closeErrTips();
+        });
+    };
+    //remove friend
+    $scope.removeFriend = function (systemid, username) {
+        var yourFriend = {
+            username : username,
+            systemid : systemid,
+            selfName : _myself.name,
+            selfId : _myself.systemid
+        };
+        $http.post('/add_friend/remove', yourFriend).success(function(data, status, headers, config){
+            var _data = data.data;
+            if (typeof _data == "string") {
+                $scope.errorTips = _data;
+                closeErrTips();
+            } else {
+                if (_data.name && _data.systemid) {
+                    //delete friend from $scope.friendList
+                    for (var i = 0; i < $scope.friendList.length; i++) {
+                        if ($scope.friendList[i].name == _data.name) {
+                            $scope.friendList.splice(i, 1);
+                            break;
+                        }
+                    };
+                } else {
+                    $scope.errorTips = "取消好友失败";
+                    closeErrTips();
+                }
+                //rewrite the friend msg
+                initFrientMsg();
+                //tips
+                $scope.systemTips = "成功取消好友" + _data.name;
+                closeSystemTips();
+                //session storage
+                window.sessionStorage.setItem('friendList',JSON.stringify($scope.friendList));
+                //update status
+                $scope.isYourFriend[_data.systemid] = 0;
+            }
+        }).error(function(data, status, headers, config){
+            //tip
+            $scope.errorTips = "取消好友失败";
+            closeErrTips();
+        });
     }
     //其他人创建房间时
     socket.on('newRoom',function(data){
-    	$scope.roomList.push({
-    		roomName : data._roomName
-    	});
+        $scope.roomList.push({
+            roomName : data._roomName
+        });
     });
     //收到房间列表时
     socket.on('onRoomList',function(data){
@@ -667,7 +793,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             }
         }
     });
-    //
+    //updateRoomStatus
     socket.on('updateRoomStatus',function(data){
         var _room = data;
         if (!$scope.hovePeople[_room._roomName]) 
@@ -678,24 +804,24 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     });
     //游戏开始
     socket.on('gameStart',function(data){
-    	$scope.sysMessage.push('游戏开始');
-    	socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom});
+        $scope.sysMessage.push('游戏开始');
+        socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom});
     });
     //收到身份，词等
     socket.on('setIdentity',function(data){
-    	$scope.word = data._word;
-    	if(data._wordLength){
-    		$scope.wordLength = data._wordLength;
-    	}
+        $scope.word = data._word;
+        if(data._wordLength){
+            $scope.wordLength = data._wordLength;
+        }
     });
     //轮到用户user发言时
     socket.on('makeStatement',function(data){
-    	var userName = data._userName;
-    	if(userName == _myself.name){
+        var userName = data._userName;
+        if(userName == _myself.name){
             //time leave
             timeLeave();
             $scope.isYourTurn = 0;
-    	}
+        }
     });
     //开始投票
     socket.on('startVote',function(data){
@@ -703,28 +829,31 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //系统消息
     socket.on('Message',function(data){
         if (data.type == 4) {
-            $scope.sayMessageTip = data.msg;
+            $scope.sayMessageTips = data.msg;
             closeSayTips();
         }
-        if (data.type == 6) {
+        if (data.type == 6 || data.type == 3 || data.type == 2 || data.type ==1) {
             $timeout(function () {
-                $scope.sayMessageTip = data.msg;
-                closeSayTips();
-            }, 4000)
+                $scope.systemTips = data.msg;
+                closeSystemTips();
+            }, 1000);
         }
-    	$scope.sysMessage.push(data.msg);
+        if (data.type == 5) {
+            //display vote
+            $scope.isDisplayVote = 1;
+        }
+        $scope.sysMessage.push(data.msg);
     });
     //错误消息
     socket.on('err',function(data){
-        if (data.msg == '房间已存在') {
-            $scope.systemTips = "该房间已经存在";
-            closeSystemTips();
+        if (data.type == 2) {
+            $scope.errorTips = data.msg;
+            closeErrTips();
         };
-    	$scope.sysMessage.push(data.msg);
+        $scope.sysMessage.push(data.msg);
     });
     socket.on('rooms',function(data){
-    	//仅作测试用，可删除
-    	debugger ;
+        //仅作测试用，可删除
     });
 
 }

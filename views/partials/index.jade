@@ -2,8 +2,6 @@ div.wrap
 
   div.maskDiv(style='display:none;')
 
-  div.systemTips(ng-show='systemTips') {{systemTips}}
-
   div.roomBox#roomBox(ng-class='{editingName : isEditing == true}')
     a.roomClose(href='javascript:;') 关闭
     div.roomTop
@@ -53,23 +51,27 @@ div.wrap
     div.gameView
       div.gameDisplay
         div.players(ng-repeat='player in playerList')
-          div.face(mouse-over='faceMouseOver(player.username)', mouse-out='faceMouseOut(player.username)')
-          div.vote(ng-show='isDisplayVote && player.username != _myself.name')
-            a(href='javascript:;', ng-click='voteOne(curRoom, _myself.name, player.username)') 投票
-          div.userInfo(ng-show='isDisplayInfo[player.username]',mouse-over='faceMouseOver(player.username)', mouse-out='faceMouseOut(player.username)')
-            p 昵称：{{player.username}}
-            p 胜率：{{player.winRate}}
-            p 等级：{{player.level}}
+          div.face(mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)', ng-class='{on:player.isOn==1}')
+          div.vote(ng-show='isDisplayVote && player.info.systemID != _myself.systemid')
+            a(href='javascript:;', ng-click='voteOne(curRoom, player.info.systemID)') 投票
+          div.userInfo(ng-show='isDisplayInfo[player.info.systemID] && player.isOn',mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)')
+            p 昵称：{{player.info.userName}}
+            p 胜率：{{player.info.winRate}}
+            p 等级：{{player.info.level}}
             p
-              a(href='javascript:;', ng-click='addFriend(player.name)') 加为好友
+              a(href='javascript:;', ng-click='addFriend(player.info.systemID, player.info.userName)', ng-hide='isYourFriend[player.info.systemID] || player.info.systemID == _myself.systemid') 加为好友
+              a(href='javascript:;', ng-click='removeFriend(player.info.systemID, player.info.userName)', ng-show='isYourFriend[player.info.systemID || player.info.systemID != _myself.systemid]') 取消好友
         div.timeLeave 剩下 : {{timeLeave}}s
-        div.playMsg(ng-show='sayMessageTip') {{sayMessageTip}}
+        div.playMsg(ng-show='sayMessageTips') {{sayMessageTips}}
+        div.systemTips(ng-show='systemTips') {{systemTips}}
+        div.errTips(ng-show='errorTips') {{errorTips}}
+
         p.bg_txt 游戏区
         a.ctrlBtn.caici(href='javascript:;') 我要猜词
         a.ctrlBtn.yiyan(href='javascript:;') 我要留遗言
       div.gameSend
         textarea.playTextarea(ng-model='sayMessage', placeholder='请输入词语的描述句子...')
-        input.playSubmit(type='button', value='发言', ng-disabled='isYourTurn', ng-class='{disable:isYourTurn==1}', ng-click='makeStatement(curRoom, _myself.name, sayMessage)')
+        input.playSubmit(type='button', value='发言', ng-disabled='isYourTurn', ng-class='{disable:isYourTurn==1}', ng-click='makeStatement(curRoom, sayMessage)')
     div.gameSystem
       div.gameSystemInfo.box_style
         h3.title_mod 系统信息
