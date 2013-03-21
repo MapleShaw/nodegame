@@ -58,7 +58,6 @@ exports.User.prototype.save = function save(callback) {
     });
   });
 };
-
 exports.User.get = function get(username, callback) {
   mongodb.open(function(err, db) {
     if (err) {
@@ -71,7 +70,7 @@ exports.User.get = function get(username, callback) {
         return callback(err);
       }
       // 查找 name 屬性爲 username 的文檔
-      collection.findOne({name: username}, function(err, doc) {console.log(doc);
+      collection.findOne({name: username}, function(err, doc) {
         mongodb.close();
         if (doc) {
           // 封裝文檔爲 User 對象
@@ -79,6 +78,54 @@ exports.User.get = function get(username, callback) {
           callback(err, user);
         } else {
           callback(err, null);
+        }
+      });
+    });
+  });
+};
+//更新用户信息
+exports.User.prototype.update = function update(systemid,winRate,level,callback) {
+  mongodb.open(function(err, db) {
+    if (err) {
+      return callback(err);
+    }
+    // 讀取 users 集合
+    db.collection('users', function(err, collection) {
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+
+      // 更新 user 文檔      
+      collection.update({systemid:systemid}, {$set:{winRate:winRate,level:level}}, function(err) {
+        mongodb.close();
+        if(err){
+          callback(err);
+        }else{
+          callback("susseed!");
+        }
+        
+      });
+    });
+  });
+}
+exports.User.check = function ckeck(systemid, callback) {
+  mongodb.open(function(err, db) {
+    if (err) {
+      return callback(err);
+    }
+    // 讀取 users 集合
+    db.collection('users', function(err, collection) {
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+      
+      collection.findOne({systemid: systemid}, function(err, doc) {
+        mongodb.close();
+        if (doc) {
+          err = 0;
+          callback(err);
         }
       });
     });

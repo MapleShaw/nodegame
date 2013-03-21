@@ -72,6 +72,8 @@ app.post('/subjects/addSubject', subjects.addSubject);
 app.post('/add_friend/add', add_friend.add);
 //remove friends
 app.post('/add_friend/remove', add_friend.remove);
+//user update
+app.post('/add_friend/update', add_friend.update);
 // redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
 

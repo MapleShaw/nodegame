@@ -40,7 +40,7 @@ exports.login = function(req, res){
     }else if(_err==0){
       res.json({
         err : _err,
-        myselfInfo : {name:_user.name,systemid:_user.systemid},
+        myselfInfo : {name:_user.name,systemid:_user.systemid,winRate:_user.winRate,level:_user.level},
         friendList : _user.friendList ? _user.friendList : []
       });
     }

@@ -49,6 +49,20 @@ function gameRuleCtrl($scope, $http, $routeParams, $location){//friendCtrl目前
             
         });
     };
+    //更新用户信息测试函数
+    $scope.updatePost = function(){
+        var currentUser={
+            systemid:"nodegame11377627961363776874746",
+            winRate:"100%",
+            level:100,
+        };
+        $http.post('/add_friend/update', currentUser).success(function(data, status, headers, config){
+            console.log(data.data);
+           
+        }).error(function(data, status, headers, config){
+            
+        });
+    };
 
 }
 gameRuleCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];//friendCtrl

@@ -40,7 +40,6 @@ exports.remove = function(req, res){
     name: data.username,
     systemid: data.systemid,
   });
-  console.log(data);
   //新增好友 
   user.Friend.get(data.systemid, data.selfId, function(err) {
     if(err==0){
@@ -61,3 +60,27 @@ exports.remove = function(req, res){
     });
   }
 };
+
+exports.update = function(req, res){
+  var data = req.body;
+  var currentUser = new user.User({
+    systemid: data.systemid, 
+    winRate:data.winRate,
+    level:data.level,
+  });
+  user.User.check(currentUser.systemid, function(tip) {
+    if(tip==0){
+      currentUser.update(currentUser.systemid, currentUser.winRate, currentUser.level, function(tips){
+        _callback(tips);
+      });
+    }
+  });
+  function _callback (_data) {
+    res.json({
+      data : _data
+    });
+  }
+}
+
+
+
