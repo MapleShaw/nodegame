@@ -1,21 +1,21 @@
 /**/
-.background{background: url(../img/back.png) no-repeat;
+/*.background{background: url(../img/back.png) no-repeat;
   background-size: 100% 100%;
   margin-top: -40px;
   height: 800px;
   padding-top: 50px;
-}
-.background .formBackground{
+}*/
+.formBackground{
   background-color: rgba(95, 92, 92, 0.4);
   
   width: 400px;
   margin: -50px auto;
   padding-top: 50px;
 }
-.background .loginBackground{
+.loginBackground{
   height: 250px;
 }
-.background .registerBackground{
+.registerBackground{
   height: 420px;
 }
 form{

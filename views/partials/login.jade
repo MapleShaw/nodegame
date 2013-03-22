@@ -1,18 +1,17 @@
 div.index
-	div.background
-		h2 Login
-		div.formBackground.loginBackground
-			form(method="post")
-				div.eachItem
-					label Username
-					input(type="text" , id="errorLoginOfName" , name="username" , ng-model="loginForm.username" , placeholder="Type your name…", autofocus='autofocus', required)
-				div.eachItem
-					label Password
-					input(type="password" , id="errorLoginOfPw" , name="password" , ng-model="loginForm.password" , placeholder="Type your password…" , required)
-				div.eachItem
-					label.checkbox
-						input.checkbox(type="checkbox") 
-						span remember me
-				button.btn.formBtn(type="submit" , ng-click="loginPost()") Login
-				p.errorTips {{userMsg}}
+	h2 Login
+	div.formBackground.loginBackground
+		form(method="post")
+			div.eachItem
+				label Username
+				input(type="text" , id="errorLoginOfName" , name="username" , ng-model="loginForm.username" , placeholder="Type your name…", autofocus='autofocus', required)
+			div.eachItem
+				label Password
+				input(type="password" , id="errorLoginOfPw" , name="password" , ng-model="loginForm.password" , placeholder="Type your password…" , required)
+			div.eachItem
+				label.checkbox
+					input.checkbox(type="checkbox") 
+					span remember me
+			button.btn.formBtn(type="submit" , ng-click="loginPost()") Login
+			p.errorTips {{userMsg}}
 	

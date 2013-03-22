@@ -40,8 +40,7 @@ function gameRuleCtrl($scope, $http, $routeParams, $location){//friendCtrl目前
     };
     //加题目
     $scope.topicPost = function(){
-        $scope.topicForm.words=$scope.topicForm.words.split(",")
-        console.log(typeof $scope.topicForm.words);
+        $scope.topicForm.words=$scope.topicForm.words.split("，");
         $http.post('/subjects/addSubject', $scope.topicForm).success(function(data, status, headers, config){
             console.log(data.data);
             $scope.msgTips = "You have sucessfully insert a kinds of words!!";
