@@ -238,7 +238,7 @@ module.exports = function(socket,rooms,io){
 
 		//所有玩家投过票
 		if(room_temp.isAllVote()){
-			//onVoteEnd返回的数据如下{max_vote_name:max_vote_id,max_vote:max_vote,max_repeat:max_repeat}
+			//onVoteEnd返回的数据如下{max_vote_name:max_vote_name,max_vote:max_vote,max_repeat:max_repeat}
 			var vote_data = room_temp.onVoteEnd();
 			if(vote_data.max_repeat == 1 && vote_data.max_vote_name.length != 0){
 				//只有一个玩家最高票
@@ -246,8 +246,10 @@ module.exports = function(socket,rooms,io){
 					type: 8,
 					msg: '玩家【'+vote_data.max_vote_name[0]+'】获得最高票数出局'
 				});
+				//玩家出局
 				io.sockets.in(roomName).emit('voteOut',{
-					_userName :　vote_data.max_vote_name[0],
+					_userName:　vote_data.max_vote_name[0],
+					_userID: vote_data.max_vote_id[0],
 				});
 				//清除pk状态
 				if(room_temp._isPK){
