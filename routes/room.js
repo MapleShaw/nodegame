@@ -636,7 +636,8 @@ module.exports = function(socket,rooms,io){
 				io.sockets.emit('updateRoomStatus',{
 					_roomName: roomName,
 					_userName: userName,
-					_location: roomIndex
+					_location: roomIndex,
+					_type: 1,
 				});
 				//给该房间的所有用户发送用户列表信息
 				var list_temp = room_temp.getRoomMemberList();
@@ -687,6 +688,7 @@ module.exports = function(socket,rooms,io){
 			_roomName: roomName,
 			_userName: userName,
 			_location: roomIndex,
+			_type: -1,
 		});
 		//给用户离开的房间里的成员发送
 		var list_temp = room.getRoomMemberList();
@@ -700,6 +702,6 @@ module.exports = function(socket,rooms,io){
 		玩家断开连接
 	*/
 	socket.on('disconnect',function(){
-		
+
 	});
 }
