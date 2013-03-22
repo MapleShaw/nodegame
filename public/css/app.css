@@ -61,14 +61,14 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 /*game*/
 .ctrlBtn{width: 96%;cursor: pointer;text-align: center;height: 30px;display: block;margin: 0 0 10px 0;line-height: 30px;background-image: -webkit-linear-gradient(top, #ffffff,#e1e1e1);border: 1px solid #d3d3d3;border-radius: 3px;outline: none;}
 .ctrlBtn:hover{background-image: -webkit-linear-gradient(top, #ffffff,#efefef);text-decoration: none;}
-.ctrlBtn.caici{position: absolute;bottom: 10px;right: 10px;width: 80px;margin-bottom: 0;}
-.ctrlBtn.yiyan{position: absolute;bottom: 10px;right: 100px;width: 80px;margin-bottom: 0;}
-.prepareGame{background-image: -webkit-linear-gradient(top,#589bc6,#5395bf);background-image: linear-gradient(top,#589bc6,#5395bf);border: 1px solid #5389af;color: #fff;}
-.prepareGame.disable{background-image: none;background-color: #f5f5f5;color: #999;border: 1px solid #dddddd;text-shadow: 1px 1px 0 #fff;cursor: default;}
-.prepareGame:hover{background-image:-webkit-linear-gradient(top,#76b1d7,#5a9dc7);background-image:linear-gradient(top,#76b1d7,#5a9dc7);}
-.prepareGame.disable:hover{background-image: none;}
+.ctrlBtn.caici{position: absolute;bottom: 2px;right: 2px;width: 80px;margin-bottom: 0;}
+.ctrlBtn.yiyan{position: absolute;bottom: 2px;right: 84px;width: 80px;margin-bottom: 0;}
+.prepareGame,.ctrlBtn.caici,.ctrlBtn.yiyan{background-image: -webkit-linear-gradient(top,#589bc6,#5395bf);background-image: linear-gradient(top,#589bc6,#5395bf);border: 1px solid #5389af;color: #fff;}
+.prepareGame.disable,.ctrlBtn.caici.disable,.ctrlBtn.yiyan.disable{background-image: none;background-color: #f5f5f5;color: #999;border: 1px solid #dddddd;text-shadow: 1px 1px 0 #fff;cursor: default;}
+.prepareGame:hover,.ctrlBtn.caici:hover,.ctrlBtn.yiyan:hover{background-image:-webkit-linear-gradient(top,#76b1d7,#5a9dc7);background-image:linear-gradient(top,#76b1d7,#5a9dc7);}
+.prepareGame.disable:hover,.ctrlBtn.caici.disable:hover,.ctrlBtn.yiyan.disable:hover{background-image: none;}
 
-.gameArea{overflow: hidden;padding: 20px;width: 1120px;margin: 0 auto;}
+.gameArea{overflow: hidden;padding: 20px;width: 1180px;margin: 0 auto;}
 .gameArea .box_style{background: rgba(255, 255, 255, 0.4);padding: 5px;}
 .gameArea .title_mod{padding: 5px 0 5px 0;border-bottom: 1px solid rgb(255, 255, 255);font-size: 14px;}
 .gameArea .gameView{float: left;width: 600px;height: 530px;position: relative;}
@@ -78,9 +78,11 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameView .gameDisplay .players .face{height: 60px;width: 60px;margin: 12px 0 0 12px;background: url(../img/face5.png) no-repeat;background-size: 60px 60px;}
 .gameView .gameDisplay .players .on{padding-right: 20px; background: url(../img/face3.png) no-repeat;background-size: 60px 60px;}
 .gameView .gameDisplay .players .ready{padding-right: 20px; background: url(../img/face4.png) no-repeat;background-size: 60px 60px;}
+.gameView .gameDisplay .players .voteOut{padding-right: 20px; background: url(../img/face6.png) no-repeat;background-size: 60px 60px;}
 .gameView .gameDisplay .players .isMyself.face{height: 85px;width: 85px;margin: 0;background-size: 85px 85px;}
 .gameView .gameDisplay .players .isMyself.on{background: url(../img/face3.png) no-repeat;background-size: 85px 85px;}
 .gameView .gameDisplay .players .isMyself.ready{background: url(../img/face4.png) no-repeat;background-size: 85px 85px;}
+.gameView .gameDisplay .players .isMyself.voteOut{background: url(../img/face6.png) no-repeat;background-size: 85px 85px;}
 .gameView .gameDisplay .players .vote{width: 100px;height: 50px;background-color: #000;opacity: 0.8;border-radius: 3px;position: absolute;top: -15px;left: -7px;}
 .gameView .gameDisplay .players .vote a{height: 30px;width: 70px;text-align: center;line-height: 30px;background-color: #fff;opacity: 0.8;border-radius: 3px;display: inline-block;margin: 10px 15px;color: #000;text-decoration: none;}
 .gameView .gameDisplay .players .vote a:hover{opacity: 1;}
@@ -108,19 +110,19 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameView .playSubmit:hover{background-image:-webkit-linear-gradient(top,#76b1d7,#5a9dc7);background-image:linear-gradient(top,#76b1d7,#5a9dc7);}
 .gameView .playSubmit.disable:hover{background-image: none;}
 
-.gameArea .gameCtrl{float: left;width: 250px;margin-right: 10px;}
+.gameArea .gameCtrl{float: left;width: 280px;margin-right: 10px;}
 .gameCtrl .gameUserInfo{margin-bottom: 10px;height: 160px;}
 .gameCtrl .gameUserInfo .items{padding: 5px 0 0 0;}
 .gameCtrl .gameUserInfo .items li{line-height: 2;}
-.gameCtrl .gameUserCtrl{height: 273px;}
+.gameCtrl .gameUserCtrl{height: 340px;}
 .gameCtrl .gameUserCtrl .btn_list{padding: 10px 0 0 0;}
 
-.gameArea .gameSystem{float: left;width: 250px;margin-left: 10px;}
+.gameArea .gameSystem{float: left;width: 280px;margin-left: 10px;}
 .gameSystem .gameSetting{height: 80px;}
 .gameSystem .gameSetting .items{padding-top: 10px;}
-.gameSystem .gameSystemInfo{height: 353px;margin-bottom: 10px;}
+.gameSystem .gameSystemInfo{height: 419px;margin-bottom: 10px;}
 .gameSystem .gameSystemInfo .name{color: #4183c4;}
-.gameSystem .gameSystemInfo .items{padding: 10px 0 0 0;height: 310px;overflow: auto;font-size: 12px;}
+.gameSystem .gameSystemInfo .items{padding: 10px 0 0 0;height: 375px;overflow: auto;font-size: 12px;}
 .gameSystem .gameSystemInfo .items li{margin-bottom: 5px;}
 
 /*room*/
