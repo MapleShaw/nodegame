@@ -64,9 +64,9 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .ctrlBtn.caici{position: absolute;bottom: 2px;right: 2px;width: 80px;margin-bottom: 0;}
 .ctrlBtn.yiyan{position: absolute;bottom: 2px;right: 84px;width: 80px;margin-bottom: 0;}
 .prepareGame,.ctrlBtn.caici,.ctrlBtn.yiyan{background-image: -webkit-linear-gradient(top,#589bc6,#5395bf);background-image: linear-gradient(top,#589bc6,#5395bf);border: 1px solid #5389af;color: #fff;}
-.prepareGame.disable,.ctrlBtn.caici.disable,.ctrlBtn.yiyan.disable{background-image: none;background-color: #f5f5f5;color: #999;border: 1px solid #dddddd;text-shadow: 1px 1px 0 #fff;cursor: default;}
+.prepareGame.disable,.ctrlBtn.caici.disable,.ctrlBtn.yiyan.disable,.leaveRoom.disable{background-image: none;background-color: #f5f5f5;color: #999;border: 1px solid #dddddd;text-shadow: 1px 1px 0 #fff;cursor: default;}
 .prepareGame:hover,.ctrlBtn.caici:hover,.ctrlBtn.yiyan:hover{background-image:-webkit-linear-gradient(top,#76b1d7,#5a9dc7);background-image:linear-gradient(top,#76b1d7,#5a9dc7);}
-.prepareGame.disable:hover,.ctrlBtn.caici.disable:hover,.ctrlBtn.yiyan.disable:hover{background-image: none;}
+.prepareGame.disable:hover,.ctrlBtn.caici.disable:hover,.ctrlBtn.yiyan.disable:hover,.leaveRoom.disable:hover{background-image: none;}
 
 .gameArea{overflow: hidden;padding: 20px;width: 1180px;margin: 0 auto;}
 .gameArea .box_style{background: rgba(255, 255, 255, 0.4);padding: 5px;}
@@ -165,7 +165,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .systemTips{background-color: #50b909;}
 .errTips{background-color: #c00;}
 
-.wordArea{height: 115px;text-align: center;font-size: 24px;padding: 10px 0 0 0;background-image: url(../img/wordbg.png);background-size: 270px 125px;}
+.wordArea{height: 115px;text-align: center;font-size: 24px;padding: 10px 0 0 0;margin-top: 18px;background-image: url(../img/wordbg.png);background-size: 270px 125px;}
 
 /*footer*/
 .footer{height: 5px;width: 100%;background-color: #50b909;position: absolute;bottom: 0px;left: 0px;overflow: hidden; z-index: 100;}

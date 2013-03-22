@@ -44,8 +44,8 @@ div.wrap
         h3.title_mod 游戏操作
         div.btn_list
           input.ctrlBtn#chooseRoom(type='button', ng-click='getRoomList()', value='选择房间') 
-          input.ctrlBtn.prepareGame(type='button', ng-disabled='isReady', ng-class='{disable:isReady==1}', ng-click='prepareForGame(curRoom)', value='准备游戏') 
-          input.ctrlBtn(type='button', ng-click='leaveRoom(curRoom)', value='离开房间') 
+          input.ctrlBtn.prepareGame(type='button', ng-disabled='isReady==0', ng-class='{disable:isReady==0}', ng-click='prepareForGame(curRoom)', value='准备游戏') 
+          input.ctrlBtn.leaveRoom(type='button', ng-click='leaveRoom()', value='离开房间', ng-disabled='isAddRoom==0', ng-class='{disable:isAddRoom==0}') 
           input.ctrlBtn(type='button', value='给词库添加词语') 
           div.wordArea {{word}} {{wordLength}}
     div.gameView
@@ -67,11 +67,11 @@ div.wrap
         div.errTips(ng-show='errorTips') {{errorTips}}
 
         p.bg_txt 游戏区
-        input.ctrlBtn.caici(type='button', value='我要猜词', ng-click='') 
-        input.ctrlBtn.yiyan(type='button', value='我要留遗言', ng-click='') 
+        input.ctrlBtn.caici(type='button', value='我要猜词', ng-click='guessWord()', ng-class='{disable:isGameStart==0}', ng-disabled='isGameStart==0') 
+        input.ctrlBtn.yiyan(type='button', value='我要留遗言', ng-click='leaveMsg()', ng-class='{disable:leaveMessage==0}', ng-disabled='leaveMessage==0') 
       div.gameSend
         textarea.playTextarea(ng-model='sayMessage', placeholder='请输入词语的描述句子...')
-        input.playSubmit(type='button', value='发言', ng-disabled='isYourTurn', ng-class='{disable:isYourTurn==1}', ng-click='makeStatement(curRoom, sayMessage)')
+        input.playSubmit(type='button', value='发言', ng-disabled='isYourTurn==0', ng-class='{disable:isYourTurn==0}', ng-click='makeStatement(curRoom, sayMessage)')
     div.gameSystem
       div.gameSystemInfo.box_style
         h3.title_mod 系统信息

@@ -429,10 +429,13 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.createRoomName = "";
     $scope.hovePeople = {};
     $scope.isAddRoom = 0;
+    $scope.leaveMessage = 0;
     $scope.curRoom = "";
+    $scope.curLocation = -1;
     $scope.timeLeave = 0;
-    $scope.isYourTurn = 1;
-    $scope.isReady = 1;
+    $scope.isYourTurn = 0;
+    $scope.isReady = 0;
+    $scope.isGameStart = 0;
     $scope.isDisplayVote = 0;
     $scope.isDisplayInfo = {};
     $scope.isYourFriend = {};
@@ -447,7 +450,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         }
         $(".maskDiv").show();
         $("#roomBox").animate({"top" : "40px"}, 200, "ease");
-        localStorage.put('nodeGameIsFirstLoad', false)
+        localStorage.put('nodeGameIsFirstLoad', false);
     }
 
     //以下是angular相关函数和操作
@@ -527,8 +530,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     $scope.systemTips = "创建房间成功";
                     closeSystemTips();
                     $scope.curRoom = roomName;
-                    if ($scope.isReady == 1) {
-                        $scope.isReady = 0;
+                    if ($scope.isReady == 0) {
+                        $scope.isReady = 1;
                     }
                     $timeout(function(){
                         $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
@@ -538,6 +541,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     //join the room you create when you create it.(play1)
                     var _jID = _myself.systemid;
                     var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
+                    $scope.curLocation = 0;
                     socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0, _userID : _jID, _userInfo : _jUserInfo});
                 }
             });
@@ -560,6 +564,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 var _jRoom = roomName;
                 var _jID = _myself.systemid;
                 var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
+                $scope.curLocation = roomIndex;
                 socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex, _userID : _jID, _userInfo : _jUserInfo});
                 /*
                     when succeed join the room
@@ -570,8 +575,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                         $scope.systemTips = "加入房间成功";
                         closeSystemTips();
                         $scope.curRoom = roomName;
-                        if ($scope.isReady == 1) {
-                            $scope.isReady = 0;
+                        if ($scope.isReady == 0) {
+                            $scope.isReady = 1;
                         }
                         //hide the dialog
                         $timeout(function(){
@@ -590,9 +595,34 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             closeErrTips();
         }
     }
-    $scope.leaveRoom = function (room) {
-        
+    //离开房间
+    $scope.leaveRoom = function () {
+        //init server
+        socket.emit('leaveRoom',{_roomName : $scope.curRoom, _userName : _myself.name, _userID : _myself.systemid, _location : $scope.curLocation});
+        //if succeed
+        socket.on('leaveSuccess',function (data) {
+            //reset
+            initPlayerList();
+            //$scope.hovePeople[$scope.curRoom][$scope.curLocation] = 0;
+            $scope.curRoom = "";
+            $scope.isAddRoom = 0;
+            $scope.isReady = 0;
+            $scope.isDisplayInfo = {};
+            $scope.isYourFriend = {};
+            $scope.isPlayerReady = {};
+            $scope.systemTips = "退出房间成功";
+            closeSystemTips();
+        });
     }
+    //是否为空房间
+    socket.on('deleteRoom',function (data) {
+        var _roomName = data._roomName;
+        for (var i = 0; i < $scope.roomList.length; i++) {
+            if ($scope.roomList[i].roomName == _roomName) {
+                $scope.roomList.splice(i, 1);
+            }
+        }
+    })
     //准备游戏
     $scope.prepareForGame = function(roomName){
         socket.emit('prepareForGame',{
@@ -600,8 +630,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             _userID : _myself.systemid,
             _userName : _myself.name
         });
-        if ($scope.isReady == 0) {
-            $scope.isReady = 1;
+        if ($scope.isReady == 1) {
+            $scope.isReady = 0;
         }
     }
     //发言
@@ -616,7 +646,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         timeLimit = 30;
         $scope.timeLeave = 0;
         $scope.sayMessage = "";
-        $scope.isYourTurn = 1;
+        $scope.isYourTurn = 0;
     }
     //投票
     $scope.playerList = [];
@@ -679,6 +709,14 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //mouse over
     $scope.faceMouseOut = function (userID) {
         $scope.isDisplayInfo[userID] = 0;
+    }
+    //鬼猜词
+    $scope.guessWord = function () {
+        //
+    }
+    //死后留遗言
+    $scope.leaveMsg = function () {
+        //
     }
     //添加好友
     $scope.addFriend = function (systemid, username) {
@@ -797,16 +835,26 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //更新所有房间内桌子的状态
     socket.on('updateRoomStatus',function(data){
         var _room = data;
-        if (!$scope.hovePeople[_room._roomName]) 
-        {
+        if (!$scope.hovePeople[_room._roomName]){
             $scope.hovePeople[_room._roomName] = [];
         }
-        $scope.hovePeople[_room._roomName][_room._location] = 1;
+        //leave room
+        if (_room._type == -1) {
+            debugger;
+            $scope.hovePeople[_room._roomName][_room._location] = 0;
+            //$scope.curLocation = -1;
+        }
+        //join room 
+        else {
+            $scope.hovePeople[_room._roomName][_room._location] = 1;
+            //$scope.curLocation = _room._location;
+        }
     });
     //游戏开始
     socket.on('gameStart',function(data){
         $scope.sysMessage.push('游戏开始');
         socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom, _userID : _myself.systemid});
+        $scope.isGameStart = 1;
     });
     //收到身份，词等
     socket.on('setIdentity',function(data){
@@ -821,7 +869,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         if(userName == _myself.name){
             //time leave
             timeLeave();
-            $scope.isYourTurn = 0;
+            $scope.isYourTurn = 1;
         }
     });
     //开始投票
