@@ -165,7 +165,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .systemTips{background-color: #50b909;}
 .errTips{background-color: #c00;}
 
-.wordArea{height: 115px;text-align: center;font-size: 24px;padding: 10px 0 0 0;margin-top: 18px;background-image: url(../img/wordbg.png);background-size: 270px 125px;}
+.wordArea{height: 105px;text-align: center;font-size: 30px;padding: 20px 0 0 0;margin-top: 18px;background-image: url(../img/wordbg.png);background-size: 270px 125px;}
 
 /*footer*/
 .footer{height: 5px;width: 100%;background-color: #50b909;position: absolute;bottom: 0px;left: 0px;overflow: hidden; z-index: 100;}

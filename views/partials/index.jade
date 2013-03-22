@@ -52,7 +52,7 @@ div.wrap
       div.gameDisplay
         div.players(ng-repeat='player in playerList')
           div.face(mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)', ng-class='{on:player.isOn==1, ready:isPlayerReady[player.info.systemID], isMyself:player.info.systemID==_myself.systemid, voteOut:isVoteOut[player.info.systemID]==1}')
-          div.vote(ng-show='isDisplayVote && player.info.systemID != _myself.systemid && isVoteOut[player.info.systemID] != 1')
+          div.vote(ng-show='isDisplayVote==1 && player.info.systemID != _myself.systemid && isVoteOut[_myself.systemid] != 1')
             a(href='javascript:;', ng-click='voteOne(curRoom, player.info.userName, player.info.systemID)') 投票
           div.userInfo(ng-show='isDisplayInfo[player.info.systemID] && player.isOn',mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)')
             p 昵称：{{player.info.userName}}

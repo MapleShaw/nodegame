@@ -603,13 +603,19 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         socket.on('leaveSuccess',function (data) {
             //reset
             initPlayerList();
-            //$scope.hovePeople[$scope.curRoom][$scope.curLocation] = 0;
             $scope.curRoom = "";
             $scope.isAddRoom = 0;
             $scope.isReady = 0;
             $scope.isDisplayInfo = {};
             $scope.isYourFriend = {};
             $scope.isPlayerReady = {};
+            $scope.leaveMessage = 0;
+            $scope.timeLeave = 0;
+            $scope.isYourTurn = 0;
+            $scope.isGameStart = 0;
+            $scope.isDisplayVote = 0;
+            $scope.isVoteOut = {};
+            //tips
             $scope.systemTips = "退出房间成功";
             closeSystemTips();
         });
@@ -842,12 +848,10 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         if (_room._type == -1) {
             debugger;
             $scope.hovePeople[_room._roomName][_room._location] = 0;
-            //$scope.curLocation = -1;
         }
         //join room 
         else {
             $scope.hovePeople[_room._roomName][_room._location] = 1;
-            //$scope.curLocation = _room._location;
         }
     });
     //游戏开始
