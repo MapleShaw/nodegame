@@ -570,6 +570,11 @@ module.exports = function(socket,rooms,io){
 			var _newRoom = new RoomStructure(roomName);	
 			//add to the roomlist
 			rooms.addRoom(_newRoom);
+			//创建成功
+			socket.emit('createRoomSuccess',{
+				type: 1,
+			});
+			//给所有人发送
 			io.sockets.emit('newRoom',{
 				_roomName : roomName,
 			});
