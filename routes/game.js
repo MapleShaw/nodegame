@@ -34,12 +34,13 @@ module.exports = function(socket,rooms,io){
 		var user = rooms.getUser(roomName,userID);
 		var room = rooms.getRoom(roomName);
 		if(typeof user.errType == "undefined"){
-			//所有玩家已经准备
-			if(room.userPrepare()){
+			//玩家准备
+			if(room.userPrepare(userID)){
 				io.sockets.in(roomName).emit('Message',{
 					type: 2,
 					msg : '玩家【'+userName+"】已准备",
 				});
+				//所有玩家已经准备
 				if(room.isAllPrepare()){
 					//游戏开始
 					room.onGameStart();
@@ -201,6 +202,13 @@ module.exports = function(socket,rooms,io){
 			});
 			return false;
 		}
+		if(user_temp.isOut){
+			//投票的玩家是已经出局了
+			socket.emit('err',{
+				msg: '你已经出局，不能投票！'
+			});
+			return false;
+		}
 
 		if(voteToID){
 			var beVote_temp = rooms.getUser(roomName,voteToID);
@@ -208,6 +216,13 @@ module.exports = function(socket,rooms,io){
 				//所投的用户并未在该房间内
 				socket.emit('err',{
 					msg : beVote_temp.errType
+				});
+				return false;
+			}
+			if(beVote_temp.isOut){
+				//被投的玩家已经出局了
+				socket.emit('err',{
+					msg: '被投的玩家已经出局！不能投给该玩家'
 				});
 				return false;
 			}

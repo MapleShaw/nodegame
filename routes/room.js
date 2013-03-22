@@ -76,6 +76,7 @@ module.exports = function(socket,rooms,io){
 				var temp = this._roomMember[sequence[i]].userInfo;
 				newList[i] = temp;
 				newList[i].systemID = sequence[i];
+				newList[i].isPrepare = this._roomMember[sequence[i]].isPrepare;
 			}
 			return newList;
 		},
@@ -121,12 +122,13 @@ module.exports = function(socket,rooms,io){
 		},
 
 		//玩家准备
-		userPrepare : function(){
+		userPrepare : function(userID){
 			if(this._prepareCount >= 9){
 				return -1;
 			}
 			else{
 				this._prepareCount ++;
+				this._roomMember[userID].isPrepare = true;
 				return this;
 			}
 		},
@@ -474,6 +476,8 @@ module.exports = function(socket,rooms,io){
 		this.word = null;
 		//词语长度
 		this.wordLength = null;
+		//是否已经准备
+		this.isPrepare = false;
 		//是否已经发言
 		this.isSay = false;
 		//是否已经投票
