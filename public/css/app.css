@@ -120,7 +120,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameArea .gameSystem{float: left;width: 280px;margin-left: 10px;}
 .gameSystem .gameSetting{height: 80px;}
 .gameSystem .gameSetting .items{padding-top: 10px;}
-.gameSystem .gameSystemInfo{height: 419px;margin-bottom: 10px;}
+.gameSystem .gameSystemInfo{height: 420px;margin-bottom: 10px;}
 .gameSystem .gameSystemInfo .name{color: #4183c4;}
 .gameSystem .gameSystemInfo .items{padding: 10px 0 0 0;height: 375px;overflow: auto;font-size: 12px;}
 .gameSystem .gameSystemInfo .items li{margin-bottom: 5px;}
@@ -165,7 +165,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .systemTips{background-color: #50b909;}
 .errTips{background-color: #c00;}
 
-.wordArea{text-align: center;font-size: 24px;padding: 10px 0 0 0;}
+.wordArea{height: 115px;text-align: center;font-size: 24px;padding: 10px 0 0 0;background-image: url(../img/wordbg.png);background-size: 270px 125px;}
 
 /*footer*/
 .footer{height: 5px;width: 100%;background-color: #50b909;position: absolute;bottom: 0px;left: 0px;overflow: hidden; z-index: 100;}
