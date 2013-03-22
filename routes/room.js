@@ -664,6 +664,7 @@ module.exports = function(socket,rooms,io){
 		var userName = data._userName;
 		var userID = data._userID;
 		var roomIndex = data._location;
+		//离开房间
 		socket.leave(roomName);
 		var room = rooms.getRoom(roomName);
 		var user = rooms.getUser(roomName,userID);
@@ -682,6 +683,8 @@ module.exports = function(socket,rooms,io){
 				_roomName: roomName
 			});
 		}
+		//设置桌子状态
+		room.toggleDeskStatus(roomIndex);
 		//用户离开房间
 		io.sockets.in(roomName).emit('Message',{
 			type: 1,
