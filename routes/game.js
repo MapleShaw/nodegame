@@ -51,13 +51,23 @@ module.exports = function(socket,rooms,io){
 					room.onGameStart();
 					//广播
 					io.sockets.in(roomName).emit('gameStart',{});
-					io.sockets.in(roomName).emit('Message',{
-						type: 3,
-						msg: '玩家【'+room.getNameByID(userID)+'】开始发言'
-					});
-					io.sockets.in(roomName).emit('makeStatement',{
-						_userName : room.getNameByID(userID)
-					});
+					var nextName = room.getNextPlayer();
+					if(nextName){
+						//第一个个玩家
+						io.sockets.in(roomName).emit('Message',{
+							type: 3,
+							msg: '玩家【'+nextName+'】开始发言'
+						});
+						io.sockets.in(roomName).emit('makeStatement',{
+							_userName : nextName,
+						});
+					}
+					else{
+						//获取不到下个玩家
+						io.sockets.in(roomName).emit('err',{
+							msg: 'system err'
+						});
+					}
 				}
 			}
 			else{
