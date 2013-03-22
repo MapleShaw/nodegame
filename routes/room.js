@@ -90,6 +90,7 @@ module.exports = function(socket,rooms,io){
 		//删除成员
 		deleteMember : function(userID){
 			this._count --;
+			this._prepareCount --;
 			//从保存的顺序中删除该用户
 			var sequence = this._sequence;
 			for(var i = 0;i < sequence.length;i ++){
