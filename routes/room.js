@@ -678,10 +678,16 @@ module.exports = function(socket,rooms,io){
 			type: 1,
 			msg: '用户【'+userName+'】离开了房间',
 		});
+		//给所有人发送
 		io.sockets.emit('updateRoomStatus',{
 			_roomName: roomName,
 			_userName: userName,
 			_location: roomIndex,
+		});
+		//给用户离开的房间里的成员发送
+		var list_temp = room.getRoomMemberList();
+		io.sockets.in(roomName).emit('updateRoomMember',{
+			_list: list_temp,
 		});
 	});
 }
