@@ -51,9 +51,9 @@ div.wrap
     div.gameView
       div.gameDisplay
         div.players(ng-repeat='player in playerList')
-          div.face(mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)', ng-class='{on:player.isOn==1}')
+          div.face(mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)', ng-class='{on:player.isOn==1, ready:isPlayerReady[player.info.systemID], isMyself:player.info.systemID==_myself.systemid}')
           div.vote(ng-show='isDisplayVote && player.info.systemID != _myself.systemid')
-            a(href='javascript:;', ng-click='voteOne(curRoom, player.info.systemID)') 投票
+            a(href='javascript:;', ng-click='voteOne(curRoom, player.info.userName, player.info.systemID)') 投票
           div.userInfo(ng-show='isDisplayInfo[player.info.systemID] && player.isOn',mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)')
             p 昵称：{{player.info.userName}}
             p 胜率：{{player.info.winRate}}

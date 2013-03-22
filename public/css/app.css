@@ -73,38 +73,30 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameArea .title_mod{padding: 5px 0 5px 0;border-bottom: 2px solid #ccc;font-size: 14px;}
 .gameArea .gameView{float: left;width: 600px;height: 530px;position: relative;}
 .gameArea .gameView .gameDisplay{width: 596px;height: 468px;border: 2px solid #ccc;position: absolute;background-color: #fff;top: 0px;left: 0px;}
-.gameView .gameDisplay .players{position: absolute;height: 40px;width: 34px;}
-.gameView .gameDisplay .players .face{height: 40px;width: 34px;background: url(../img/off.png) no-repeat;}
-.gameView .gameDisplay .players .face.on{background: url(../img/on.png) no-repeat;}
-.gameView .gameDisplay .players .vote{width: 100px;height: 50px;background-color: #000;opacity: 0.8;border-radius: 3px;position: absolute;top: -60px;left: -33px;}
+.gameView .gameDisplay .players{position: absolute;height: 85px;width: 85px;}
+.gameView .gameDisplay .players .face{height: 60px;width: 60px;margin: 12px 0 0 12px;background: url(../img/face5.png) no-repeat;background-size: 60px 60px;}
+.gameView .gameDisplay .players .on{background: url(../img/face3.png) no-repeat;background-size: 60px 60px;}
+.gameView .gameDisplay .players .ready{background: url(../img/face4.png) no-repeat;background-size: 60px 60px;}
+.gameView .gameDisplay .players .isMyself.face{height: 85px;width: 85px;margin: 0;background-size: 85px 85px;}
+.gameView .gameDisplay .players .isMyself.on{background: url(../img/face3.png) no-repeat;background-size: 85px 85px;}
+.gameView .gameDisplay .players .isMyself.ready{background: url(../img/face4.png) no-repeat;background-size: 85px 85px;}
+.gameView .gameDisplay .players .vote{width: 100px;height: 50px;background-color: #000;opacity: 0.8;border-radius: 3px;position: absolute;top: -15px;left: -7px;}
 .gameView .gameDisplay .players .vote a{height: 30px;width: 70px;text-align: center;line-height: 30px;background-color: #fff;opacity: 0.8;border-radius: 3px;display: inline-block;margin: 10px 15px;color: #000;text-decoration: none;}
 .gameView .gameDisplay .players .vote a:hover{opacity: 1;}
 .gameView .gameDisplay .players .vote:after{content: "";height: 0px;width: 0px;border-style: solid;border-color: #000 transparent transparent transparent;position: absolute;border-width: 8px 5px;display: block;bottom: -16px;left: 44px;overflow: hidden;}
-.gameView .gameDisplay .players .userInfo{width: 150px;border-radius: 3px;background-color: #000;opacity: 0.8;position: absolute;left: 45px;top: -10px;z-index: 5;padding: 10px;color: #fff;}
+.gameView .gameDisplay .players .userInfo{width: 150px;border-radius: 3px;background-color: #000;opacity: 0.8;position: absolute;left: 86px;top: -10px;z-index: 5;padding: 10px;color: #fff;}
 .gameView .gameDisplay .players .userInfo:after{content: "";height: 0px;width: 0px;border-style: solid;border-color: transparent #000 transparent transparent;position: absolute;border-width: 5px 8px;display: block;left: -16px;top: 25px;overflow: hidden;}
 .gameView .gameDisplay .players .userInfo a{text-decoration: underline;}
 
-
-/*
-.gameView .gameDisplay .player1{bottom: 60px;left: 286px;}
-.gameView .gameDisplay .player2{top: 260px;left: 20px;}
-.gameView .gameDisplay .player3{top: 140px;left: 20px;}
-.gameView .gameDisplay .player4{top: 40px;left: 92px;}
-.gameView .gameDisplay .player5{top: 40px;left: 218px;}
-.gameView .gameDisplay .player6{top: 40px;left: 344px;}
-.gameView .gameDisplay .player7{top: 40px;left: 470px;}
-.gameView .gameDisplay .player8{top: 140px;right: 20px;}
-.gameView .gameDisplay .player9{top: 260px;right: 20px;}
-*/
-.gameView .gameDisplay > div:nth-child(100n+1){bottom: 60px;left: 286px;}
-.gameView .gameDisplay > div:nth-child(100n+2){top: 260px;left: 20px;}
-.gameView .gameDisplay > div:nth-child(100n+3){top: 140px;left: 20px;}
-.gameView .gameDisplay > div:nth-child(100n+4){top: 40px;left: 92px;}
-.gameView .gameDisplay > div:nth-child(100n+5){top: 40px;left: 218px;}
-.gameView .gameDisplay > div:nth-child(100n+6){top: 40px;left: 344px;}
-.gameView .gameDisplay > div:nth-child(100n+7){top: 40px;left: 470px;}
-.gameView .gameDisplay > div:nth-child(100n+8){top: 140px;right: 20px;}
-.gameView .gameDisplay > div:nth-child(100n+9){top: 260px;right: 20px;}
+.gameView .gameDisplay > div:nth-child(100n+1){bottom: 40px;left: 255px;}
+.gameView .gameDisplay > div:nth-child(100n+2){top: 240px;left: 10px;}
+.gameView .gameDisplay > div:nth-child(100n+3){top: 120px;left: 10px;}
+.gameView .gameDisplay > div:nth-child(100n+4){top: 0px;left: 55px;}
+.gameView .gameDisplay > div:nth-child(100n+5){top: 0px;left: 190px;}
+.gameView .gameDisplay > div:nth-child(100n+6){top: 0px;left: 325px;}
+.gameView .gameDisplay > div:nth-child(100n+7){top: 0px;left: 455px;}
+.gameView .gameDisplay > div:nth-child(100n+8){top: 120px;right: 10px;}
+.gameView .gameDisplay > div:nth-child(100n+9){top: 240px;right: 10px;}
 .gameView .gameDisplay .timeLeave{position: absolute;bottom: 0px;left: 0px;padding: 8px 20px;color: #fff;background-color: #589bc6;border-left: 1px solid #5389af;border-top: 1px solid #5389af;border-top-right-radius: 3px;}
 .gameView .gameDisplay .bg_txt{font-size: 60px;color: #eee;line-height: 400px;text-align: center;}
 .gameView .gameDisplay .playMsg{position: absolute;top: 140px;padding: 15px;background-color: #000;width: 320px;left: 50%;margin-left: -175px;color: #fff;border-radius: 3px;max-height: 155px;overflow: auto;opacity: 0.8;word-break: break-all;}
@@ -146,12 +138,12 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .roomBox .rp3, .roomBox .rp4,
 .roomBox .rp5, .roomBox .rp6,
 .roomBox .rp7, .roomBox .rp8,
-.roomBox .rp9{height: 40px;width: 34px;background: url(../img/off.png) no-repeat;position: absolute;cursor: pointer;}
+.roomBox .rp9{height: 40px;width: 34px;background: url(../img/face2.png) no-repeat;position: absolute;cursor: pointer;}
 .roomBox .rp1.on, .roomBox .rp2.on,
 .roomBox .rp3.on, .roomBox .rp4.on,
 .roomBox .rp5.on, .roomBox .rp6.on,
 .roomBox .rp7.on, .roomBox .rp8.on,
-.roomBox .rp9.on{background: url(../img/on.png) no-repeat;}
+.roomBox .rp9.on{background: url(../img/face1.png) no-repeat;}
 .roomBox .rp1{top: 0px;left: 85px;}
 .roomBox .rp2{top: 15px;left: 138px;}
 .roomBox .rp3{top: 65px;left: 160px;}
