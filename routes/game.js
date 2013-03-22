@@ -40,6 +40,11 @@ module.exports = function(socket,rooms,io){
 					type: 2,
 					msg : '玩家【'+userName+"】已准备",
 				});
+				//更新房间成员状态
+				var list_temp = room.getRoomMemberList();
+				io.sockets.in(room).emit('updateRoomMember',{
+					_list: list_temp,
+				});
 				//所有玩家已经准备
 				if(room.isAllPrepare()){
 					//游戏开始
