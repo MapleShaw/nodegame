@@ -668,6 +668,10 @@ module.exports = function(socket,rooms,io){
 		var user = rooms.getUser(roomName,userID);
 		if(typeof user.errType == 'undefined'){
 			room.deleteMember(userID);
+			//成功离开房间
+			socket.emit('leaveSuccess',{
+
+			});
 		}
 		//房间人数为0时删除房间
 		if(room.isEmpty()){
@@ -689,5 +693,13 @@ module.exports = function(socket,rooms,io){
 		io.sockets.in(roomName).emit('updateRoomMember',{
 			_list: list_temp,
 		});
+	});
+
+	/*
+		Disconnect
+		玩家断开连接
+	*/
+	socket.on('disconnect',function(){
+		
 	});
 }
