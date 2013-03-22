@@ -9,14 +9,14 @@ img{border: none;}
 
 
 /*header*/
-.header{overflow: hidden;position: absolute;width: 100%;height: 45px;background-color: #589bc6;z-index: 5;border-bottom: 5px solid #888;}
+.header{overflow: hidden;position: absolute;width: 100%;height: 45px;background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(184,225,252,1)), color-stop(10%,rgba(169,210,243,1)), color-stop(25%,rgba(144,186,228,1)), color-stop(37%,rgba(144,188,234,1)), color-stop(50%,rgba(144,191,240,1)), color-stop(51%,rgba(107,168,229,1)), color-stop(83%,rgba(162,218,245,1)), color-stop(100%,rgba(189,243,253,1))); /* Chrome,Safari4+ */z-index: 5;border-bottom: 5px solid #50b909;}
 .header h1{text-align: center;line-height: 45px;font-family: "黑体";}
 .header h1 a{color: #fff;font-size: 24px;text-decoration: none;}
 .header .ctrl{position: absolute;right: 0px;top: 0px;height: 60px;}
 .header .ctrl a{line-height: 45px;margin: 0 10px;color: #fff;}
 
 /*container*/
-.container{position: absolute;top: 50px;bottom: 5px;width: 100%;z-index: 4;}
+.container{position: absolute;top: 50px;bottom: 5px;width: 100%;background: url(../img/back.png) no-repeat ;background-size: 100% 100%;z-index: 4;}
 .container .index{text-align: center;padding: 40px 0;}
 
 /*chart*/
@@ -42,12 +42,12 @@ img{border: none;}
 .chatDialog .c_cnt{word-break:break-all;}
 .chatDialog .c_name .username{color: #4183c4;}
 
-.friend_list{width: 160px;position: absolute;z-index: 5;height:100%;padding: 0px; right: -165px;bottom: 0px;background-color: #fff;border-left: 5px solid #999;border-right: 5px solid #999;border-bottom: none;}
+.friend_list{width: 160px;position: absolute;z-index: 5;height:100%;padding: 0px; right: -165px;bottom: 0px;background-color: #fff;border-left: 5px solid #50b909;border-right: 5px solid #50b909;border-bottom: none;}
 .friend_list .items{position: absolute;top: 34px;bottom: 0px;width: 100%;overflow: auto;}
-.friend_list .title{width: 100%;text-align: center;font-weight: normal;padding: 5px 0;background-color: #ccc;}
-.friend_list li{padding: 5px 10px 5px 50px;height: 40px;line-height: 40px; border-bottom: 1px solid #ccc;background: url(../img/on.png) no-repeat 6px 5px;}
+.friend_list .title{width: 100%;text-align: center;font-weight: normal;padding: 5px 0;background-color: #50b909;;}
+.friend_list li{padding: 5px 10px 5px 50px;height: 40px;line-height: 40px; border-bottom: 1px solid #ccc;background: url(../img/face1.png) no-repeat 6px 5px;}
 .friend_list li:hover{cursor: pointer;color: blue;word-break: break-all;word-wrap: break-word;}
-.friend_list .fl_popup{height: 50px;width: 20px;background-color: #999;left: -20px;top: 50%;margin-top: -25px;position: absolute;cursor: pointer;}
+.friend_list .fl_popup{height: 50px;width: 20px;background-color: #50b909;left: -20px;top: 50%;margin-top: -25px;position: absolute;cursor: pointer;}
 .friend_list .fl_popup:after{content: "";display: block;height: 0px;width: 0px;overflow: hidden;border-width: 8px 8px 8px 0;border-color: transparent #fff transparent transparent;border-style: solid;position: absolute;left: 4px;top: 18px;}
 
 .friend_tips{position: absolute;width: 160px;bottom: 0px;right: 5px;z-index: 5;}
@@ -69,14 +69,15 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .prepareGame.disable:hover{background-image: none;}
 
 .gameArea{overflow: hidden;padding: 20px;width: 1120px;margin: 0 auto;}
-.gameArea .box_style{border: 2px solid #ccc;padding: 5px;}
-.gameArea .title_mod{padding: 5px 0 5px 0;border-bottom: 2px solid #ccc;font-size: 14px;}
+.gameArea .box_style{background: rgba(255, 255, 255, 0.4);padding: 5px;}
+.gameArea .title_mod{padding: 5px 0 5px 0;border-bottom: 1px solid rgb(255, 255, 255);font-size: 14px;}
 .gameArea .gameView{float: left;width: 600px;height: 530px;position: relative;}
 .gameArea .gameView .gameDisplay{width: 596px;height: 468px;border: 2px solid #ccc;position: absolute;background-color: #fff;top: 0px;left: 0px;}
+.gameDisplay{background: url(../img/gameground.jpg) no-repeat; background-size: 100% 100%;}
 .gameView .gameDisplay .players{position: absolute;height: 85px;width: 85px;}
 .gameView .gameDisplay .players .face{height: 60px;width: 60px;margin: 12px 0 0 12px;background: url(../img/face5.png) no-repeat;background-size: 60px 60px;}
-.gameView .gameDisplay .players .on{background: url(../img/face3.png) no-repeat;background-size: 60px 60px;}
-.gameView .gameDisplay .players .ready{background: url(../img/face4.png) no-repeat;background-size: 60px 60px;}
+.gameView .gameDisplay .players .on{padding-right: 20px; background: url(../img/face3.png) no-repeat;background-size: 60px 60px;}
+.gameView .gameDisplay .players .ready{padding-right: 20px; background: url(../img/face4.png) no-repeat;background-size: 60px 60px;}
 .gameView .gameDisplay .players .isMyself.face{height: 85px;width: 85px;margin: 0;background-size: 85px 85px;}
 .gameView .gameDisplay .players .isMyself.on{background: url(../img/face3.png) no-repeat;background-size: 85px 85px;}
 .gameView .gameDisplay .players .isMyself.ready{background: url(../img/face4.png) no-repeat;background-size: 85px 85px;}
