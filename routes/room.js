@@ -677,6 +677,10 @@ module.exports = function(socket,rooms,io){
 		//房间人数为0时删除房间
 		if(room.isEmpty()){
 			rooms.deleteRoom(roomName);
+			//广播
+			io.sockets.emit('deleteRoom',{
+				_roomName: roomName
+			});
 		}
 		//用户离开房间
 		io.sockets.in(roomName).emit('Message',{
