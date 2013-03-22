@@ -623,6 +623,10 @@ module.exports = function(socket,rooms,io){
 				user_temp.userInfo = userInfo;
 				//设置桌子状态
 				room_temp.toggleDeskStatus(roomIndex);
+				//加入房间成功
+				socket.emit('joinRoomSuccess',{
+					type: 1,
+				});
 				//广播
 				io.sockets.in(roomName).emit('Message',{
 					type: 1,
