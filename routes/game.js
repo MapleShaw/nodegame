@@ -132,6 +132,12 @@ module.exports = function(socket,rooms,io){
 			});
 			return false;
 		}
+		if(user_temp.isOut){
+			//玩家已出局
+			socket.emit('err',{
+				msg: '你已经出局，不能发言',
+			});
+		}
 		//玩家已发言
 		user_temp.makeStatement();
 		//广播

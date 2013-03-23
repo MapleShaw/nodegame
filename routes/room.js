@@ -344,7 +344,7 @@ module.exports = function(socket,rooms,io){
 				var sequence = this._sequence;
 				var name = max_vote_id[0];
 				for(var i = 0; i < sequence.length; i ++){
-					if(sequence[i] == name){
+					if(sequence[0] == name){
 						break;
 					}
 					else{
@@ -547,7 +547,7 @@ module.exports = function(socket,rooms,io){
 
 		//计算玩家分数
 		calculateScores : function(){
-			var info = this._userInfo();
+			//var info = this._userInfo();
 		},
 	};
 
