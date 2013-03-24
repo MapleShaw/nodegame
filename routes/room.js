@@ -339,7 +339,7 @@ module.exports = function(socket,rooms,io){
 			}
 			//最高票数者出局（唯一最高票数的情况下）
 			if(max_repeat == 1){
-				member[max_vote_id[0]].isOut = true;
+				member[max_vote_id[0]].outGame();
 				//最高票数者出局后，发言的第一位从出局的下一位开始
 				var sequence = this._sequence;
 				var name = max_vote_id[0];
@@ -425,7 +425,7 @@ module.exports = function(socket,rooms,io){
 		//更新房间内用户的分数等级
 		updateScores : function(){
 			for(var item in this._roomMember){
-				this._roomMember[item].calculateScores();
+				this._roomMember[item].calculateScores(this._roomMember);
 			}
 		},
 
@@ -434,28 +434,35 @@ module.exports = function(socket,rooms,io){
 			var member = this._roomMember;
 			//玩家复位,记录游戏结果
 			for(var item in member){
-				member[item].resetState();
 				if(type == 3){
 					//人阵营胜利
 					if(member[item].identity < 2){
 						member[item].gameResult = true;
+						member[item].basicScores = 2;
 					}
 					else{
 						member[item].gameResult = false;
+						member[item].basicScores = -2;
 					}
 				}
 				else{
 					//鬼阵营胜利
 					if(member[item].identity == 2){
 						member[item].gameResult = true;
+						member[item].basicScores = 2;
 					}
 					else{
 						member[item].gameResult = false;
+						member[item].basicScores = -2;
 					}
 				}
 			}
 			//更新分数
 			this.updateScores();
+			//返回所有游戏结果信息
+			var result = this.getGameResultInfo();
+			//玩家信息重置
+			this.resetUserState();
 			//房间复位
 			this._state = false;
 			this._prepareCount = 0;
@@ -463,6 +470,34 @@ module.exports = function(socket,rooms,io){
 			this._isPK = false;
 			this._pkMember = [];
 			this._answer = null;
+
+			return result;
+		},
+
+		resetUserState : function(){
+			for(var item in this._roomMember){
+				this._roomMember[item].resetState();
+			}
+		},
+
+		getGameResultInfo : function(){
+			var member = this._roomMember;
+			var result = [];
+			for(var item in member){
+				//每个对象包含ID，Name，identity，Word，WordLength，isWin，Score，rewardScore
+				var itemResult = {};
+				itemResult.userID = item;
+				itemResult.userName = member[item].userInfo.userName;
+				itemResult.identity = member[item].identity;
+				itemResult.word = member[item].word;
+				itemResult.wordLength = member[item].wordLength;
+				itemResult.isWin = member[item].isWin;
+				itemResult.score = member[item].basicScores;
+				itemResult.rewardScore = member[item].rewardPoints;
+				//保存到数组
+				result.push(itemResult);
+			}
+			return result;
 		},
 	};
 
@@ -485,16 +520,26 @@ module.exports = function(socket,rooms,io){
 		this.isVote = false;
 		//投票得到的票数
 		this.voteCount = 0;
-		//是否已被票出局
+		//是否已出局
 		this.isOut = false;
 		//游戏结果
 		this.gameResult = null;
+		//基本分
+		this.basicScores = 0;
+		//玩家游戏奖励积分
+		this.rewardPoints = 0;
 		//玩家资料
 		this.userInfo = {
 			// winRate : null,
 			// level : null,
 			// userName : null,
 		};
+		//是否逃跑
+		this.isRun = false;
+		//出局的轮数
+		this.outGameTurn = 0;
+		//每次投票投给的ID
+		this.voteToAsID = [];
 	}
 	UserStructure.prototype = {
 		//构造指针
@@ -510,8 +555,9 @@ module.exports = function(socket,rooms,io){
 			this.isSay = true;
 		},
 
-		voteTo : function(){
+		voteTo : function(userID){
 			this.isVote = true;
+			this.voteToAsID.push(userID);
 		},
 
 		//被投票
@@ -529,9 +575,72 @@ module.exports = function(socket,rooms,io){
 			}
 		},
 
+		//猜对词
+		guessRightWord : function(){
+			this.rewardPoints += 2;
+		},
+
 		//玩家出局
-		outGame : function(){
-			this.isOut = false;
+		outGame : function(turns){
+			this.isOut = true;
+			this.outGameTurn = turns;
+		},
+
+
+		//积分奖励
+		calculateRewardPoints : function(roomMember){
+			if(this.identity == 0){
+				//平民如果胜利且并未出局，投的每个是鬼，则加两分
+				if(this.gameResult && !this.isOut){
+					for(var i = 0; i < this.voteToAsID.length; i++){
+						if(roomMember[this.voteToAsID[i]].identity != 2){
+							//投的有不是鬼的
+							return 0;
+						}
+					}
+					//加2分
+					this.rewardPoints += 2;
+					return ;
+				}
+				//平民输了但是平民没投过鬼
+				else{
+					for(var i = 0; i < this.voteToAsID.length; i++){
+						if(roomMember[this.voteToAsID[i]].identity == 2){
+							//有投过鬼
+							if(this.outGameTurn < 3){
+								//3轮内出局
+								this.rewardPoints = -1;
+							}
+							return 0;
+						}
+						//扣一分
+						this.rewardPoints = -1;
+						return;
+					}
+				}
+			}
+			else if(this.identity == 1){
+				//白痴胜利且白痴并未出局加一分
+				if(this.gameResult && !this.isOut){
+					this.rewardPoints += 1;
+					return ;
+				}
+			}
+			else{
+				//鬼胜利(猜词猜中)
+				//没出局
+				if(this.gameResult && !this.isOut){
+					this.rewardPoints += 1;
+					return ;
+				}
+				else{
+					if(this.voteToAsID.length == this.outGameTurn && this.outGameTurn > 6){
+						//坚持到最后一轮
+						this.rewardPoints += 1;
+					}
+					return ;
+				}
+			}
 		},
 
 		//重置游戏记录的相关数据
@@ -543,11 +652,19 @@ module.exports = function(socket,rooms,io){
 			this.isVote = false;
 			this.voteCount = 0;
 			this.isOut = false;
+			this.gameResult = null;
+			this.basicScores = 0;
+			this.rewardPoints = 0;
+			this.isRun = false;
+			this.outGameTurn = 0;
+			this.voteToAsID = [];
 		},
 
 		//计算玩家分数
 		calculateScores : function(){
-			//var info = this._userInfo();
+			//先计算奖励分数
+			this.calculateRewardPoints();
+			//更新到数据库
 		},
 	};
 

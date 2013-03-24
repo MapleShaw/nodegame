@@ -249,7 +249,7 @@ module.exports = function(socket,rooms,io){
 			}
 			beVote_temp.beVoted();
 		}
-		user_temp.voteTo();
+		user_temp.voteTo(voteToID);
 
 		//广播
 		io.sockets.in(roomName).emit('Message',{
@@ -279,12 +279,17 @@ module.exports = function(socket,rooms,io){
 				//是否满足游戏结束条件
 				var gameover_temp = room_temp.isGameOver();
 				if(gameover_temp){
+					//游戏结束复位处理
+					var result_temp = room_temp.onGameOver(gameover_temp[0]);					
 					//发送游戏结束
 					io.sockets.in(roomName).emit('gameOver',{
 						msg : gameover_temp[1]
 					});
-					//游戏结束复位处理
-					room_temp.onGameOver(gameover_temp[0]);
+					//发送游戏结果数据
+					io.sockets.in(roomName).emit('gameOverResult',{
+						_result: result_temp,
+					});
+					return;
 				}
 				else{
 					//游戏尚未结束
@@ -370,12 +375,18 @@ module.exports = function(socket,rooms,io){
 		var gameover_temp = room_temp.isGameOver(word_temp);
 		if(gameover_temp){
 			//猜对词
+			user_temp.guessRightWord();
+			//复位处理
+			var result_temp = room_temp.onGameOver(1);
+			//游戏结束，广播
 			io.sockets.in(roomName).emit('gameOver',{
 				type: 1,
 				msg: '玩家猜对词'
 			});
-			//复位处理
-			room_temp.onGameOver(1);
+			//发送游戏结果数据
+			io.sockets.in(roomName).emit('gameOverResult',{
+				_result: result_temp,
+			});
 			return;
 		}
 		else{
@@ -388,11 +399,17 @@ module.exports = function(socket,rooms,io){
 			//游戏是否结束
 			var temp = room_temp.isGameOver();
 			if(temp){
+				//游戏结束
+				var result_temp = room_temp.onGameOver(temp[0]);
+				//游戏结束广播
 				io.sockets.in(roomName).emit('gameOver',{
 					type: temp[0],
 					msg: temp[1]
 				});
-				room_temp.onGameOver(temp[0]);
+				//发送游戏结果数据
+				io.sockets.in(roomName).emit('gameOverResult',{
+					_result: result_temp,
+				});
 				return;
 			}
 			else{
