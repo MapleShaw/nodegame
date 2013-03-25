@@ -883,7 +883,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         resetGame(true);
     });
     socket.on('gameOverResult',function (data) {
-        $scope.gameOverInfo = data;
+        $scope.gameOverInfo = data._result;
         $timeout(function () {
             $(".maskDiv").show();
             $("#gameOverBox").animate({"top" : "40px"}, 200, "ease");
