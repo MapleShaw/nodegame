@@ -667,9 +667,9 @@ module.exports = function(socket,rooms,io){
 		},
 
 		//计算玩家分数
-		calculateScores : function(){
+		calculateScores : function(roomMember){
 			//先计算奖励分数
-			this.calculateRewardPoints(this._roomMember);
+			this.calculateRewardPoints(roomMember);
 			//更新到数据库
 		},
 	};
