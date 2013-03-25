@@ -408,6 +408,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     /*
         房间
     */
+
     $scope.roomList = [];
     $scope.sysMessage = [];
     //success msg tip
@@ -432,11 +433,13 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.isReady = 0;
     $scope.isGameStart = 0;
     $scope.isDisplayVote = 0;
+    $scope.isDisplayVoteCount = 0;
     $scope.isDisplayInfo = {};
     $scope.isYourFriend = {};
     $scope.isPlayerReady = {};
     $scope.isVoteOut = {};
     $scope.gameOverInfo = {};
+    $scope.playVoteCount = {};
 
     //if is first into the index page,display the room box
     if (localStorage.get('nodeGameIsFirstLoad') == true) {
@@ -506,6 +509,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     _userName: _myself.name,
                     _statement: "规定时间内没有发言!!!"
                 });
+                $scope.isYourTurn = 0;
             } else {
                 timeLeave();
             }
@@ -520,13 +524,16 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isYourTurn = 0;
         $scope.isGameStart = 0;
         $scope.isDisplayVote = 0;
+        $scope.isDisplayVoteCount = 0;
         $scope.isPlayerReady = {};
         $scope.isVoteOut = {};
+        $scope.wordLength = null;
+        $scope.word = '';
         //tips
         if (isGameOver) {
             $scope.isReady = 1;
-            for (var item in $scope.isPlayerReady) {
-               $scope.isPlayerReady[item] = false;
+            for (var item in $scope.playVoteCount) {
+               $scope.playVoteCount[item] = false;
             }
         } else {
             initPlayerList();
@@ -535,6 +542,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             $scope.isReady = 0;
             $scope.isDisplayInfo = {};
             $scope.isYourFriend = {};
+            $scope.playVoteCount = {};
             //tips
             $scope.systemTips = "退出房间成功";
             closeSystemTips();
@@ -649,17 +657,21 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     }
     //发言
     $scope.makeStatement = function(roomName,statement){
-        socket.emit('onMakeStatement',{
-            _roomName: roomName,
-            _userID : _myself.systemid,
-            _userName: _myself.name,
-            _statement: statement
-        });
-        $timeout.cancel(_timeLeave);
-        timeLimit = 30;
-        $scope.timeLeave = 0;
-        $scope.sayMessage = "";
-        $scope.isYourTurn = 0;
+        if ($scope.sayMessage = "") {
+            return -1;
+        } else {
+            socket.emit('onMakeStatement',{
+                _roomName: roomName,
+                _userID : _myself.systemid,
+                _userName: _myself.name,
+                _statement: statement
+            });
+            $timeout.cancel(_timeLeave);
+            timeLimit = 30;
+            $scope.timeLeave = 0;
+            $scope.sayMessage = "";
+            $scope.isYourTurn = 0;
+        } 
     }
     //投票
     $scope.playerList = [];
@@ -680,6 +692,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //更新房间内玩家
     socket.on('updateRoomMember',function (data) {
         var _member = data._list;
+        var _type = data._type;
         initPlayerList();
         var _length = _member.length;
         for (var i = 0; i < _length; i++) {
@@ -695,7 +708,24 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 break;
             }
         }
+        //join room
+        if (_type = 0) {
+            $scope.playVoteCount[_member[i].systemID] = 0;
+        }
+        //leave room
+        if (_type = 1) {
+            delete $scope.playVoteCount[_member[i].systemID];
+        }
+        //prepare game
+        if (_type = 2) {}
     });
+    //更新分数
+    socket.on('updataVoteCount',function (data) {
+        var _voteCount = data._count;
+        for (var _playID in _voteCount) {
+            $scope.playVoteCount[_playID] = _voteCount[_playID];
+        }
+    })
     //是否展示玩家信息(初始化isDisplayInfo)
     for (var i = 0; i < $scope.playerList.length; i++) {
         $scope.isDisplayInfo[$scope.playerList[i].info.systemID] = 0;
@@ -853,7 +883,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         }
         //leave room
         if (_room._type == -1) {
-            debugger;
             $scope.hovePeople[_room._roomName][_room._location] = 0;
         }
         //join room 
@@ -909,12 +938,16 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //开始投票
     socket.on('startVote',function(data){
         $scope.isDisplayVote = 1;
+        $scope.isDisplayVoteCount = 1;
         $scope.systemTips = "发言结束,请开始投票";
         closeSystemTips();
     });
     //玩家出局
     socket.on('voteOut',function(data){
+        //init VoteOut
         $scope.isVoteOut[data._userID] = 1;
+        //init VoteCount
+        $scope.isDisplayVoteCount = 0;
     });
     //系统消息
     socket.on('Message',function(data){
@@ -932,7 +965,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     });
     //错误消息
     socket.on('err',function(data){
-        if (data.type == 2) {
+        if (data.type == 2 || data.type == -1) {
             $scope.errorTips = data.msg;
             closeErrTips();
         };

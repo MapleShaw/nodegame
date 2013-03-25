@@ -80,6 +80,8 @@ div.wrap
             p
               a(href='javascript:;', ng-click='addFriend(player.info.systemID, player.info.userName)', ng-hide='isYourFriend[player.info.systemID] || player.info.systemID == _myself.systemid') 加为好友
               a(href='javascript:;', ng-click='removeFriend(player.info.systemID, player.info.userName)', ng-show='isYourFriend[player.info.systemID || player.info.systemID != _myself.systemid]') 取消好友
+          p.playname.ellipsis(title='{{player.info.userName}}',ng-hide='player.info.systemID==_myself.systemid') {{player.info.userName}}
+          p.playVoteCount(ng-show='isDisplayVoteCount==1 && isVoteOut[player.info.systemID] != 1') {{playVoteCount[player.info.systemID]}}
         div.timeLeave 剩下 : {{timeLeave}}s
         div.playMsg(ng-show='sayMessageTips') {{sayMessageTips}}
         div.systemTips(ng-show='systemTips') {{systemTips}}
