@@ -657,7 +657,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     }
     //发言
     $scope.makeStatement = function(roomName,statement){
-        if ($scope.sayMessage = "") {
+        if ($scope.sayMessage == "") {
             return -1;
         } else {
             socket.emit('onMakeStatement',{
