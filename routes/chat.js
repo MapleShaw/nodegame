@@ -7,7 +7,7 @@ var users_chat = {};
 module.exports = function (socket) {
     //客户端连接成功则设置客户端标示
 	socket.on('set nickname', function (user) {
-        var user = eval(user);
+        var user = user;
         users_chat[user.systemid] = socket;
         //set username
         users_chat[user.systemid].set('username', user.systemid, function () { 
@@ -15,7 +15,7 @@ module.exports = function (socket) {
         });
         //event of public message
         users_chat[user.systemid].on('chat_publicmsg', function(data){
-            var data = eval(data);
+            var data = data;
             users_chat[user.systemid].get('username', function(err, name){
                     io.sockets.emit('chat_usermsg',{
                         from : name,
@@ -25,7 +25,7 @@ module.exports = function (socket) {
         });
         //event of private message
         users_chat[user.systemid].on('chat_privatemsg', function(data){
-            var data = eval(data);
+            var data = data;
             //get the username to judge if the user of "data.sendTo" is exist.
             try{
                 users_chat[data.sendTo].get('username', function(err, name){

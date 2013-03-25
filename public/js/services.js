@@ -92,13 +92,34 @@ angular.module('myApp.services', []).
     }
   }).
   factory('localStorage', function () {
-    var STORAGE_ID = 'nodeGameIsFirstLoad';
     return {
+      set: function (storageName, storageVal) {
+        localStorage.setItem(storageName, storageVal);
+      },
       get: function (storageName) {
         return JSON.parse(localStorage.getItem(storageName) || false);
       },
-      put: function (storageName, isFirstLoad) {
-        localStorage.setItem(storageName, JSON.stringify(isFirstLoad));
+      remove: function (storageName) {
+        localStorage.removeItem(storageName);
+      },
+      clear: function () {
+        localStorage.clear();
       }
     };
-  });
+  }).
+  factory('sessionStorage', function () {
+    return {
+      set: function (sessionName, sessionVal) {
+        sessionStorage.setItem(sessionName, sessionVal);
+      },
+      get: function (sessionName) {
+        return JSON.parse(sessionStorage.getItem(sessionName) || false);
+      },
+      remove: function (sessionName) {
+        sessionStorage.removeItem(sessionName);
+      },
+      clear: function () {
+        sessionStorage.clear();
+      }
+    };
+  })

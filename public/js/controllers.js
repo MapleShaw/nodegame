@@ -36,7 +36,7 @@ gameRuleCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];//friend
 /*
 	login controller
 */
-function loginCtrl($scope, $http, $routeParams, $location, localStorage){
+function loginCtrl($scope, $http, $routeParams, $location, localStorage, sessionStorage){
     //var 
 	$scope.loginForm = {};
 	//submit function
@@ -46,9 +46,9 @@ function loginCtrl($scope, $http, $routeParams, $location, localStorage){
 			var loginMark = data.err;
 			var friendToJson = JSON.stringify(data.friendList);
 			var myselfInfoToJson = JSON.stringify(data.myselfInfo);
-            localStorage.put('nodeGameIsFirstLoad', true);
-			window.sessionStorage.setItem('friendList',friendToJson);
-			window.sessionStorage.setItem('myselfInfo',myselfInfoToJson);
+            localStorage.set('nodeGameIsFirstLoad', true);
+			sessionStorage.set('friendList', friendToJson);
+			sessionStorage.set('myselfInfo', myselfInfoToJson);
 			if(loginMark == 1){
 				$scope.userMsg = "User is not existed!";
 				document.getElementById("errorLoginOfName").style.backgroundColor = "#FA787E";
@@ -65,25 +65,24 @@ function loginCtrl($scope, $http, $routeParams, $location, localStorage){
 
 	
 }
-loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStorage'];
+loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStorage', 'sessionStorage'];
 
 /*
 	loginOut controllers
 */
-function loginOutController($scope, $http, $routeParams, $location, localStorage) {
+function loginOutController($scope, $http, $routeParams, $location, localStorage, sessionStorage) {
   $scope.loginOut = function(){
 		$http.get('/login/loginout').success(function(data, status, headers, config){
 			//set storage
-            localStorage.put('nodeGameIsFirstLoad', false)
-			window.sessionStorage.clear();
+            localStorage.clear();
+			sessionStorage.clear();
 			window.location.reload();
-			
 		}).error(function(data, status, headers, config){
-			
+			//err
 		});
 	};
 }
-loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStorage'];
+loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStorage', 'sessionStorage'];
 
 /*
 	register controller
@@ -148,7 +147,7 @@ registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 /*
 	index controller
 */
-function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localStorage, global) {
+function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localStorage, sessionStorage, global) {
 
     $scope.msgFrom = {};
     $scope.userTxt = {};
@@ -163,9 +162,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var usersObj = {};
 
     // 取出当前用户的好友列表
-    var getFriendList = window.sessionStorage.getItem('friendList');
-    var getMyselfInfo = window.sessionStorage.getItem('myselfInfo');
-    
+    var getFriendList = sessionStorage.get('friendList');
+    var getMyselfInfo = sessionStorage.get('myselfInfo');
+    debugger;
     var initFrientMsg = function () {
         //arr to obj
         for (var i = 0; i < $scope.friendList.length; i++) {
@@ -181,14 +180,14 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     // the list of all friends and myself
     if (getFriendList) {
         // get the friendList
-        $scope.friendList = JSON.parse(getFriendList) || [];
+        $scope.friendList = getFriendList || [];
         // arr to obj
         // init the msg arr
         initFrientMsg();
     }
 
     // get the info of yourself
-    var _myself = JSON.parse(getMyselfInfo);
+    var _myself = getMyselfInfo;
     $scope._myself = _myself;
 
     //send id to server
@@ -205,7 +204,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         var _dialog = document.getElementById("dialog_" + friend.systemid);
         if (_dialog) {
             _dialog.style.display = "block";
-            return ;
+            return -1;
         }
 
         // init info
@@ -409,36 +408,61 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         房间
     */
 
+    //所有房间的列表
     $scope.roomList = [];
+    //系统信息存储数组
     $scope.sysMessage = [];
-    //success msg tip
+    //成功时的tips
     $scope.systemTips = 0;
-    //error msg tip
+    //错误时的tips
     $scope.errorTips = 0;
-    //user say msg tip
+    //玩家发言内容的tips
     $scope.sayMessageTips = 0;
+    //玩家发出去的内容，即textarea里面的内容
     $scope.sayMessage = "";
+    //词语长度
     $scope.wordLength = null;
+    //词语
     $scope.word = '';
+    //创建房间是否处于编辑状态
     $scope.isEditing = false;
+    //是否第一次获取所有房间的列表
     $scope.isFirstGet = 0;
+    //创建房间的名字
     $scope.createRoomName = "";
+    //房间内的桌子是否有人
     $scope.hovePeople = {};
+    //是否已经加入了一个房间
     $scope.isAddRoom = 0;
+    //是否可以写遗言
     $scope.leaveMessage = 0;
+    //当前所在的房间
     $scope.curRoom = "";
+    //当前所在房间的位置
     $scope.curLocation = -1;
+    //剩余时间
     $scope.timeLeave = 0;
+    //是否轮到你发言
     $scope.isYourTurn = 0;
+    //是否已经准备游戏
     $scope.isReady = 0;
+    //游戏是否开始了
     $scope.isGameStart = 0;
+    //是否显示投票
     $scope.isDisplayVote = 0;
+    //是否显示投票情况
     $scope.isDisplayVoteCount = 0;
+    //是否显示玩家mouseover信息
     $scope.isDisplayInfo = {};
+    //是否是你的朋友
     $scope.isYourFriend = {};
+    //已经准备游戏的玩家列表
     $scope.isPlayerReady = {};
+    //是否已经被投死了
     $scope.isVoteOut = {};
+    //游戏结束后的弹出信息列表
     $scope.gameOverInfo = {};
+    //每个玩家的票数
     $scope.playVoteCount = {};
 
     //if is first into the index page,display the room box
@@ -449,7 +473,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         }
         $(".maskDiv").show();
         $("#roomBox").animate({"top" : "40px"}, 200, "ease");
-        localStorage.put('nodeGameIsFirstLoad', false);
+        localStorage.set('nodeGameIsFirstLoad', false);
     }
 
     //以下是angular相关函数和操作
@@ -528,7 +552,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isPlayerReady = {};
         $scope.isVoteOut = {};
         $scope.wordLength = null;
-        $scope.word = '';
+        $scope.word = "";
         //tips
         if (isGameOver) {
             $scope.isReady = 1;
@@ -593,6 +617,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 var _jName = _myself.name;
                 var _jRoom = roomName;
                 var _jID = _myself.systemid;
+                debugger;
                 var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
                 $scope.curLocation = roomIndex;
                 socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex, _userID : _jID, _userInfo : _jUserInfo});
@@ -787,7 +812,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 $scope.systemTips = "成功添加" + _data.name + "为好友";
                 closeSystemTips();
                 //session storage
-                window.sessionStorage.setItem('friendList',JSON.stringify($scope.friendList));
+                sessionStorage.set('friendList', $scope.friendList);
                 //update status
                 $scope.isYourFriend[_data.systemid] = 1;
             }
@@ -829,7 +854,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 $scope.systemTips = "成功取消好友" + _data.name;
                 closeSystemTips();
                 //session storage
-                window.sessionStorage.setItem('friendList',JSON.stringify($scope.friendList));
+                sessionStorage.set('friendList', $scope.friendList);
                 //update status
                 $scope.isYourFriend[_data.systemid] = 0;
             }
@@ -972,7 +997,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     });
 
 }
-indexCtrl.$inject = ['$scope', '$http', '$location', '$timeout', '$compile', 'socket', 'localStorage', 'global'];
+indexCtrl.$inject = ['$scope', '$http', '$location', '$timeout', '$compile', 'socket', 'localStorage', 'sessionStorage', 'global'];
 
 
 

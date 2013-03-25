@@ -66,7 +66,7 @@ div.wrap
           input.ctrlBtn.prepareGame(type='button', ng-disabled='isReady==0', ng-class='{disable:isReady==0}', ng-click='prepareForGame(curRoom)', value='准备游戏') 
           input.ctrlBtn.leaveRoom(type='button', ng-click='leaveRoom()', value='离开房间', ng-disabled='isAddRoom==0', ng-class='{disable:isAddRoom==0}') 
           input.ctrlBtn(type='button', value='给词库添加词语', ng-click='addWords(_myself.systemid,_myself.name)') 
-          div.wordArea {{word}} {{wordLength}}
+          div.wordArea {{word}} {{wordLength || ""}}
     div.gameView
       div.gameDisplay
         div.players(ng-repeat='player in playerList')
