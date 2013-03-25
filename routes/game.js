@@ -138,6 +138,13 @@ module.exports = function(socket,rooms,io){
 				msg: '你已经出局，不能发言',
 			});
 		}
+		var nextName_temp = room_temp.getNextPlayer();
+		if(userName != nextName_temp){
+			////还没轮到玩家发言
+			socket.emit('err',{
+				msg: '还没轮到你发言',
+			});
+		}
 		//玩家已发言
 		user_temp.makeStatement();
 		//广播
@@ -158,6 +165,7 @@ module.exports = function(socket,rooms,io){
 				return 1;	
 			}
 			else{
+				//第一轮发言两次
 				var nextName = room_temp.getNextPlayer();
 				//下一个玩家发言
 				io.sockets.in(roomName).emit('Message',{
@@ -251,7 +259,11 @@ module.exports = function(socket,rooms,io){
 		}
 		user_temp.voteTo(voteToID);
 
-		//广播
+		//广播票数、消息
+		var voteCount_temp = room_temp.getAllVoteCount();
+		io.sockets.in(roomName).emit('updateVoteCount',{
+			_count: voteCount_temp,
+		});
 		io.sockets.in(roomName).emit('Message',{
 			type: 7,
 			msg : '玩家【'+userName+'】投给了玩家【'+voteToName+'】',

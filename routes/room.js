@@ -32,6 +32,8 @@ module.exports = function(socket,rooms,io){
 		this._pkMember = [];
 		//游戏谜底
 		this._answer = null;
+		//游戏为结束离开房间的玩家
+		this._leaveMember = [];
 	}
 	RoomStructure.prototype = {
 		//构造指针
@@ -295,6 +297,16 @@ module.exports = function(socket,rooms,io){
 			}
 		},
 
+		//获取当前的所有用户的票数
+		getAllVoteCount : function(){
+			//格式 {id:1,id:2,id:3}
+			var result = {};
+			for(var item in this._roomMember){
+				result.item = this._roomMember[item].voteCount;
+			}
+			return result;
+		},
+
 		//投票回合结束,返回最高票数者的名字,票数
 		onVoteEnd : function(){
 			var result = {};
@@ -474,12 +486,19 @@ module.exports = function(socket,rooms,io){
 			return result;
 		},
 
+		//重置所有用户状态
 		resetUserState : function(){
+			//先清除游戏过程中离开房间的玩家
+			for(var i = 0; i < this._leaveMember.length; i ++){
+				this.deleteMember(this._leaveMember[i]);
+			}
+			//再对房间里每个用户重置状态
 			for(var item in this._roomMember){
 				this._roomMember[item].resetState();
 			}
 		},
 
+		//获取游戏结果信息
 		getGameResultInfo : function(){
 			var member = this._roomMember;
 			var result = [];
@@ -793,11 +812,16 @@ module.exports = function(socket,rooms,io){
 		var room = rooms.getRoom(roomName);
 		var user = rooms.getUser(roomName,userID);
 		if(typeof user.errType == 'undefined'){
-			room.deleteMember(userID);
+			if(!room._state){
+				//房间未开始游戏
+				room.deleteMember(userID);
+			}
+			else{
+				//房间正在游戏，保存到数组中，游戏结束后再统一处理
+				room._leaveMember.push(userID);
+			}
 			//成功离开房间
-			socket.emit('leaveSuccess',{
-
-			});
+			socket.emit('leaveSuccess',{});
 		}
 		//房间人数为0时删除房间
 		if(room.isEmpty()){
