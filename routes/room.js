@@ -302,7 +302,7 @@ module.exports = function(socket,rooms,io){
 			//格式 {id:1,id:2,id:3}
 			var result = {};
 			for(var item in this._roomMember){
-				result.item = this._roomMember[item].voteCount;
+				result[item] = this._roomMember[item].voteCount;
 			}
 			return result;
 		},
