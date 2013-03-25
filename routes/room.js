@@ -490,7 +490,12 @@ module.exports = function(socket,rooms,io){
 				itemResult.userName = member[item].userInfo.userName;
 				itemResult.identity = member[item].identity;
 				itemResult.word = member[item].word;
-				itemResult.wordLength = member[item].wordLength;
+				if(!itemResult.wordLength){
+					itemResult.wordLength = "";
+				}
+				else{
+					itemResult.wordLength = member[item].wordLength;
+				}
 				itemResult.isWin = member[item].gameResult;
 				itemResult.score = member[item].basicScores;
 				itemResult.rewardScore = member[item].rewardPoints;
