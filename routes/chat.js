@@ -6,43 +6,33 @@ var users_chat = {};
 
 module.exports = function (socket) {
     //客户端连接成功则设置客户端标示
-	socket.on('set nickname', function (user) {
+	socket.on('setNickname', function (user) {
         var user = user;
         users_chat[user.systemid] = socket;
         //set username
         users_chat[user.systemid].set('username', user.systemid, function () { 
             users_chat[user.systemid].emit('ready', {}); 
         });
-        //event of public message
-        users_chat[user.systemid].on('chat_publicmsg', function(data){
-            var data = data;
-            users_chat[user.systemid].get('username', function(err, name){
-                    io.sockets.emit('chat_usermsg',{
-                        from : name,
-                        msg : data
-                    });
-            });
-        });
         //event of private message
-        users_chat[user.systemid].on('chat_privatemsg', function(data){
+        users_chat[user.systemid].on('chatPrivateMsg', function(data){
             var data = data;
             //get the username to judge if the user of "data.sendTo" is exist.
             try{
                 users_chat[data.sendTo].get('username', function(err, name){
                 //send message to friend from server
                 if (err) {
-                    users_chat[user.systemid].emit('chat_errmsg', {
+                    users_chat[user.systemid].emit('chatErrMsg', {
                         fromId : data.sendTo,
                         fromName : user.name,
                         toId : name,
                         msg : 'error msg : network problem.'
                     });
-                    users_chat[user.systemid].emit('chat_have_receive', {
+                    users_chat[user.systemid].emit('chatHaveReceive', {
                         fromId : data.sendTo,
                         flag : false
                     });
                 } else {
-                    users_chat[data.sendTo].emit('chat_usermsg', {
+                    users_chat[data.sendTo].emit('chatUserMsg', {
                         //id of who send the msg
                         fromId : user.systemid,
                         //name of who send the msg
@@ -52,19 +42,20 @@ module.exports = function (socket) {
                         //text of msg
                         msg : data.sendText,
                     });
-                    users_chat[user.systemid].emit('chat_have_receive', {
+                    users_chat[user.systemid].emit('chatHaveReceive', {
                         fromId : data.sendTo,
                         flag : true
                     });
                 }
             });
             }catch(e){
-                users_chat[user.systemid].emit('chat_errmsg', {
+                users_chat[user.systemid].emit('chatErrMsg', {
                     fromId : data.sendTo,
                     fromName : 'system : ',
                     msg : 'error msg : the user is not online...',
                 });
-                users_chat[user.systemid].emit('chat_have_receive', {
+                users_chat[user.systemid].emit('chatHaveReceive', {
+                    fromId : data.sendTo,
                     flag : false
                 });
             }

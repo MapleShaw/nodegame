@@ -44,8 +44,9 @@ function loginCtrl($scope, $http, $routeParams, $location, localStorage, session
 		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
 			//var 
 			var loginMark = data.err;
-			var friendToJson = JSON.stringify(data.friendList);
-			var myselfInfoToJson = JSON.stringify(data.myselfInfo);
+			var friendToJson = data.friendList;
+			var myselfInfoToJson = data.myselfInfo;
+            debugger;
             localStorage.set('nodeGameIsFirstLoad', true);
 			sessionStorage.set('friendList', friendToJson);
 			sessionStorage.set('myselfInfo', myselfInfoToJson);
@@ -148,71 +149,85 @@ registerCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];
 	index controller
 */
 function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localStorage, sessionStorage, global) {
-
+    //聊天好友对象
     $scope.msgFrom = {};
+    //聊天内容
     $scope.userTxt = {};
+    //收信人id
     $scope.sendToId = {};
+    //收信人姓名
     $scope.sendToName = {};
+    //聊天内容数组
     $scope.msgs = {};
+    //消息提示
     $scope.tipsMsg = [];
+    //消息提示数量
     $scope.msgCount = 0;
+    //单个玩家的消息数
     $scope.count = {};
+    //好友列表
     $scope.friendList = [];
-
+    //将好友数组转为对象
     var usersObj = {};
+    //是否显示橙色条
+    $scope.sT = false;
 
     // 取出当前用户的好友列表
     var getFriendList = sessionStorage.get('friendList');
     var getMyselfInfo = sessionStorage.get('myselfInfo');
-    debugger;
+
+    //初始化好友信息和好友信息数
     var initFrientMsg = function () {
-        //arr to obj
         for (var i = 0; i < $scope.friendList.length; i++) {
             usersObj[$scope.friendList[i].systemid] = $scope.friendList[i];
-        };
-        // init the msg arr
+        }
         for(var i=0; i < $scope.friendList.length; i++) {
             $scope.msgs[$scope.friendList[i].systemid] = [];
             $scope.count[$scope.friendList[i].systemid] = 0;
         }
     }
 
-    // the list of all friends and myself
+    //获取好友信息
     if (getFriendList) {
-        // get the friendList
+        //将好友列表赋值给angular对象
         $scope.friendList = getFriendList || [];
-        // arr to obj
-        // init the msg arr
+        //调用初始化函数
         initFrientMsg();
-    }
-
-    // get the info of yourself
-    var _myself = getMyselfInfo;
-    $scope._myself = _myself;
-
-    //send id to server
-    if (_myself) {
-        socket.emit('set nickname', _myself);
     } else {
+        console.log("获取友列信息失败");
+        $scope.friendList = [];
     }
-    socket.on('ready', function () {
-       //do something if server return ready
-    });
 
+    //获取自己的信息
+    if (getMyselfInfo) {
+        var _myself = getMyselfInfo;
+        $scope._myself = _myself;
+        //到服务器注册聊天socket
+        socket.emit('setNickname', _myself);
+        //注册聊天socket成功
+        socket.on('ready', function () {
+           console.log("注册聊天socket成功");
+        });
+    } else {
+        console.log("获取个人信息失败");
+        var _myself = {};
+        $scope._myself = _myself;
+    }
+
+    
+    //聊天窗口模板
     function _template (friend) {
-        // check if the dialog is exist
+        //如果窗口存在,则显示
         var _dialog = document.getElementById("dialog_" + friend.systemid);
         if (_dialog) {
             _dialog.style.display = "block";
-            return -1;
+            return 1;
         }
-
-        // init info
+        //否则初始化信息
         $scope.sendToId[friend.systemid] = friend.systemid;
         $scope.sendToName[friend.systemid] = friend.name;
         $scope.msgFrom[friend.systemid] = $scope.sendToName[friend.systemid];
-
-        //template string
+        //模板html
         var _html = ['<div class="chat chatDialog" id="dialog_', friend.systemid, '" style="left:500px;top:100px;display:block;" data-left="500" data-top="100">',
                         '<div on-draggable="on-draggable" class="userMsgg">',
                             '<div class="title">',
@@ -245,13 +260,12 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                             '<a href="javascript:;" class="clearTxt" ng-click="clearMsg(\'', friend.systemid, '\')">清除记录</a>',
                         '</p>',
                     '</div>'].join("");
-        // compile the template
+        //编译模板
         var chatTeml = $compile(_html)($scope);
         document.getElementById('chatTemplate').appendChild(chatTeml[0]);
     }
-
+    //新信息提醒的橙色条
     function _showTips (fromId, fromName) {
-        // show tips
         $scope.msgCount++;
         if ($scope.count[fromId] === 0) {
             $scope.tipsMsg.push({
@@ -262,7 +276,11 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.count[fromId]++;
     }
 
-    $scope.sT = false;
+    /*
+        angular 函数
+    */
+
+    //点击橙色条显示具体信息
     $scope.showTip = function() {
         if ($scope.sT == false) {
             $scope.sT = true;
@@ -270,73 +288,86 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             $scope.sT = false;
         }
     }
-
-    //the function of init message
-    $scope.initName = function (friend) {
-        // get _template to show the dialog
+    //初始化聊天窗口（点击好友头像弹出聊天窗口的）
+    $scope.initChat = function (friend) {
+        //调用函数构造模板
         _template(friend);
     }
-
-    //see the msg tips
-    $scope.showWin = function (userId) {
-        // get _template to show the dialog
+    //初始化聊天窗口（点击橙色条里面的信息）
+    $scope.showChatWin = function (userId) {
+        //调用函数构造模板
         _template(usersObj[userId]);
-        // rewrite the info
+        //reset信息数
         $scope.msgCount -= $scope.count[userId];
         $scope.count[userId] = 0;
-
         for (var i = 0; i < $scope.tipsMsg.length; i++) {
             if($scope.tipsMsg[i].fromId === userId) {
                 $scope.tipsMsg.splice(i, 1);
             }
         }
     }
-
+    //发送聊天信息
     $scope.sendMsg = function(userId){
-        // send the message to server
+        //非空
         if ($scope.userTxt[userId] == undefined || $scope.userTxt[userId] == "") {
-            // if err
-            document.getElementById('chat_msg').focus();
-            return false;
+            document.getElementById('chat_msg_' + data.fromId).focus();
+            return -1;
         } else {
             $scope.flag = true;
-            if($scope.sendToId[userId] == ''){
-                socket.emit('chat_publicmsg',$scope.userTxt[userId]);
-            }else{
-                socket.emit('chat_privatemsg', {
-                    'sendTo' : $scope.sendToId[userId],
-                    'sendText' : $scope.userTxt[userId]
-                });
-            }
+            socket.emit('chatPrivateMsg', {
+                'sendTo' : $scope.sendToId[userId],
+                'sendText' : $scope.userTxt[userId]
+            });
         }
     }
+    //关闭聊天窗口
+    $scope.closeDialog = function (userId) {
+        var dialog = document.getElementById("dialog_" + userId);
+        var dParent = document.getElementById("chatTemplate");
+        $scope.msgs[userId] = [];
+        dParent.removeChild(dialog);
+    }
+    //清除聊天记录
+    $scope.clearMsg = function (userId) {
+        $scope.msgs[userId] = [];
+    }
+    //最小化窗口
+    $scope.minDialog = function (userId) {
+        var dialog = document.getElementById("dialog_" + userId);
+        dialog.style.display = "none";
+    }
 
-    //chat_users[$scope.sendToId[user.id]].on('chat_have_receive', function (data) {
-    socket.on('chat_have_receive', function (data) {
-        // if return error
-        var data = eval(data);
-        // init info 
+    /*
+        接收socket
+    */
+
+    //后台是否接收到信息
+    socket.on('chatHaveReceive', function (data) {
+        var data = data;
         $scope.flag = data.flag;
-        // update info to plane of yourself
-        if ($scope.flag && $scope.userTxt[data.fromId] != "") {
+        if ($scope.flag) {
             $scope.msgs[data.fromId].push({
                 name : 'Me : ',
                 time : global._getTime(),
                 cnt : $scope.userTxt[data.fromId]
             });
-            // clear
             $scope.userTxt[data.fromId] = '';
             document.getElementById('chat_msg_' + data.fromId).focus();
+        } else {
+            $scope.msgs[data.fromId].push({
+                name : 'Me : ',
+                time : global._getTime(),
+                cnt : '发送信息失败.'
+            });
         }
     }); 
-
-    socket.on('chat_usermsg', function (data) {
-       // do something if someone send "data" to you
-       var data = eval(data);
+    //接收对方发送信息
+    socket.on('chatUserMsg', function (data) {
+       var data = data;
        var isIdExist = document.getElementById("dialog_" + data.fromId);
        // if dialog is exist and bolck
        if (usersObj[data.fromId] && isIdExist && isIdExist.style.display == "block") {
-            //if the window is display=block
+            //display=block
             $scope.msgs[data.fromId].push({
                 name : data.fromName + ' : ',
                 time : global._getTime(),
@@ -345,7 +376,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
        } 
        // if dialog is exist and none
        else if (usersObj[data.fromId] && isIdExist && isIdExist.style.display == "none") {
-            //if the window is display=none
+            //display=none
             $scope.msgs[data.fromId].push({
                 name : data.fromName + ' : ',
                 time : global._getTime(),
@@ -357,7 +388,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
        } 
        // if dialog is not exist
        else if (usersObj[data.fromId] && !isIdExist) {
-            //if the window is not display yeat
+            //not display yet
             $scope.msgs[data.fromId].push({
                 name : data.fromName + ' : ',
                 time : global._getTime(),
@@ -365,17 +396,15 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             });
             //tips
             _showTips(data.fromId, data.fromName);
-
        } 
        // err
        else {
             console.log('the user is not online...')
        }
     });
-
-    socket.on('chat_errmsg', function (data) {
-        // if the user is not exist
-        var data = eval(data);
+    //接收错误信息
+    socket.on('chatErrMsg', function (data) {
+        var data = data;
         $scope.msgs[data.fromId].push({
             name : data.fromName,
             time : global._getTime(),
@@ -383,26 +412,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         });
     });
 
-    // close the dialog
-    $scope.closeDialog = function (userId) {
-        var dialog = document.getElementById("dialog_" + userId);
-        var dParent = document.getElementById("chatTemplate");
-        $scope.msgs[userId] = [];
-        dParent.removeChild(dialog);
-    }
-
-    // clear the msg
-    $scope.clearMsg = function (userId) {
-        // clear
-        $scope.msgs[userId] = [];
-    }
-
-    // minimize the window
-    $scope.minDialog = function (userId) {
-        // min dialog
-        var dialog = document.getElementById("dialog_" + userId);
-        dialog.style.display = "none";
-    }
 
     /*
         房间
@@ -617,7 +626,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 var _jName = _myself.name;
                 var _jRoom = roomName;
                 var _jID = _myself.systemid;
-                debugger;
                 var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
                 $scope.curLocation = roomIndex;
                 socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex, _userID : _jID, _userInfo : _jUserInfo});
@@ -653,6 +661,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //离开房间
     $scope.leaveRoom = function () {
         //init server
+        debugger;
         socket.emit('leaveRoom',{_roomName : $scope.curRoom, _userName : _myself.name, _userID : _myself.systemid, _location : $scope.curLocation});
         //if succeed
         socket.on('leaveSuccess',function (data) {
@@ -799,8 +808,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             } else {
                 if (_data.name && _data.systemid) {
                     $scope.friendList.push({
-                        "name" : _data.name,
-                        "systemid" : data.systemid
+                        name : _data.name,
+                        systemid : _data.systemid
                     });
                 } else {
                     $scope.errorTips = "添加好友失败";
@@ -850,6 +859,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 }
                 //rewrite the friend msg
                 initFrientMsg();
+                delete usersObj[_data.systemid];
                 //tips
                 $scope.systemTips = "成功取消好友" + _data.name;
                 closeSystemTips();

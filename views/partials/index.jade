@@ -43,11 +43,11 @@ div.wrap
   div.friend_list
     h3.title 好友列表
     ul.items
-      li.ellipsis(ng-repeat='friend in friendList', title='{{friend.name}}', ng-click='initName(friend)') {{friend.name}}
+      li.ellipsis(ng-repeat='friend in friendList', title='{{friend.name}}', ng-click='initChat(friend)') {{friend.name}}
     p.fl_popup
   div.friend_tips
     ul.items(ng-show='msgCount && sT')
-      li.ellipsis(ng-repeat='tip in tipsMsg', title='{{tip.fromName}}', ng-click='showWin(tip.fromId)') {{tip.fromName}} ({{count[tip.fromId]}})
+      li.ellipsis(ng-repeat='tip in tipsMsg', title='{{tip.fromName}}', ng-click='showChatWin(tip.fromId)') {{tip.fromName}} ({{count[tip.fromId]}})
     p.tip_title(ng-show='msgCount', ng-click='showTip()') 您收到{{msgCount}}条信息
 
   div.gameArea

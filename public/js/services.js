@@ -94,7 +94,7 @@ angular.module('myApp.services', []).
   factory('localStorage', function () {
     return {
       set: function (storageName, storageVal) {
-        localStorage.setItem(storageName, storageVal);
+        localStorage.setItem(storageName, JSON.stringify(storageVal));
       },
       get: function (storageName) {
         return JSON.parse(localStorage.getItem(storageName) || false);
@@ -110,7 +110,7 @@ angular.module('myApp.services', []).
   factory('sessionStorage', function () {
     return {
       set: function (sessionName, sessionVal) {
-        sessionStorage.setItem(sessionName, sessionVal);
+        sessionStorage.setItem(sessionName, JSON.stringify(sessionVal));
       },
       get: function (sessionName) {
         return JSON.parse(sessionStorage.getItem(sessionName) || false);
