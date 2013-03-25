@@ -43,6 +43,7 @@ module.exports = function(socket,rooms,io){
 				//更新房间成员状态
 				var list_temp = room.getRoomMemberList();
 				io.sockets.in(roomName).emit('updateRoomMember',{
+					_type: 2,
 					_list: list_temp,
 				});
 				//所有玩家已经准备

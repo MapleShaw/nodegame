@@ -785,6 +785,7 @@ module.exports = function(socket,rooms,io){
 				//给该房间的所有用户发送用户列表信息
 				var list_temp = room_temp.getRoomMemberList();
 				io.sockets.in(roomName).emit('updateRoomMember',{
+					_type: 0,
 					_list: list_temp,
 				});
 			}
@@ -848,6 +849,7 @@ module.exports = function(socket,rooms,io){
 		//给用户离开的房间里的成员发送
 		var list_temp = room.getRoomMemberList();
 		io.sockets.in(roomName).emit('updateRoomMember',{
+			_type: 1,
 			_list: list_temp,
 		});
 	});

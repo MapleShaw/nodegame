@@ -533,7 +533,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         if (isGameOver) {
             $scope.isReady = 1;
             for (var item in $scope.playVoteCount) {
-               $scope.playVoteCount[item] = false;
+               $scope.playVoteCount[item] = 0;
             }
         } else {
             initPlayerList();
@@ -709,15 +709,11 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             }
         }
         //join room
-        if (_type = 0) {
-            $scope.playVoteCount[_member[i].systemID] = 0;
-        }
+        if (_type == 0) {}
         //leave room
-        if (_type = 1) {
-            delete $scope.playVoteCount[_member[i].systemID];
-        }
+        if (_type == 1) {}
         //prepare game
-        if (_type = 2) {}
+        if (_type == 2) {}
     });
     //更新分数
     socket.on('updateVoteCount',function (data) {

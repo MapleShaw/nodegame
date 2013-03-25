@@ -73,7 +73,7 @@ div.wrap
           div.face(mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)', ng-class='{on:player.isOn==1, ready:isPlayerReady[player.info.systemID], isMyself:player.info.systemID==_myself.systemid, voteOut:isVoteOut[player.info.systemID]==1}')
           div.vote(ng-show='isDisplayVote==1 && player.info.systemID != _myself.systemid && isVoteOut[_myself.systemid] != 1 && isVoteOut[player.info.systemID] != 1')
             a(href='javascript:;', ng-click='voteOne(curRoom, player.info.userName, player.info.systemID)') 投票
-          div.userInfo(ng-show='isDisplayInfo[player.info.systemID] && player.isOn',mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)')
+          div.userInfo(ng-show='isDisplayInfo[player.info.systemID] && player.isOn && player.info.systemID != _myself.systemid',mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)')
             p 昵称：{{player.info.userName}}
             p 胜率：{{player.info.winRate}}
             p 等级：{{player.info.level}}
@@ -81,7 +81,7 @@ div.wrap
               a(href='javascript:;', ng-click='addFriend(player.info.systemID, player.info.userName)', ng-hide='isYourFriend[player.info.systemID] || player.info.systemID == _myself.systemid') 加为好友
               a(href='javascript:;', ng-click='removeFriend(player.info.systemID, player.info.userName)', ng-show='isYourFriend[player.info.systemID || player.info.systemID != _myself.systemid]') 取消好友
           p.playname.ellipsis(title='{{player.info.userName}}',ng-hide='player.info.systemID==_myself.systemid') {{player.info.userName}}
-          p.playVoteCount(ng-show='isDisplayVoteCount==1 && isVoteOut[player.info.systemID] != 1') {{playVoteCount[player.info.systemID]}}
+          p.playVoteCount(ng-show='isDisplayVoteCount==1 && isVoteOut[player.info.systemID] != 1') {{playVoteCount[player.info.systemID] || 0}}
         div.timeLeave 剩下 : {{timeLeave}}s
         div.playMsg(ng-show='sayMessageTips') {{sayMessageTips}}
         div.systemTips(ng-show='systemTips') {{systemTips}}
