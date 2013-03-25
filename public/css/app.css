@@ -6,6 +6,7 @@ ul, ol{list-style-type: none;}
 a{text-decoration: none;color: #4183c4;}
 a:hover{text-decoration: underline;}
 img{border: none;}
+table{border-spacing: 0;table-layout: fixed;}
 
 
 /*header*/
@@ -128,7 +129,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 /*room*/
 .unloginBg{height:550px;background:url(../img/unloginbg.png) no-repeat;background-size: 100%;}
 .maskDiv{height: 100%;width: 100%;background-color: #000;opacity: 0.8;position: absolute;top: 0px;left: 0px;z-index: 8;}
-.roomBox{width: 1000px;height: 450px;background: #eee;border: 1px solid #ccc;border-radius: 5px;position: absolute;/*top: 40px;*/top: -510px;left: 50%;z-index: 20;margin-left: -500px;overflow: auto;padding-top: 50px;}
+.roomBox,.gameOverBox{width: 1000px;height: 450px;background: #eee;border: 1px solid #ccc;border-radius: 5px;position: absolute;/*top: 40px;*/top: -510px;left: 50%;z-index: 20;margin-left: -500px;overflow: auto;padding-top: 50px;}
 .roomBox .items{overflow: auto;height: 450px;background-color: #fff;}
 .roomBox .roomItem{position: relative;height: 200px;width: 200px;padding: 2px 0;float: left;margin: 15px 0 0 100px;}
 .roomBox .roomItem .desk{position: absolute;display: block;height: 100px;width: 100px;border-radius: 50px;background-color: #ccc;top: 50px;left: 50px;text-align: center;line-height: 100px;overflow: hidden;}
@@ -158,9 +159,18 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .roomBox .rp8{top: 65px;left: 5px;}
 .roomBox .rp9{top: 15px;left: 30px;}
 
+.gameOverInfo{width: 900px;margin: 10px auto 0;background-color: #fff;overflow: hidden;border-radius: 3px;}
+.gameOverInfo td,.gameOverInfo th{overflow: hidden;white-space: nowrap;text-overflow:ellipsis;}
+.gameOverInfo th{padding: 10px 10px;background-color: #5389af;color: #fff;text-align: center;}
+.gameOverInfo td{padding: 8px 10px;text-align: center;border-bottom: 1px solid #ccc;}
+.gameOverInfo tr:last-child td{border-bottom: none;}
+.gameOverInfo tr:nth-child(odd){background-color: #f1f9ff;}
+
 .roomBox .roomTop{position: absolute;left: 50%;margin-left: -107px;width: 214px;top: 10px;}
-.roomBox .roomClose{position: absolute;right: 20px;line-height: 20px;top: 15px;width: 16px;height: 16px;text-decoration: none;background: url(../img/icons.png) no-repeat -108px -175px;text-indent: -9999px;}
-.roomBox .roomClose:hover{background-position :-129px -175px;}
+.roomBox .roomClose,
+.gameOverBox .roomClose{position: absolute;right: 20px;line-height: 20px;top: 15px;width: 16px;height: 16px;text-decoration: none;background: url(../img/icons.png) no-repeat -108px -175px;text-indent: -9999px;}
+.roomBox .roomClose:hover,
+.gameOverBox .roomClose:hover{background-position :-129px -175px;}
 
 .systemTips,.errTips{width: 230px;border-radius: 3px;opacity: 0.8;text-align: center;padding: 10px;position: absolute;left: 50%;margin-left: -125px;top: 80px;z-index: 50;color: #fff;word-break:break-all;}
 .systemTips{background-color: #50b909;}
@@ -177,4 +187,5 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .red{color: #c00;}
 .blue{color: #4183c4;}
 .black{color: #000;}
+.green{color: #50b909;}
 .ellipsis{overflow: hidden;white-space: nowrap;text-overflow:ellipsis;display: block;}

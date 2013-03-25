@@ -178,10 +178,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         }
     }
 
-    if (!getMyselfInfo) {
-        $location.path('/login');
-    }
-
     // the list of all friends and myself
     if (getFriendList) {
         // get the friendList
@@ -295,7 +291,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 $scope.tipsMsg.splice(i, 1);
             }
         }
-
     }
 
     $scope.sendMsg = function(userId){
@@ -441,6 +436,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.isYourFriend = {};
     $scope.isPlayerReady = {};
     $scope.isVoteOut = {};
+    $scope.gameOverInfo = {};
 
     //if is first into the index page,display the room box
     if (localStorage.get('nodeGameIsFirstLoad') == true) {
@@ -518,6 +514,32 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
 
     //以下是socket相关函数和操作
 
+    var resetGame = function (isGameOver) {
+        $scope.leaveMessage = 0;
+        $scope.timeLeave = 0;
+        $scope.isYourTurn = 0;
+        $scope.isGameStart = 0;
+        $scope.isDisplayVote = 0;
+        $scope.isPlayerReady = {};
+        $scope.isVoteOut = {};
+        //tips
+        if (isGameOver) {
+            $scope.isReady = 1;
+            for (var item in $scope.isPlayerReady) {
+               $scope.isPlayerReady[item] = false;
+            }
+        } else {
+            initPlayerList();
+            $scope.curRoom = "";
+            $scope.isAddRoom = 0;
+            $scope.isReady = 0;
+            $scope.isDisplayInfo = {};
+            $scope.isYourFriend = {};
+            //tips
+            $scope.systemTips = "退出房间成功";
+            closeSystemTips();
+        }
+    };
     var createRoom = function(roomName){
         if ($scope.isAddRoom == 0) {
             socket.emit('createRoom',{_roomName : roomName});
@@ -602,22 +624,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         //if succeed
         socket.on('leaveSuccess',function (data) {
             //reset
-            initPlayerList();
-            $scope.curRoom = "";
-            $scope.isAddRoom = 0;
-            $scope.isReady = 0;
-            $scope.isDisplayInfo = {};
-            $scope.isYourFriend = {};
-            $scope.isPlayerReady = {};
-            $scope.leaveMessage = 0;
-            $scope.timeLeave = 0;
-            $scope.isYourTurn = 0;
-            $scope.isGameStart = 0;
-            $scope.isDisplayVote = 0;
-            $scope.isVoteOut = {};
-            //tips
-            $scope.systemTips = "退出房间成功";
-            closeSystemTips();
+            resetGame(false);
         });
     }
     //是否为空房间
@@ -860,6 +867,29 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom, _userID : _myself.systemid});
         $scope.isGameStart = 1;
     });
+    $scope.addWords = function (userID, uername) {
+        //Just test
+    }
+    //游戏结束
+    socket.on('gameOver',function (data) {
+        //leave room
+        //socket.emit('leaveRoom',{_roomName : $scope.curRoom, _userName : _myself.name, _userID : _myself.systemid, _location : $scope.curLocation});
+        //tips
+        $timeout(function () {
+            $scope.systemTips = data.msg;
+            closeSystemTips();
+        },1500);
+        //reset game
+        resetGame(true);
+    });
+    socket.on('gameOverResult',function (data) {
+        $scope.gameOverInfo = data;
+        $timeout(function () {
+            $(".maskDiv").show();
+            $("#gameOverBox").animate({"top" : "40px"}, 200, "ease");
+        },3000);
+    });
+            
     //收到身份，词等
     socket.on('setIdentity',function(data){
         $scope.word = data._word;
@@ -892,7 +922,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             $scope.sayMessageTips = data.msg;
             closeSayTips();
         }
-        if (data.type == 7 || data.type == 6 || data.type == 5 || data.type == 3 || data.type == 2 || data.type ==1) {
+        if (data.type == 8 || data.type == 7 || data.type == 6 || data.type == 5 || data.type == 3 || data.type == 2 || data.type ==1) {
             $timeout(function () {
                 $scope.systemTips = data.msg;
                 closeSystemTips();

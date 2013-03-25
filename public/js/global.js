@@ -10,6 +10,9 @@ $(".roomClose, .maskDiv").live("click", function (event) {
 	$("#roomBox").animate({"top" : "-510px"}, 200, "ease", function () {
 		$(".maskDiv").hide();
 	});
+	$("#gameOverBox").animate({"top" : "-510px"}, 200, "ease", function () {
+		$(".maskDiv").hide();
+	});
 })
 $(".friend_list .fl_popup, .friend_list").live("mouseover", function (event) {
 	$(".friend_list").animate({"right" : "0px"}, 100, "ease");

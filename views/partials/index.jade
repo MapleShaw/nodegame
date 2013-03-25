@@ -1,7 +1,6 @@
 div.wrap
 
   div.maskDiv(style='display:none;')
-
   div.roomBox#roomBox(ng-class='{editingName : isEditing == true}')
     a.roomClose(href='javascript:;') 关闭
     div.roomTop
@@ -19,6 +18,26 @@ div.wrap
         div.rp7(title='点击进入房间', ng-click='joinRoom(room.roomName, 6)', ng-class='{on:hovePeople[room.roomName][6]==1}')
         div.rp8(title='点击进入房间', ng-click='joinRoom(room.roomName, 7)', ng-class='{on:hovePeople[room.roomName][7]==1}')
         div.rp9(title='点击进入房间', ng-click='joinRoom(room.roomName, 8)', ng-class='{on:hovePeople[room.roomName][8]==1}')
+  
+  div.gameOverBox#gameOverBox
+    a.roomClose(href='javascript:;') 关闭
+    table.gameOverInfo
+      tr.goiHeader
+        th(style="width:200px;") 玩家名字
+        th 玩家角色
+        th 玩家词语
+        th 成功或失败
+        th(style="width:200px;") 所得分数(基本分+奖励分)
+      tr.goiList(ng-repeat='goi in gameOverInfo')
+        td {{goi.userName}}
+        td(ng-show='goi.identity==0') 平民
+        td(ng-show='goi.identity==1') 白痴
+        td(ng-show='goi.identity==2') 鬼
+        td {{goi.word}} {{goi.wordLength}}
+        td(ng-hide='goi.isWin', ng-class='{red:goi.isWin==false}') 失败
+        td(ng-show='goi.isWin', ng-class='{green:goi.isWin==true}') 胜利
+        td {{goi.score}} + {{goi.rewardScore}}
+
 
   div#chatTemplate
   div.friend_list
@@ -46,13 +65,13 @@ div.wrap
           input.ctrlBtn#chooseRoom(type='button', ng-click='getRoomList()', value='选择房间') 
           input.ctrlBtn.prepareGame(type='button', ng-disabled='isReady==0', ng-class='{disable:isReady==0}', ng-click='prepareForGame(curRoom)', value='准备游戏') 
           input.ctrlBtn.leaveRoom(type='button', ng-click='leaveRoom()', value='离开房间', ng-disabled='isAddRoom==0', ng-class='{disable:isAddRoom==0}') 
-          input.ctrlBtn(type='button', value='给词库添加词语') 
+          input.ctrlBtn(type='button', value='给词库添加词语', ng-click='addWords(_myself.systemid,_myself.name)') 
           div.wordArea {{word}} {{wordLength}}
     div.gameView
       div.gameDisplay
         div.players(ng-repeat='player in playerList')
           div.face(mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)', ng-class='{on:player.isOn==1, ready:isPlayerReady[player.info.systemID], isMyself:player.info.systemID==_myself.systemid, voteOut:isVoteOut[player.info.systemID]==1}')
-          div.vote(ng-show='isDisplayVote==1 && player.info.systemID != _myself.systemid && isVoteOut[_myself.systemid] != 1')
+          div.vote(ng-show='isDisplayVote==1 && player.info.systemID != _myself.systemid && isVoteOut[_myself.systemid] != 1 && isVoteOut[player.info.systemID] != 1')
             a(href='javascript:;', ng-click='voteOne(curRoom, player.info.userName, player.info.systemID)') 投票
           div.userInfo(ng-show='isDisplayInfo[player.info.systemID] && player.isOn',mouse-over='faceMouseOver(player.info.systemID)', mouse-out='faceMouseOut(player.info.systemID)')
             p 昵称：{{player.info.userName}}
