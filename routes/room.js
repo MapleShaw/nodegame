@@ -658,6 +658,7 @@ module.exports = function(socket,rooms,io){
 			this.isRun = false;
 			this.outGameTurn = 0;
 			this.voteToAsID = [];
+			this.isPrepare = false;
 		},
 
 		//计算玩家分数
@@ -827,6 +828,7 @@ module.exports = function(socket,rooms,io){
 		玩家断开连接
 	*/
 	socket.on('disconnect',function(){
-
+		//判断玩家是否加入了房间
+		//判断玩家是否有在游戏中
 	});
 }
