@@ -720,7 +720,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         if (_type = 2) {}
     });
     //更新分数
-    socket.on('updataVoteCount',function (data) {
+    socket.on('updateVoteCount',function (data) {
         var _voteCount = data._count;
         for (var _playID in _voteCount) {
             $scope.playVoteCount[_playID] = _voteCount[_playID];
