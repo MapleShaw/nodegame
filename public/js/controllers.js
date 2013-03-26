@@ -574,7 +574,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             $scope.isAddRoom = 0;
             $scope.isReady = 0;
             $scope.isDisplayInfo = {};
-            $scope.isYourFriend = {};
             $scope.playVoteCount = {};
             //tips
             $scope.systemTips = "退出房间成功";
@@ -661,7 +660,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //离开房间
     $scope.leaveRoom = function () {
         //init server
-        debugger;
         socket.emit('leaveRoom',{_roomName : $scope.curRoom, _userName : _myself.name, _userID : _myself.systemid, _location : $scope.curLocation});
         //if succeed
         socket.on('leaveSuccess',function (data) {
@@ -979,6 +977,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isVoteOut[data._userID] = 1;
         //init VoteCount
         $scope.isDisplayVoteCount = 0;
+        for (var item in $scope.playVoteCount) {
+           $scope.playVoteCount[item] = 0;
+        }
     });
     //系统消息
     socket.on('Message',function(data){
