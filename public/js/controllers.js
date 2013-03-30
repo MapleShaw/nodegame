@@ -611,8 +611,15 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         }
     };
 
-    //剩余时间函数
-    var timeLeave = function () {
+    //重置剩余时间
+    var initLeaveTime = function () {
+        $timeout.cancel(_timeLeave);
+        timeLimit = TIME_LIMIT;
+        $scope.timeLeave = 0;
+    };
+
+    //发言剩余时间
+    var timeLeave = function (type) {
         _timeLeave = $timeout(function () {
             timeLimit --;
             $scope.timeLeave = timeLimit;
@@ -620,16 +627,31 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 timeLimit = 30;
                 $timeout.cancel(_timeLeave);
                 //callback
-                socket.emit('onMakeStatement',{
-                    _roomName: $scope.curRoom,
-                    _userID : _myself.systemid,
-                    _userName: _myself.name,
-                    _statement: "规定时间内没有发言!!!"
-                });
-                //局部重置
-                $scope.isYourTurn = 0;
+                if (type === 'say') {
+                    socket.emit('onMakeStatement',{
+                        _roomName: $scope.curRoom,
+                        _userID : _myself.systemid,
+                        _userName: _myself.name,
+                        _statement: "规定时间内没有发言!!!"
+                    });
+                    //局部重置
+                    $scope.isYourTurn = 0;
+                } else if (type === 'vote') {
+                    socket.emit('voteOne',{
+                        _roomName: roomName,
+                        _userID: _myself.systemid,
+                        _userName: _myself.name,
+                        _voteToID: null,
+                        _voteToName: null
+                    });
+                    //隐藏投票
+                    $scope.isDisplayVote = 0;
+                    //重置定时器
+                    initLeaveTime();
+                }
+                
             } else {
-                timeLeave();
+                timeLeave(type);
             }
         }, 1000);
     };
@@ -779,9 +801,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 _statement: statement
             });
             //重置定时器
-            $timeout.cancel(_timeLeave);
-            timeLimit = TIME_LIMIT;
-            $scope.timeLeave = 0;
+            initLeaveTime();
             $scope.sayMessage = "";
             $scope.isYourTurn = 0;
         } 
@@ -798,6 +818,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         });
         //隐藏投票
         $scope.isDisplayVote = 0;
+        //重置定时器
+        initLeaveTime();
     };
 
     //显示玩家信息
@@ -1051,7 +1073,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         var userName = data._userName;
         if(userName == _myself.name){
             //time leave
-            timeLeave();
+            timeLeave('say');
             $scope.isYourTurn = 1;
         }
     });
@@ -1062,6 +1084,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isDisplayVoteCount = 1;
         //系统信息
         showSystemTips("发言结束,请开始投票");
+        timeLeave('vote');
     });
 
     //玩家出局
@@ -1073,6 +1096,26 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         //重置票数
         resetVoteCount();
     });
+
+    //进入pk状态
+    socket.on('pkTurn', function (data) {
+        //_userName : vote_data.max_vote_name
+        var member = data._userName,
+            _name = '玩家 : ';
+        for (var i=0; i < member.length; i++) {
+            _name += member[i] + ' , ';
+        }
+        _name += '票数相等，现在进入PK环节，请票数相等的玩家按顺序发言';
+        //系统信息
+        showSystemTips(_name);
+        $scope.sysMessage.push(_name);
+        //init VoteOut
+        $scope.isVoteOut[data._userID] = 1;
+        //init VoteCount
+        $scope.isDisplayVoteCount = 0;
+        //重置票数
+        resetVoteCount();
+    })
 
     //系统消息
     socket.on('Message',function (data) {

@@ -335,6 +335,15 @@ module.exports = function(socket,rooms,io){
 				});
 				//进入pk状态
 				room_temp.onPKTurn(vote_data.max_vote_name);
+				//下一个玩家发言
+				io.sockets.in(roomName).emit('Message',{
+					type: 6,
+					msg: '轮到玩家【'+vote_data.max_vote_name[0]+'】发言'
+				});				
+				//拿到下一个玩家的名字
+				io.sockets.in(roomName).emit('makeStatement',{
+					_userName : vote_data.max_vote_name[0]
+				});
 			}
 			else{
 				return false;
