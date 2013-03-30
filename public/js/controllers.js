@@ -177,13 +177,16 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var getMyselfInfo = sessionStorage.get('myselfInfo');
 
     //初始化好友信息和好友信息数
-    var initFrientMsg = function () {
+    var initFrientMsg = function (id) {
         for (var i = 0; i < $scope.friendList.length; i++) {
             usersObj[$scope.friendList[i].systemid] = $scope.friendList[i];
         }
         for(var i=0; i < $scope.friendList.length; i++) {
             $scope.msgs[$scope.friendList[i].systemid] = [];
             $scope.count[$scope.friendList[i].systemid] = 0;
+        }
+        if (id) {   //remove friend
+            delete usersObj[id];
         }
     }
 
@@ -473,61 +476,142 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.gameOverInfo = {};
     //每个玩家的票数
     $scope.playVoteCount = {};
+    //当前房间玩家列表
+    $scope.playerList = [];
+    //时间限制常量
+    var TIME_LIMIT = 30;
+    //系统提示定时器
+    var _closeSystemTips;
+    //错误提示定时器
+    var _closeErrTips;
+    //发言提示定时器
+    var _closeSayTips;
+    //剩余时间定时器
+    var _timeLeave;
+    //时间限制
+    var timeLimit = TIME_LIMIT;
 
-    //if is first into the index page,display the room box
-    if (localStorage.get('nodeGameIsFirstLoad') == true) {
-        if ($scope.isFirstGet === 0) {
+
+    /* 
+     * Function 
+     */
+
+     //获取所有房间列表
+     var getRoomList = function () {
+        //仅调用一次
+         if ($scope.isFirstGet === 0) {
             socket.emit('getRoomList',{});
             $scope.isFirstGet = 1;
         }
-        $(".maskDiv").show();
-        $("#roomBox").animate({"top" : "40px"}, 200, "ease");
-        localStorage.set('nodeGameIsFirstLoad', false);
-    }
+     };
 
-    //以下是angular相关函数和操作
-
-    //close tips div
-    var _closeSystemTips;
-    var closeSystemTips = function () {
+     //显示系统信息
+     var showSystemTips = function (msg) {
+        //赋值给angular变量
+        $scope.systemTips = msg;
+        //定时器
         $timeout.cancel(_closeSystemTips);
         _closeSystemTips = $timeout(function () {
             $scope.systemTips = 0;
         }, 1500);
     };
-    var _closeErrTips;
-    var closeErrTips = function () {
+    
+    //显示错误信息
+    var showErrTips = function (msg) {
+        //赋值给angular变量
+        $scope.errorTips = msg;
+        //定时器
         $timeout.cancel(_closeErrTips);
         _closeErrTips = $timeout(function () {
             $scope.errorTips = 0;
         }, 1500);
     };
-    var _closeSayTips;
-    var closeSayTips = function () {
+
+    //显示发言信息
+    var showSayTips = function (msg) {
+        //赋值给angular变量
+        $scope.sayMessageTips = msg;
+        //定时器
         $timeout.cancel(_closeSayTips);
         _closeSayTips = $timeout(function () {
             $scope.sayMessageTips = 0;
         }, 3000);
     };
-    $scope.editRoomName = function () {
-        $scope.isEditing = true;
-    }
-    $scope.roomNameBlur = function () {
-        if ($scope.createRoomName == '') {
-            //tip : not exist
-            $scope.errorTips = "房间名不能为空";
-            closeErrTips();
-            $scope.isEditing = false;
-        } else {
-            // create room
-            createRoom($scope.createRoomName);
-            $scope.isEditing = false;
-            $scope.createRoomName = "";
+
+    //重置玩家票数
+    var resetVoteCount = function () {
+        for (var item in $scope.playVoteCount) {
+           $scope.playVoteCount[item] = 0;
         }
     }
 
-    var _timeLeave;
-    var timeLimit = 30;
+    //重置游戏所有变量
+    var resetGame = function (type) {
+        $scope.leaveMessage = 0;
+        $scope.timeLeave = 0;
+        $scope.isYourTurn = 0;
+        $scope.isGameStart = 0;
+        $scope.isDisplayVote = 0;
+        $scope.isDisplayVoteCount = 0;
+        $scope.isPlayerReady = {};
+        $scope.isVoteOut = {};
+        $scope.wordLength = null;
+        $scope.word = "";
+        //离开房间和游戏结束的重置不同
+        if (type === "gameOver") {
+            //重置票数
+            resetVoteCount();
+            $scope.isReady = 1;
+        } else if (type === "leaveRoom") {
+            //重置房间内的玩家状态
+            initPlayerList();
+            $scope.curRoom = "";
+            $scope.isAddRoom = 0;
+            $scope.isReady = 0;
+            $scope.isDisplayInfo = {};
+            $scope.playVoteCount = {};
+            //系统信息
+            showSystemTips("退出房间成功");
+        } else {
+            //others
+        }
+    };
+
+    //创建房间
+    var createRoom = function(roomName){
+        if ($scope.isAddRoom == 0) {
+            socket.emit('createRoom',{_roomName : roomName});
+            //创建成功
+            socket.on('createRoomSuccess', function (data) {
+                if (data.type == 1) {
+                    //系统信息
+                    showSystemTips("创建房间成功");
+                    //局部重置
+                    $scope.isAddRoom = 1;
+                    $scope.curRoom = roomName;
+                    $scope.curLocation = 0;
+                    if ($scope.isReady === 0) {
+                        $scope.isReady = 1;
+                    }
+                    //弹出框
+                    $timeout(function(){
+                        $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
+                            $(".maskDiv").hide();
+                        });
+                    }, 1200);
+                    //加入房间
+                    var _jID = _myself.systemid;
+                    var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
+                    socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0, _userID : _jID, _userInfo : _jUserInfo});
+                }
+            });
+        } else {
+            //显示错误信息
+            showErrTips("你已经加入了一个房间，不能创建房间");
+        }
+    };
+
+    //剩余时间函数
     var timeLeave = function () {
         _timeLeave = $timeout(function () {
             timeLimit --;
@@ -542,171 +626,15 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     _userName: _myself.name,
                     _statement: "规定时间内没有发言!!!"
                 });
+                //局部重置
                 $scope.isYourTurn = 0;
             } else {
                 timeLeave();
             }
         }, 1000);
-    }
-
-    //以下是socket相关函数和操作
-
-    var resetGame = function (isGameOver) {
-        $scope.leaveMessage = 0;
-        $scope.timeLeave = 0;
-        $scope.isYourTurn = 0;
-        $scope.isGameStart = 0;
-        $scope.isDisplayVote = 0;
-        $scope.isDisplayVoteCount = 0;
-        $scope.isPlayerReady = {};
-        $scope.isVoteOut = {};
-        $scope.wordLength = null;
-        $scope.word = "";
-        //tips
-        if (isGameOver) {
-            $scope.isReady = 1;
-            for (var item in $scope.playVoteCount) {
-               $scope.playVoteCount[item] = 0;
-            }
-        } else {
-            initPlayerList();
-            $scope.curRoom = "";
-            $scope.isAddRoom = 0;
-            $scope.isReady = 0;
-            $scope.isDisplayInfo = {};
-            $scope.playVoteCount = {};
-            //tips
-            $scope.systemTips = "退出房间成功";
-            closeSystemTips();
-        }
     };
-    var createRoom = function(roomName){
-        if ($scope.isAddRoom == 0) {
-            socket.emit('createRoom',{_roomName : roomName});
-            /*
-                when succeed create the room
-            */
-            socket.on('createRoomSuccess', function (data) {
-                if (data.type == 1) {
-                    $scope.isAddRoom = 1;
-                    $scope.systemTips = "创建房间成功";
-                    closeSystemTips();
-                    $scope.curRoom = roomName;
-                    if ($scope.isReady == 0) {
-                        $scope.isReady = 1;
-                    }
-                    $timeout(function(){
-                        $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
-                            $(".maskDiv").hide();
-                        });
-                    }, 1200);
-                    //join the room you create when you create it.(play1)
-                    var _jID = _myself.systemid;
-                    var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
-                    $scope.curLocation = 0;
-                    socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0, _userID : _jID, _userInfo : _jUserInfo});
-                }
-            });
-        } else {
-            $scope.errorTips = "你已经加入了一个房间，不能创建房间";
-            closeErrTips();
-        }
-    }
-    //获取房间列表
-    $scope.getRoomList = function(){
-        if ($scope.isFirstGet === 0) {
-            socket.emit('getRoomList',{});
-            $scope.isFirstGet = 1;
-        }
-    }
-    $scope.joinRoom = function(roomName, roomIndex){
-        if (!$scope.hovePeople[roomName][roomIndex]) {
-            if ($scope.isAddRoom == 0) {
-                var _jName = _myself.name;
-                var _jRoom = roomName;
-                var _jID = _myself.systemid;
-                var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
-                $scope.curLocation = roomIndex;
-                socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex, _userID : _jID, _userInfo : _jUserInfo});
-                /*
-                    when succeed join the room
-                */
-                socket.on('joinRoomSuccess', function (data) {
-                    if (data.type ==1) {
-                        $scope.isAddRoom = 1;
-                        $scope.systemTips = "加入房间成功";
-                        closeSystemTips();
-                        $scope.curRoom = roomName;
-                        if ($scope.isReady == 0) {
-                            $scope.isReady = 1;
-                        }
-                        //hide the dialog
-                        $timeout(function(){
-                            $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
-                                $(".maskDiv").hide();
-                            });
-                        }, 1200);
-                    }
-                });
-            } else {
-                $scope.errorTips = "你已经加入了一个房间，不能再加入一个房间";
-                closeErrTips();
-            }
-        } else {
-            $scope.errorTips = "此桌子已经有人，请选择其他桌子";
-            closeErrTips();
-        }
-    }
-    //离开房间
-    $scope.leaveRoom = function () {
-        //init server
-        socket.emit('leaveRoom',{_roomName : $scope.curRoom, _userName : _myself.name, _userID : _myself.systemid, _location : $scope.curLocation});
-        //if succeed
-        socket.on('leaveSuccess',function (data) {
-            //reset
-            resetGame(false);
-        });
-    }
-    //是否为空房间
-    socket.on('deleteRoom',function (data) {
-        var _roomName = data._roomName;
-        for (var i = 0; i < $scope.roomList.length; i++) {
-            if ($scope.roomList[i].roomName == _roomName) {
-                $scope.roomList.splice(i, 1);
-            }
-        }
-    })
-    //准备游戏
-    $scope.prepareForGame = function(roomName){
-        socket.emit('prepareForGame',{
-            _roomName : roomName,
-            _userID : _myself.systemid,
-            _userName : _myself.name
-        });
-        if ($scope.isReady == 1) {
-            $scope.isReady = 0;
-        }
-    }
-    //发言
-    $scope.makeStatement = function(roomName,statement){
-        if ($scope.sayMessage == "") {
-            return -1;
-        } else {
-            socket.emit('onMakeStatement',{
-                _roomName: roomName,
-                _userID : _myself.systemid,
-                _userName: _myself.name,
-                _statement: statement
-            });
-            $timeout.cancel(_timeLeave);
-            timeLimit = 30;
-            $scope.timeLeave = 0;
-            $scope.sayMessage = "";
-            $scope.isYourTurn = 0;
-        } 
-    }
-    //投票
-    $scope.playerList = [];
+
+    //当前房间玩家列表
     var initPlayerList = function () {
         $scope.playerList = [
             {isOn : 0, info : {}},
@@ -719,19 +647,299 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             {isOn : 0, info : {}},
             {isOn : 0, info : {}}
         ];
-    }
+    };
+    //invote
     initPlayerList();
+
+    //初始化对象（是否展示玩家信息）
+    var initDisplayInfo = function () {
+        //默认不展示
+        for (var i = 0; i < $scope.playerList.length; i++) {
+            $scope.isDisplayInfo[$scope.playerList[i].info.systemID] = 0;
+        }
+    };
+    //invote
+    initDisplayInfo();
+
+    //初始化好友对象（isYourFriend），后面用来判断游戏区里面的玩家是否为你的好友
+    var intiYourFriend = function () {
+        //好友默认为１
+        for (var i = 0; i < $scope.friendList.length; i++) {
+            $scope.isYourFriend[$scope.friendList[i].systemid] = 1;
+        }
+    };
+    //invote
+    intiYourFriend();
+
+    //如果是登录进来的而不是刷新
+    var isFirstLoad = function () {
+        if (localStorage.get('nodeGameIsFirstLoad') == true) {
+            localStorage.set('nodeGameIsFirstLoad', false);
+            //调用房间列表函数
+            getRoomList();
+            //弹出框
+            $(".maskDiv").show();
+            $("#roomBox").animate({"top" : "40px"}, 200, "ease");
+        }
+    };
+    //invote
+    isFirstLoad();
+    
+
+    //以下是angular相关函数和操作
+    
+    //改变房间名编辑状态
+    $scope.editRoomName = function () {
+        $scope.isEditing = true;
+    };
+
+    //房间名编辑框失去焦点
+    $scope.roomNameBlur = function () {
+        if ($scope.createRoomName == '') {
+            //显示错误信息
+            showErrTips("房间名不能为空");
+            $scope.isEditing = false;
+        } else {
+            //创建房间函
+            createRoom($scope.createRoomName);
+            //局部重置
+            $scope.isEditing = false;
+            $scope.createRoomName = "";
+        }
+    };
+
+    //获取房间列表
+    $scope.getRoomList = function () {
+        //调用房间列表函数
+        getRoomList();
+    };
+
+    //加入房间
+    $scope.joinRoom = function (roomName, roomIndex) {
+        //房间要没有人
+        if (!$scope.hovePeople[roomName][roomIndex]) {
+            //还没有加入其他房间
+            if ($scope.isAddRoom == 0) {
+                $scope.curLocation = roomIndex;
+                var _jName = _myself.name;
+                var _jRoom = roomName;
+                var _jID = _myself.systemid;
+                var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
+                socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex, _userID : _jID, _userInfo : _jUserInfo});
+                //加入成功
+                socket.on('joinRoomSuccess', function (data) {
+                    if (data.type ==1) {
+                        //系统信息
+                        showSystemTips("加入房间成功");
+                        //局部重置
+                        $scope.isAddRoom = 1;
+                        $scope.curRoom = roomName;
+                        if ($scope.isReady === 0) {
+                            $scope.isReady = 1;
+                        }
+                        //弹出框
+                        $timeout(function(){
+                            $("#roomBox").animate({"top" : "-510px"}, 300, "ease", function () {
+                                $(".maskDiv").hide();
+                            });
+                        }, 1200);
+                    }
+                });
+            } else {
+                //显示错误信息
+                showErrTips("你已经加入了一个房间，不能再加入一个房间");
+            }
+        } else {
+            //显示错误信息
+            showErrTips("此桌子已经有人，请选择其他桌子");
+        }
+    };
+
+    //准备游戏
+    $scope.prepareForGame = function (roomName) {
+        socket.emit('prepareForGame', {
+            _roomName : roomName,
+            _userID : _myself.systemid,
+            _userName : _myself.name
+        });
+        if ($scope.isReady === 1) {
+            $scope.isReady = 0;
+        }
+    };
+
+    //发言
+    $scope.makeStatement = function (roomName,statement) {
+        if ($scope.sayMessage == "") {
+            return 0;
+        } else {
+            socket.emit('onMakeStatement',{
+                _roomName: roomName,
+                _userID : _myself.systemid,
+                _userName: _myself.name,
+                _statement: statement
+            });
+            //重置定时器
+            $timeout.cancel(_timeLeave);
+            timeLimit = TIME_LIMIT;
+            $scope.timeLeave = 0;
+            $scope.sayMessage = "";
+            $scope.isYourTurn = 0;
+        } 
+    };
+
+    //投票
+    $scope.voteOne = function (roomName,voteToName,voteToID) {
+        socket.emit('voteOne',{
+            _roomName: roomName,
+            _userID: _myself.systemid,
+            _userName: _myself.name,
+            _voteToID: voteToID,
+            _voteToName: voteToName
+        });
+        //隐藏投票
+        $scope.isDisplayVote = 0;
+    };
+
+    //显示玩家信息
+    $scope.faceMouseOver = function (userID) {
+        $scope.isDisplayInfo[userID] = 1;
+    };
+
+    //隐藏玩家信息
+    $scope.faceMouseOut = function (userID) {
+        $scope.isDisplayInfo[userID] = 0;
+    };
+
+    //鬼猜词
+    $scope.guessWord = function () {
+        //
+    };
+
+    //死后留遗言
+    $scope.leaveMsg = function () {
+        //
+    };
+
+    //为游戏添加词语
+    $scope.addWords = function (userID, uername) {
+        //
+    };
+
+    //添加好友
+    $scope.addFriend = function (systemid, username) {
+        var yourFriend = {
+            username : username,
+            systemid : systemid,
+            selfName : _myself.name,
+            selfId : _myself.systemid
+        };
+        $http.post('/add_friend/add', yourFriend).success(function (data, status, headers, config) {
+            //{userName : "zhoonchen", "systemid" : "nodegame232232323"}
+            var _data = data.data;
+            if (typeof _data == "string") {
+                //显示错误信息
+                showErrTips(_data);
+            } else {
+                if (_data.name && _data.systemid) {
+                    $scope.friendList.push({
+                        name : _data.name,
+                        systemid : _data.systemid
+                    });
+                } else {
+                    //显示错误信息
+                    showErrTips("添加好友失败");
+                }
+                //重置好友列表
+                initFrientMsg();
+                //系统信息
+                showSystemTips("成功添加" + _data.name + "为好友");
+                //重置session
+                sessionStorage.set('friendList', $scope.friendList);
+                //update isYourFriend
+                $scope.isYourFriend[_data.systemid] = 1;
+            }
+        }).error(function (data, status, headers, config) {
+            //显示错误信息
+            showErrTips("添加好友失败");
+        });
+    };
+
+    //删除好友
+    $scope.removeFriend = function (systemid, username) {
+        var yourFriend = {
+            username : username,
+            systemid : systemid,
+            selfName : _myself.name,
+            selfId : _myself.systemid
+        };
+        $http.post('/add_friend/remove', yourFriend).success(function (data, status, headers, config) {
+            var _data = data.data;
+            if (typeof _data == "string") {
+                //显示错误信息
+                showErrTips(_data);
+            } else {
+                if (_data.name && _data.systemid) {
+                    for (var i = 0; i < $scope.friendList.length; i++) {
+                        if ($scope.friendList[i].name == _data.name) {
+                            $scope.friendList.splice(i, 1);
+                            break;
+                        }
+                    };
+                } else {
+                    //显示错误信息
+                    showErrTips("取消好友失败");
+                }
+                //重置好友列表
+                initFrientMsg(_data.systemid);
+                //系统信息
+                showSystemTips("成功取消好友" + _data.name);
+                //重置session
+                sessionStorage.set('friendList', $scope.friendList);
+                //update isYourFriend
+                $scope.isYourFriend[_data.systemid] = 0;
+            }
+        }).error(function (data, status, headers, config) {
+            //显示错误信息
+            showErrTips("取消好友失败");
+        });
+    };
+
+    //离开房间
+    $scope.leaveRoom = function () {
+        socket.emit('leaveRoom',{_roomName : $scope.curRoom, _userName : _myself.name, _userID : _myself.systemid, _location : $scope.curLocation});
+        //离开成功
+        socket.on('leaveSuccess',function (data) {
+            //游戏重置
+            resetGame("leaveRoom");
+        });
+    };
+
+    //监听来自服务器的Socket
+
+    //是否为空房间
+    socket.on('deleteRoom',function (data) {
+        var _roomName = data._roomName;
+        for (var i = 0; i < $scope.roomList.length; i++) {
+            if ($scope.roomList[i].roomName == _roomName) {
+                $scope.roomList.splice(i, 1);
+            }
+        }
+    });
+    
     //更新房间内玩家
     socket.on('updateRoomMember',function (data) {
         var _member = data._list;
         var _type = data._type;
+        //重置当前玩家数组
         initPlayerList();
+        //把服务器传来的信息赋值给本地变量
         var _length = _member.length;
         for (var i = 0; i < _length; i++) {
             $scope.playerList[i].isOn = 1;
             $scope.playerList[i].info = _member[i];
             $scope.isPlayerReady[_member[i].systemID] = _member[i].isPrepare;
         }
+        //第二次排序
         for (var i = 0; i < _member.length; i++) {
             if ($scope.playerList[i].info.systemID != _myself.systemid) {
                 $scope.playerList.push($scope.playerList.shift());
@@ -747,142 +955,17 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         //prepare game
         if (_type == 2) {}
     });
-    //更新分数
+
+    //更新票数
     socket.on('updateVoteCount',function (data) {
         var _voteCount = data._count;
         for (var _playID in _voteCount) {
             $scope.playVoteCount[_playID] = _voteCount[_playID];
         }
-    })
-    //是否展示玩家信息(初始化isDisplayInfo)
-    for (var i = 0; i < $scope.playerList.length; i++) {
-        $scope.isDisplayInfo[$scope.playerList[i].info.systemID] = 0;
-    }
-    //是否为你的好友(初始化isYourFriend)
-    for (var i = 0; i < $scope.friendList.length; i++) {
-        $scope.isYourFriend[$scope.friendList[i].systemid] = 1;
-    }
-    //投票
-    $scope.voteOne = function(roomName,voteToName,voteToID){
-        socket.emit('voteOne',{
-            _roomName: roomName,
-            _userID : _myself.systemid,
-            _userName: _myself.name,
-            _voteToID : voteToID,
-            _voteToName: voteToName
-        });
-        $scope.isDisplayVote = 0;
-    }
-    //mouse over
-    $scope.faceMouseOver = function (userID) {
-        $scope.isDisplayInfo[userID] = 1;
-    }
-    //mouse over
-    $scope.faceMouseOut = function (userID) {
-        $scope.isDisplayInfo[userID] = 0;
-    }
-    //鬼猜词
-    $scope.guessWord = function () {
-        //
-    }
-    //死后留遗言
-    $scope.leaveMsg = function () {
-        //
-    }
-    //添加好友
-    $scope.addFriend = function (systemid, username) {
-        var yourFriend = {
-            username : username,
-            systemid : systemid,
-            selfName : _myself.name,
-            selfId : _myself.systemid
-        };
-        $http.post('/add_friend/add', yourFriend).success(function(data, status, headers, config){
-            //console.log(data.data); //{userName : "zhoonchen", "systemid" : "nodegame232232323"}
-            var _data = data.data;
-            if (typeof _data == "string") {
-                $scope.errorTips = _data;
-                closeErrTips();
-            } else {
-                if (_data.name && _data.systemid) {
-                    $scope.friendList.push({
-                        name : _data.name,
-                        systemid : _data.systemid
-                    });
-                } else {
-                    $scope.errorTips = "添加好友失败";
-                    closeErrTips();
-                }
-                //rewrite the friend msg
-                initFrientMsg();
-                //tips
-                $scope.systemTips = "成功添加" + _data.name + "为好友";
-                closeSystemTips();
-                //session storage
-                sessionStorage.set('friendList', $scope.friendList);
-                //update status
-                $scope.isYourFriend[_data.systemid] = 1;
-            }
-        }).error(function(data, status, headers, config){
-            //tip
-            $scope.errorTips = "添加好友失败";
-            closeErrTips();
-        });
-    };
-    //删除好友
-    $scope.removeFriend = function (systemid, username) {
-        var yourFriend = {
-            username : username,
-            systemid : systemid,
-            selfName : _myself.name,
-            selfId : _myself.systemid
-        };
-        $http.post('/add_friend/remove', yourFriend).success(function(data, status, headers, config){
-            var _data = data.data;
-            if (typeof _data == "string") {
-                $scope.errorTips = _data;
-                closeErrTips();
-            } else {
-                if (_data.name && _data.systemid) {
-                    //delete friend from $scope.friendList
-                    for (var i = 0; i < $scope.friendList.length; i++) {
-                        if ($scope.friendList[i].name == _data.name) {
-                            $scope.friendList.splice(i, 1);
-                            break;
-                        }
-                    };
-                } else {
-                    $scope.errorTips = "取消好友失败";
-                    closeErrTips();
-                }
-                //rewrite the friend msg
-                initFrientMsg();
-                delete usersObj[_data.systemid];
-                //tips
-                $scope.systemTips = "成功取消好友" + _data.name;
-                closeSystemTips();
-                //session storage
-                sessionStorage.set('friendList', $scope.friendList);
-                //update status
-                $scope.isYourFriend[_data.systemid] = 0;
-            }
-        }).error(function(data, status, headers, config){
-            //tip
-            $scope.errorTips = "取消好友失败";
-            closeErrTips();
-        });
-    }
-    socket.on('createRoomErr',function () {
-        
-    })
-    //其他人创建房间时
-    socket.on('newRoom',function(data){
-        $scope.roomList.push({
-            roomName : data._roomName
-        });
     });
+
     //收到房间列表时
-    socket.on('onRoomList',function(data){
+    socket.on('onRoomList',function (data) {
         var _roomList = data._list;
         $scope.roomList = [];
         //push the room list to the view
@@ -904,8 +987,16 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             }
         }
     });
+
+    //其他人创建房间时
+    socket.on('newRoom',function (data) {
+        $scope.roomList.push({
+            roomName : data._roomName
+        });
+    });
+
     //更新所有房间内桌子的状态
-    socket.on('updateRoomStatus',function(data){
+    socket.on('updateRoomStatus',function (data) {
         var _room = data;
         if (!$scope.hovePeople[_room._roomName]){
             $scope.hovePeople[_room._roomName] = [];
@@ -919,30 +1010,29 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             $scope.hovePeople[_room._roomName][_room._location] = 1;
         }
     });
+
     //游戏开始
-    socket.on('gameStart',function(data){
+    socket.on('gameStart',function (data) {
+        $scope.isGameStart = 1;
         $scope.sysMessage.push('游戏开始');
         socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom, _userID : _myself.systemid});
-        $scope.isGameStart = 1;
     });
-    $scope.addWords = function (userID, uername) {
-        //Just test
-    }
+    
     //游戏结束
     socket.on('gameOver',function (data) {
-        //leave room
-        //socket.emit('leaveRoom',{_roomName : $scope.curRoom, _userName : _myself.name, _userID : _myself.systemid, _location : $scope.curLocation});
-        //tips
         $timeout(function () {
-            $scope.systemTips = data.msg;
-            closeSystemTips();
+            //系统信息
+            showSystemTips(data.msg);
         },1500);
-        //reset game
-        resetGame(true);
+        //重置游戏
+        resetGame("gameOver");
     });
+
+    //游戏结束返回的数据
     socket.on('gameOverResult',function (data) {
         $scope.gameOverInfo = data._result;
         $timeout(function () {
+            //弹出框
             $(".maskDiv").show();
             $("#gameOverBox").animate({"top" : "40px"}, 200, "ease");
         },3000);
@@ -955,6 +1045,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             $scope.wordLength = data._wordLength;
         }
     });
+
     //轮到用户user发言时
     socket.on('makeStatement',function(data){
         var userName = data._userName;
@@ -964,54 +1055,51 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             $scope.isYourTurn = 1;
         }
     });
+
     //开始投票
     socket.on('startVote',function(data){
         $scope.isDisplayVote = 1;
         $scope.isDisplayVoteCount = 1;
-        $scope.systemTips = "发言结束,请开始投票";
-        closeSystemTips();
+        //系统信息
+        showSystemTips("发言结束,请开始投票");
     });
+
     //玩家出局
     socket.on('voteOut',function(data){
         //init VoteOut
         $scope.isVoteOut[data._userID] = 1;
         //init VoteCount
         $scope.isDisplayVoteCount = 0;
-        for (var item in $scope.playVoteCount) {
-           $scope.playVoteCount[item] = 0;
-        }
+        //重置票数
+        resetVoteCount();
     });
+
     //系统消息
-    socket.on('Message',function(data){
+    socket.on('Message',function (data) {
         if (data.type == 4) {
-            $scope.sayMessageTips = data.msg;
-            closeSayTips();
+            //显示发言信息
+            showSayTips(data.msg);
         }
         if (data.type == 8 || data.type == 7 || data.type == 6 || data.type == 5 || data.type == 3 || data.type == 2 || data.type ==1) {
             $timeout(function () {
-                $scope.systemTips = data.msg;
-                closeSystemTips();
+                //系统信息
+                showSystemTips(data.msg);
             }, 1000);
         }
         $scope.sysMessage.push(data.msg);
     });
+
     //错误消息
     socket.on('err',function(data){
         if (data.type == 2 || data.type == -1) {
-            $scope.errorTips = data.msg;
-            closeErrTips();
+            //显示错误信息
+            showErrTips(data.msg);
         };
         $scope.sysMessage.push(data.msg);
     });
-    socket.on('rooms',function(data){
-        //仅作测试用，可删除
-    });
-
 }
+//
 indexCtrl.$inject = ['$scope', '$http', '$location', '$timeout', '$compile', 'socket', 'localStorage', 'sessionStorage', 'global'];
-
-
-
 
 /*
 	chat controller

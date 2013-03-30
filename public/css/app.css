@@ -76,7 +76,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameArea .gameView .gameDisplay{width: 596px;height: 468px;border: 2px solid #ccc;position: absolute;background-color: #fff;top: 0px;left: 0px;}
 .gameDisplay{background: url(../img/gameground.jpg) no-repeat; background-size: 100% 100%;}
 .gameView .gameDisplay .players{position: absolute;height: 85px;width: 85px;}
-.gameView .gameDisplay .players .playname{width: 100%;color: #fff;margin: 0px auto;}
+.gameView .gameDisplay .players .playname{width: 100%;color: #fff;margin: 0px auto;text-align: center;}
 .gameView .gameDisplay .players .playVoteCount{width: 30px;height: 30px;border-radius: 15px;background-color: #50b909;color: #fff;line-height: 30px;text-align: center;position: absolute;right: 0px;bottom: 10px;font-size: 16px;}
 .gameView .gameDisplay .players .face{height: 60px;width: 60px;margin: 12px 0 0 12px;background: url(../img/face5.png) no-repeat;background-size: 60px 60px;}
 .gameView .gameDisplay .players .on{padding-right: 20px; background: url(../img/face3.png) no-repeat;background-size: 60px 60px;}
