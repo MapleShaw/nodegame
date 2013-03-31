@@ -1,5 +1,7 @@
 div.wrap
 
+  audio(src='', id='sound')
+    p 您的浏览器不支持Audio
   div.maskDiv(style='display:none;')
   div.roomBox#roomBox(ng-class='{editingName : isEditing == true}')
     a.roomClose(href='javascript:;') 关闭
@@ -37,7 +39,6 @@ div.wrap
         td(ng-hide='goi.isWin', ng-class='{red:goi.isWin==false}') 失败
         td(ng-show='goi.isWin', ng-class='{green:goi.isWin==true}') 胜利
         td {{goi.score}} + {{goi.rewardScore}}
-
 
   div#chatTemplate
   div.friend_list
@@ -105,5 +106,5 @@ div.wrap
         ul.items
           li
             label
-              input(type='checkbox', checked='checked', style='vertical-align:middle;margin-right:3px;')
+              input(type='checkbox', style='vertical-align:middle;margin-right:3px;', ng-model='sound')
               span(style='vertical-align:middle') 开启声音

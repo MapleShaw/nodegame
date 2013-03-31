@@ -217,7 +217,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope._myself = _myself;
     }
 
-    
     //聊天窗口模板
     function _template (friend) {
         //如果窗口存在,则显示
@@ -267,6 +266,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         var chatTeml = $compile(_html)($scope);
         document.getElementById('chatTemplate').appendChild(chatTeml[0]);
     }
+
     //新信息提醒的橙色条
     function _showTips (fromId, fromName) {
         $scope.msgCount++;
@@ -277,7 +277,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             });
         }
         $scope.count[fromId]++;
-    }
+    };
 
     /*
         angular 函数
@@ -290,12 +290,14 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         } else {
             $scope.sT = false;
         }
-    }
+    };
+
     //初始化聊天窗口（点击好友头像弹出聊天窗口的）
     $scope.initChat = function (friend) {
         //调用函数构造模板
         _template(friend);
-    }
+    };
+
     //初始化聊天窗口（点击橙色条里面的信息）
     $scope.showChatWin = function (userId) {
         //调用函数构造模板
@@ -308,7 +310,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 $scope.tipsMsg.splice(i, 1);
             }
         }
-    }
+    };
+
     //发送聊天信息
     $scope.sendMsg = function(userId){
         //非空
@@ -322,23 +325,26 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 'sendText' : $scope.userTxt[userId]
             });
         }
-    }
+    };
+
     //关闭聊天窗口
     $scope.closeDialog = function (userId) {
         var dialog = document.getElementById("dialog_" + userId);
         var dParent = document.getElementById("chatTemplate");
         $scope.msgs[userId] = [];
         dParent.removeChild(dialog);
-    }
+    };
+
     //清除聊天记录
     $scope.clearMsg = function (userId) {
         $scope.msgs[userId] = [];
-    }
+    };
+
     //最小化窗口
     $scope.minDialog = function (userId) {
         var dialog = document.getElementById("dialog_" + userId);
         dialog.style.display = "none";
-    }
+    };
 
     /*
         接收socket
@@ -364,6 +370,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             });
         }
     }); 
+
     //接收对方发送信息
     socket.on('chatUserMsg', function (data) {
        var data = data;
@@ -405,6 +412,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             console.log('the user is not online...')
        }
     });
+
     //接收错误信息
     socket.on('chatErrMsg', function (data) {
         var data = data;
@@ -414,7 +422,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             cnt : data.msg
         });
     });
-
 
     /*
         房间
@@ -478,6 +485,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.playVoteCount = {};
     //当前房间玩家列表
     $scope.playerList = [];
+    //是否开启游戏声音
+    $scope.sound = true;
     //时间限制常量
     var TIME_LIMIT = 30;
     //系统提示定时器
@@ -490,6 +499,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var _timeLeave;
     //时间限制
     var timeLimit = TIME_LIMIT;
+
 
 
     /* 
@@ -706,7 +716,16 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     };
     //invote
     isFirstLoad();
-    
+
+    //游戏声音
+    var _sound = 'http://www.w3schools.com/html/horse.ogg';
+    var playAudio = function (_src) {
+        if ($scope.sound) {
+            var audio = document.getElementById('sound');
+            audio.src = _src;
+            audio.play();
+        }
+    }
 
     //以下是angular相关函数和操作
     
@@ -1076,6 +1095,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             timeLeave('say');
             $scope.isYourTurn = 1;
         }
+        playAudio(_sound);
     });
 
     //开始投票

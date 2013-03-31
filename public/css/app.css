@@ -183,6 +183,13 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 /*footer*/
 .footer{height: 5px;width: 100%;background-color: #50b909;position: absolute;bottom: 0px;left: 0px;overflow: hidden; z-index: 100;}
 
+/*preMask*/
+.preMask{width: 100%;height: 100%;background-color: #000;left: 0px;top: 0px;z-index: 200;position: absolute;opacity: 0.9;}
+.loading{width: 300px;height: 400px;background-color: #5389af;position: absolute;left: 50%;margin-left: -150px;top: 100px;z-index: 300;border-radius: 3px;}
+.loading p{margin-top: 40px;color: #fff;font-size: 36px;text-align: center;text-shadow: 1px 1px 1px rgba(0,0,0,0.8);}
+.loading .v{width: 85px;height: 85px;background: url(../img/face4.png) no-repeat;margin: 20px auto;}
+.loading .i{height: 36px;width: 36px;background: #fff url(../img/loading.gif) no-repeat;margin: 70px auto 0;border-radius: 18px;}
+.loading .l{line-height: 3;text-align: center;color: #fff;}
 
 /*function*/
 .gray{color: #999;}
