@@ -718,14 +718,30 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     isFirstLoad();
 
     //游戏声音
-    var _sound = 'http://www.w3schools.com/html/horse.ogg';
+    //var _sound = 'http://www.w3schools.com/html/horse.ogg';
     var playAudio = function (_src) {
-        if ($scope.sound) {
-            var audio = document.getElementById('sound');
-            audio.src = _src;
-            audio.play();
+        if (_src !== null) {
+            if ($scope.sound) {
+                var audio = document.getElementById('sound');
+                audio.src = _src;
+                audio.play();
+            }
+        } else {
+            return 0;
         }
-    }
+    };
+    var audioRoute = function (type) {
+        switch(type) {
+            case 0:
+                playAudio('../img/s0.ogg');
+                break;
+            case 1:
+                playAudio('../img/s1.ogg');
+                break;
+            default:
+                playAudio(null);
+        }
+    };
 
     //以下是angular相关函数和操作
     
@@ -1095,7 +1111,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             timeLeave('say');
             $scope.isYourTurn = 1;
         }
-        playAudio(_sound);
+        audioRoute();
     });
 
     //开始投票
