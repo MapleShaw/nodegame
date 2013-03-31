@@ -364,6 +364,10 @@ module.exports = function(socket,rooms,io){
 					}
 				}
 			}
+			//重复票数
+			if(max_repeat > 1){
+				this._pkMember = max_vote_id;
+			}
 			for(var j = 0; j < max_vote_id.length; j++){
 				max_vote_name[j] = this.getNameByID(max_vote_id[j]);
 			}
