@@ -738,6 +738,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             case 1:
                 playAudio('../img/s1.ogg');
                 break;
+            case 2:
+                playAudio('http://www.w3schools.com/html/horse.ogg');
             default:
                 playAudio(null);
         }
@@ -1111,7 +1113,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             timeLeave('say');
             $scope.isYourTurn = 1;
         }
-        audioRoute();
+        audioRoute(2);
     });
 
     //开始投票
