@@ -21,7 +21,8 @@ div.wrap
     a.ob_close(href='javascript:;') 关闭
     div.title 添加词语
     div.cnt
-      input(type='text', ng-model='obAddWord', placeholder='输入词语...')
+      input(type='text', ng-model='obAddWord.words', placeholder='输入词语，多个词语用空格分隔...')
+      input(type='text', ng-model='obAddWord.feature', placeholder='输入特征词...')
       input(type='button', class='btn', value='提交', ng-click='submitAddWord()')
 
   div.maskDiv(style='display:none;')

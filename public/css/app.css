@@ -194,10 +194,10 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .loading .l{line-height: 3;text-align: center;color: #fff;}
 
 /*operateBox*/
-.operateBox{background-color: #fff;width: 400px;border-radius: 3px;position: absolute;border: 1px solid #ccc;box-shadow: 0 0 20px rgba(0,0,0,0.4);left: 50%;margin-left: -200px;top: 160px;z-index: 10;display: none;}
-.operateBox input[type='text']{width: 275px;margin-right: 10px;}
+.operateBox{background-color: #fff;width: 400px;border-radius: 3px;position: absolute;border: 1px solid #ccc;box-shadow: 0 0 20px rgba(0,0,0,0.4);left: 50%;margin-left: -200px;top: 150px;z-index: 10;display: none;}
+.operateBox input[type='text']{width: 340px;margin-right: 10px;margin-bottom: 15px;}
 .operateBox .title{height: 42px;line-height: 42px;background-color: #eee;text-indent: 20px;font-size: 16px;}
-.operateBox .cnt{padding: 30px 20px 40px;}
+.operateBox .cnt{padding: 30px 20px 20px;}
 
 /*function*/
 .gray{color: #999;}

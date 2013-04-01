@@ -46,7 +46,6 @@ function loginCtrl($scope, $http, $routeParams, $location, localStorage, session
 			var loginMark = data.err;
 			var friendToJson = data.friendList;
 			var myselfInfoToJson = data.myselfInfo;
-            debugger;
             localStorage.set('nodeGameIsFirstLoad', true);
 			sessionStorage.set('friendList', friendToJson);
 			sessionStorage.set('myselfInfo', myselfInfoToJson);
@@ -492,7 +491,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //留遗言
     $scope.obLeaveMsg = '';
     //添加词语
-    $scope.obAddWord = '';
+    $scope.obAddWord = {};
     //时间限制常量
     var TIME_LIMIT = 30;
     //系统提示定时器
@@ -904,13 +903,22 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
 
     //为游戏添加词语
     $scope.submitAddWord = function () {
-        //socket
-        if ($scope.obAddWord != '') {
-            socket.emit('addWord', {
-                _word : $scope.obAddWord,
-                _roomName : $scope.curRoom,
-                _userName : _myself.name,
-                _userID : _myself.systemid
+        var reg = /[,\.，';"\/\\]/ig;
+        if (!$scope.obAddWord.words || !$scope.obAddWord.feature) {
+            showErrTips("表单不能为空");
+            return false;
+        } else if (reg.test($scope.obAddWord.words) || reg.test($scope.obAddWord.feature)) {
+            showErrTips("你输入的内容包含特殊字符，请检查重新输入");
+            return false;
+        } else {
+            var _words = $scope.obAddWord.words.replace(/\s{2,}/ig, " ").split(" ");
+            var _feature = $scope.obAddWord.feature;
+            $http.post('/subjects/addSubject', {words : _words, feature : _feature}).success(function (data){
+                showSystemTips("恭喜添加词语成功");
+                debugger;
+                $scope.obAddWord = {};
+            }).error(function (data) {
+                showErrTips("添加失败，请重试");
             });
         }
     };
