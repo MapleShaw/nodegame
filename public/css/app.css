@@ -90,7 +90,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameView .gameDisplay .players .vote a{height: 30px;width: 70px;text-align: center;line-height: 30px;background-color: #fff;opacity: 0.8;border-radius: 3px;display: inline-block;margin: 10px 15px;color: #000;text-decoration: none;}
 .gameView .gameDisplay .players .vote a:hover{opacity: 1;}
 .gameView .gameDisplay .players .vote:after{content: "";height: 0px;width: 0px;border-style: solid;border-color: #000 transparent transparent transparent;position: absolute;border-width: 8px 5px;display: block;bottom: -16px;left: 44px;overflow: hidden;}
-.gameView .gameDisplay .players .userInfo{width: 150px;border-radius: 3px;background-color: #000;opacity: 0.8;position: absolute;left: 86px;top: -10px;z-index: 5;padding: 10px;color: #fff;}
+.gameView .gameDisplay .players .userInfo{width: 150px;border-radius: 3px;background-color: #000;position: absolute;left: 86px;top: -10px;z-index: 5;padding: 10px;color: #fff;}
 .gameView .gameDisplay .players .userInfo:after{content: "";height: 0px;width: 0px;border-style: solid;border-color: transparent #000 transparent transparent;position: absolute;border-width: 5px 8px;display: block;left: -16px;top: 25px;overflow: hidden;}
 .gameView .gameDisplay .players .userInfo a{text-decoration: underline;}
 
@@ -105,7 +105,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameView .gameDisplay > div:nth-child(100n+9){top: 240px;right: 10px;}
 .gameView .gameDisplay .timeLeave{position: absolute;bottom: 0px;left: 0px;padding: 8px 20px;color: #fff;background-color: #589bc6;border-left: 1px solid #5389af;border-top: 1px solid #5389af;border-top-right-radius: 3px;}
 .gameView .gameDisplay .bg_txt{font-size: 60px;color: #eee;line-height: 400px;text-align: center;}
-.gameView .gameDisplay .playMsg{position: absolute;top: 140px;padding: 15px;background-color: #000;width: 320px;left: 50%;margin-left: -175px;color: #fff;border-radius: 3px;max-height: 155px;overflow: auto;opacity: 0.8;word-break: break-all;}
+.gameView .gameDisplay .playMsg{position: absolute;top: 140px;padding: 15px;background-color: #000;width: 320px;left: 50%;margin-left: -175px;color: #fff;border-radius: 3px;max-height: 155px;overflow: auto;word-break: break-all;}
 .gameArea .gameView .gameSend{position: absolute;bottom: 0px;left: 0px;}
 .gameView .playTextarea{width: 470px;height: 40px;vertical-align: middle;}
 .gameView .playSubmit{height: 50px;width: 112px;margin-left: 4px;vertical-align: middle;border-radius: 3px;cursor: pointer;background-image: -webkit-linear-gradient(top,#589bc6,#5395bf);background-image: linear-gradient(top,#589bc6,#5395bf);border: 1px solid #5389af;font-size: 18px;color: #fff;}
@@ -170,11 +170,13 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 
 .roomBox .roomTop{position: absolute;left: 50%;margin-left: -107px;width: 214px;top: 10px;}
 .roomBox .roomClose,
-.gameOverBox .roomClose{position: absolute;right: 20px;line-height: 20px;top: 15px;width: 16px;height: 16px;text-decoration: none;background: url(../img/icons.png) no-repeat -108px -175px;text-indent: -9999px;}
+.gameOverBox .roomClose,
+.operateBox .ob_close{position: absolute;right: 15px;line-height: 20px;top: 15px;width: 16px;height: 16px;text-decoration: none;background: url(../img/icons.png) no-repeat -108px -175px;text-indent: -9999px;}
 .roomBox .roomClose:hover,
-.gameOverBox .roomClose:hover{background-position :-129px -175px;}
+.gameOverBox .roomClose:hover,
+.operateBox .ob_close:hover{background-position :-129px -175px;}
 
-.systemTips,.errTips{width: 230px;border-radius: 3px;opacity: 0.8;text-align: center;padding: 10px;position: absolute;left: 50%;margin-left: -125px;top: 80px;z-index: 50;color: #fff;word-break:break-all;}
+.systemTips,.errTips{width: 230px;border-radius: 3px;text-align: center;padding: 10px;position: absolute;left: 50%;margin-left: -125px;top: 80px;z-index: 50;color: #fff;word-break:break-all;}
 .systemTips{background-color: #50b909;}
 .errTips{background-color: #c00;}
 
@@ -190,6 +192,12 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .loading .v{width: 85px;height: 85px;background: url(../img/face4.png) no-repeat;margin: 20px auto;}
 .loading .i{height: 36px;width: 36px;background: #fff url(../img/loading.gif) no-repeat;margin: 70px auto 0;border-radius: 18px;}
 .loading .l{line-height: 3;text-align: center;color: #fff;}
+
+/*operateBox*/
+.operateBox{background-color: #fff;width: 400px;border-radius: 3px;position: absolute;border: 1px solid #ccc;box-shadow: 0 0 20px rgba(0,0,0,0.4);left: 50%;margin-left: -200px;top: 160px;z-index: 10;display: none;}
+.operateBox input[type='text']{width: 275px;margin-right: 10px;}
+.operateBox .title{height: 42px;line-height: 42px;background-color: #eee;text-indent: 20px;font-size: 16px;}
+.operateBox .cnt{padding: 30px 20px 40px;}
 
 /*function*/
 .gray{color: #999;}

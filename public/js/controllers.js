@@ -487,6 +487,12 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.playerList = [];
     //是否开启游戏声音
     $scope.sound = true;
+    //猜词语
+    $scope.obGuessWord = '';
+    //留遗言
+    $scope.obLeaveMsg = '';
+    //添加词语
+    $scope.obAddWord = '';
     //时间限制常量
     var TIME_LIMIT = 30;
     //系统提示定时器
@@ -739,7 +745,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 playAudio('../img/s1.ogg');
                 break;
             case 2:
-                playAudio('http://www.w3schools.com/html/horse.ogg');
+                playAudio('../img/s2.ogg');
+                break;
             default:
                 playAudio(null);
         }
@@ -870,18 +877,42 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     };
 
     //鬼猜词
-    $scope.guessWord = function () {
-        //
+    $scope.submitGuessWord = function () {
+        //socket
+        if ($scope.obGuessWord != '') {
+            socket.emit('guessWord', {
+                _word : $scope.obGuessWord,
+                _roomName : $scope.curRoom,
+                _userName : _myself.name,
+                _userID : _myself.systemid
+            });
+        }
     };
 
     //死后留遗言
-    $scope.leaveMsg = function () {
-        //
+    $scope.submitLeaveMsg = function () {
+        //socket
+        if ($scope.obLeaveMsg != '') {
+            socket.emit('leaveMsg', {
+                _msg : $scope.obLeaveMsg,
+                _roomName : $scope.curRoom,
+                _userName : _myself.name,
+                _userID : _myself.systemid
+            });
+        }
     };
 
     //为游戏添加词语
-    $scope.addWords = function (userID, uername) {
-        //
+    $scope.submitAddWord = function () {
+        //socket
+        if ($scope.obAddWord != '') {
+            socket.emit('addWord', {
+                _word : $scope.obAddWord,
+                _roomName : $scope.curRoom,
+                _userName : _myself.name,
+                _userID : _myself.systemid
+            });
+        }
     };
 
     //添加好友
@@ -1076,6 +1107,11 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.sysMessage.push('游戏开始');
         socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom, _userID : _myself.systemid});
     });
+
+    //玩家猜词错误
+    socket.on('guessWordFail', function (data) {
+        showSystemTips(data.msg);
+    });
     
     //游戏结束
     socket.on('gameOver',function (data) {
@@ -1172,7 +1208,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
 
     //错误消息
     socket.on('err',function(data){
-        if (data.type == 2 || data.type == -1) {
+        if (data.type == 4 || data.type == 3 || data.type == 2 || data.type == 1 || data.type == -1) {
             //显示错误信息
             showErrTips(data.msg);
         };

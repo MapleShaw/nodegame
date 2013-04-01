@@ -1,7 +1,29 @@
 div.wrap
 
   audio(src='', id='sound')
-    p 您的浏览器不支持Audio
+  audio(src='sBg.acc', id='bgSound', loop='true', autoplay='true')
+
+  div.operateBox.o_caici
+    a.ob_close(href='javascript:;') 关闭
+    div.title 我要猜词
+    div.cnt
+      input(type='text', ng-model='obGuessWord', placeholder='输入词语...')
+      input(type='button', class='btn', value='提交', ng-click='submitGuessWord()')
+
+  div.operateBox.o_yiyan
+    a.ob_close(href='javascript:;') 关闭
+    div.title 留遗言
+    div.cnt
+      input(type='text', ng-model='obLeaveMsg', placeholder='输入遗言...')
+      input(type='button', class='btn', value='提交', ng-click='submitLeaveMsg()')
+
+  div.operateBox.o_ciyu
+    a.ob_close(href='javascript:;') 关闭
+    div.title 添加词语
+    div.cnt
+      input(type='text', ng-model='obAddWord', placeholder='输入词语...')
+      input(type='button', class='btn', value='提交', ng-click='submitAddWord()')
+
   div.maskDiv(style='display:none;')
   div.roomBox#roomBox(ng-class='{editingName : isEditing == true}')
     a.roomClose(href='javascript:;') 关闭
@@ -66,7 +88,7 @@ div.wrap
           input.ctrlBtn#chooseRoom(type='button', ng-click='getRoomList()', value='选择房间') 
           input.ctrlBtn.prepareGame(type='button', ng-disabled='isReady==0', ng-class='{disable:isReady==0}', ng-click='prepareForGame(curRoom)', value='准备游戏') 
           input.ctrlBtn.leaveRoom(type='button', ng-click='leaveRoom()', value='离开房间', ng-disabled='isAddRoom==0', ng-class='{disable:isAddRoom==0}') 
-          input.ctrlBtn(type='button', value='给词库添加词语', ng-click='addWords(_myself.systemid,_myself.name)') 
+          input.ctrlBtn#addWordBtn(type='button', value='给词库添加词语') 
           div.wordArea {{word}} {{wordLength || ""}}
     div.gameView
       div.gameDisplay
@@ -89,8 +111,8 @@ div.wrap
         div.errTips(ng-show='errorTips') {{errorTips}}
 
         p.bg_txt 游戏区
-        input.ctrlBtn.caici(type='button', value='我要猜词', ng-click='guessWord()', ng-class='{disable:isGameStart==0}', ng-disabled='isGameStart==0') 
-        input.ctrlBtn.yiyan(type='button', value='我要留遗言', ng-click='leaveMsg()', ng-class='{disable:leaveMessage==0}', ng-disabled='leaveMessage==0') 
+        input.ctrlBtn.caici#guessWordbtn(type='button', value='我要猜词', ng-class='{disable:isGameStart==0}', ng-disabled='isGameStart==0') 
+        input.ctrlBtn.yiyan#leaveMsgBtn(type='button', value='我要留遗言', ng-class='{disable:leaveMessage==0}', ng-disabled='leaveMessage==0') 
       div.gameSend
         textarea.playTextarea(ng-model='sayMessage', placeholder='请输入词语的描述句子...')
         input.playSubmit(type='button', value='发言', ng-disabled='isYourTurn==0', ng-class='{disable:isYourTurn==0}', ng-click='makeStatement(curRoom, sayMessage)')

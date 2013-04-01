@@ -65,7 +65,7 @@
 		setTimeout(function () {
 			$(".preMask").hide();
 			$(".loading").hide();
-		}, 5000);
+		}, 1000);
 	});
 	loader.on('error', function (e) { 
 		console.log('资源预加载失败'); 
