@@ -121,11 +121,11 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameCtrl .gameUserCtrl .btn_list{padding: 10px 0 0 0;}
 
 .gameArea .gameSystem{float: left;width: 280px;margin-left: 10px;}
-.gameSystem .gameSetting{height: 80px;}
+.gameSystem .gameSetting{height: 100px;}
 .gameSystem .gameSetting .items{padding-top: 10px;}
-.gameSystem .gameSystemInfo{height: 420px;margin-bottom: 10px;}
+.gameSystem .gameSystemInfo{height: 400px;margin-bottom: 10px;}
 .gameSystem .gameSystemInfo .name{color: #4183c4;}
-.gameSystem .gameSystemInfo .items{padding: 10px 0 0 0;height: 375px;overflow: auto;font-size: 12px;}
+.gameSystem .gameSystemInfo .items{padding: 10px 0 0 0;height: 355px;overflow: auto;font-size: 12px;}
 .gameSystem .gameSystemInfo .items li{margin-bottom: 5px;}
 
 /*room*/

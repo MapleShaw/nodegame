@@ -3,8 +3,25 @@
 //use the lib of PxLoader.js
 
 ;(function (win, undefined) {
-	//arr of resource
-	var _images = [
+
+	//template
+	var _html = [
+		'<div class="preMask"></div>',
+		'<div class="loading">',
+			'<p>Welcome</p>',
+			'<div class="v"></div>',
+			'<div class="i"></div>',
+			'<div class="l">Loading...</div>',
+		'</div>'
+	].join("");
+	$('body').append($(_html));
+
+	//instance
+	var loader = new html5Preloader();
+
+	//add file
+	loader.addFiles(
+		'sBg1*:../../sBg1.ogg||../../sBg1.mp3',
 		'../img/arrows.png',
 		'../img/back.png',
 		'../img/face1.png',
@@ -26,41 +43,11 @@
 		'../img/unloginbg.png',
 		'../img/wordbg.png',
 		'../img/admin.png'
-	];
-	var _sound = [/*
-		'../img/s1.ogg',
-		'../img/s2.ogg',
-		'../img/s3.ogg',
-		'../img/s4.ogg',
-		'../img/s5.ogg',
-		'../img/s6.ogg',
-		'../img/s7.ogg',
-		'../img/s8.ogg',
-		'../img/s9.ogg',
-		'../img/s10.ogg'*/
-	]; 
+	);
 
-	//template
-	var _html = [
-		'<div class="preMask"></div>',
-		'<div class="loading">',
-			'<p>Welcome</p>',
-			'<div class="v"></div>',
-			'<div class="i"></div>',
-			'<div class="l">Loading...</div>',
-		'</div>'
-	].join("");
-	$('body').append($(_html));
-
-	//array
-	var arr = _images.concat(_sound);
-
-	//instance
-	var loader = html5Preloader();
-	//add file
-	loader.addFiles(arr);
 	//event
 	loader.on('finish', function () { 
+		debugger;
 		console.log('资源预加载成功');
 		setTimeout(function () {
 			$(".preMask").hide();
@@ -68,6 +55,7 @@
 		}, 1000);
 	});
 	loader.on('error', function (e) { 
+		debugger;
 		console.log('资源预加载失败'); 
 	}); 
 

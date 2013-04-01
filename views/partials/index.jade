@@ -1,7 +1,7 @@
 div.wrap
 
   audio(src='', id='sound')
-  audio(src='sBg.acc', id='bgSound', loop='true', autoplay='true')
+  audio(src='sound/sBg1.ogg', id='bgSound', loop='true', autoplay='true', preload='true')
 
   div.operateBox.o_caici
     a.ob_close(href='javascript:;') 关闭
@@ -130,4 +130,9 @@ div.wrap
           li
             label
               input(type='checkbox', style='vertical-align:middle;margin-right:3px;', ng-model='sound')
-              span(style='vertical-align:middle') 开启声音
+              span(style='vertical-align:middle') 游戏声音
+          li
+            label
+              input(type='checkbox', style='vertical-align:middle;margin-right:3px;', ng-model='bgSound', ng-change='toggleBgSound()')
+              span(style='vertical-align:middle') 背景音乐
+              a(href='javascript:;', style='vertical-align:middle;margin-left:5px;color:#fff;font-size:12px;', ng-click='changeBgSound()') (切换背景音乐)

@@ -486,6 +486,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.playerList = [];
     //是否开启游戏声音
     $scope.sound = true;
+    //是否开启游戏背景音乐
+    $scope.bgSound = true;
     //猜词语
     $scope.obGuessWord = '';
     //留遗言
@@ -773,6 +775,35 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         }
     };
 
+    //切换背景音乐
+    var _bgSoundIndex = 0;
+    var _bgSoundList = [
+        'sound/sBg1.ogg',
+        'sound/sBg1.ogg',
+        'sound/sBg1.ogg'
+    ];
+    $scope.changeBgSound = function () {
+        if ($scope.bgSound) {
+            var bgSound = document.getElementById('bgSound');
+            _bgSoundIndex ++;
+            if (_bgSoundIndex >= _bgSoundList.length-1) {
+                _bgSoundIndex = 0;
+            }
+            bgSound.src = _bgSoundList[_bgSoundIndex];
+            bgSound.play();
+        }
+    };
+
+    //是否开启背景音乐
+    $scope.toggleBgSound = function () {
+        var bgSound = document.getElementById('bgSound');
+        if ($scope.bgSound) {
+            bgSound.play();
+        } else {
+            bgSound.pause();
+        }
+    };
+
     //获取房间列表
     $scope.getRoomList = function () {
         //调用房间列表函数
@@ -892,8 +923,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.submitLeaveMsg = function () {
         //socket
         if ($scope.obLeaveMsg != '') {
-            socket.emit('leaveMsg', {
-                _msg : $scope.obLeaveMsg,
+            socket.emit('lastWord', {
+                _lastWord : $scope.obLeaveMsg,
                 _roomName : $scope.curRoom,
                 _userName : _myself.name,
                 _userID : _myself.systemid
@@ -1119,7 +1150,17 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //玩家猜词错误
     socket.on('guessWordFail', function (data) {
         showSystemTips(data.msg);
+        //出局
+        $scope.isVoteOut[data._userID] = 1;
     });
+
+    //玩家的遗言
+    socket.on('onlastWord', function (data) {
+        var lastWord = data._lastWord;
+        var userName = data._userName;
+        showSystemTips('玩家［' + userName + '］遗言 : ' + lastWord);
+        $scope.sysMessage.push('玩家［' + userName + '］遗言 : ' + lastWord);
+    })
     
     //游戏结束
     socket.on('gameOver',function (data) {
