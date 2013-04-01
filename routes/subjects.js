@@ -34,14 +34,15 @@ exports.addSubject = function(req , res){
     feature:req.body.feature,
   };
 
-  topic.Topic.add(data, function(err, repeatWords) {
+  topic.Topic.add(data, function(err, repeatWords,repeatMark) {
     
-    _callback(repeatWords);
+    _callback(repeatWords,repeatMark);
   });
 
-  function _callback (_data) {
+  function _callback (_repeatWords,_repeatMark) {
     res.json({
-      data : _data
+      repeatWords : _repeatWords,
+      repeatMark : _repeatMark
     });
   }
 }

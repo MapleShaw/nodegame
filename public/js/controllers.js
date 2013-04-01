@@ -10,8 +10,12 @@ function gameRuleCtrl($scope, $http, $routeParams, $location){//friendCtrl目前
     $scope.topicPost = function(){
         $scope.topicForm.words=$scope.topicForm.words.split("，");
         $http.post('/subjects/addSubject', $scope.topicForm).success(function(data, status, headers, config){
-            console.log(data.data);
-            $scope.msgTips = "You have sucessfully insert a kinds of words!!";
+            if(data.repeatMark==0){
+                $scope.msgTips = "You have sucessfully insert a kinds of words!!";
+            }else if(data.repeatMark==1){
+                $scope.msgTips = "这些词语重复了哦亲："+data.repeatWords;
+            }
+            
         }).error(function(data, status, headers, config){
             
         });

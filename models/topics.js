@@ -38,6 +38,7 @@ exports.Topic.add = function add(newTopic, callback) {
         mongodb.close();
         return callback(err);
       }
+      var repeatMark;
       //查询特征词是否存在
       collection.findOne({feature: newTopic.feature}, function(err, doc) {
         if (doc) {
@@ -58,11 +59,17 @@ exports.Topic.add = function add(newTopic, callback) {
             }
             mongodb.close();
           }
-          callback(err, isExist);         
+          if(isExist.length!=0){
+            repeatMark=1;
+          }else{
+            repeatMark=0;
+          }
+          callback(err, isExist,repeatMark);         
         } else {
+          repeatMark=0;
           collection.insert(newTopic, {safe: true}, function(err, yourTopic) {
             mongodb.close();
-            callback(err, yourTopic);
+            callback(err, yourTopic,repeatMark);
           });
         }
       });
