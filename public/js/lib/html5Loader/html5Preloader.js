@@ -395,6 +395,7 @@ html5Preloader.prototype = {
 	loadFiles: function () {
 		var	files	= [].slice.call(arguments),
 			i, f;
+
 		for (i=0; i<files.length; i++) {
 			f = html5Preloader.loadFile(files[i], this.loadCallback);
 			this.files.push(f);
