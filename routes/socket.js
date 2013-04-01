@@ -111,4 +111,6 @@ exports.onConnect = function(socket,io){
 	type:2  msg:房间已存在,在创建房间的时候
 	type:3	msg:用户并不在某个房间内,但是却向该房间发送了消息
 	type:4	msg:玩家不是鬼身份却进行猜词
+	type:5  msg:玩家在不能遗言的时候发送遗言
+	type:6  msg:只能投给pk台上的玩家
 */

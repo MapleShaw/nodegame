@@ -275,26 +275,13 @@ module.exports = function(socket,rooms,io){
 
 		//判断是否所有玩家已投过票
 		isAllVote : function(){
-			if(this._isPK){
-				//pk环节
-				for (var i = 0;i < this._pkMember.length;i ++){
-					var item = this._pkMember[i];
-					if(this._roomMember[item].isVote == false){
-						return false;
-					}
+			var member = this._roomMember;
+			for (var item in member){
+				if (member[item].isVote == false && member[item].isOut == false) {
+					return false;
 				}
-				return true;
 			}
-			else{
-				//非pk环节
-				var member = this._roomMember;
-				for (var item in member){
-					if (member[item].isVote == false && member[item].isOut == false) {
-						return false;
-					}
-				}
-				return true;
-			}
+			return true;
 		},
 
 		//获取当前的所有用户的票数
@@ -333,21 +320,11 @@ module.exports = function(socket,rooms,io){
 				user.isVote = false;
 				user.voteCount = 0;
 			}
-			if(this._isPK){
-				//pk环节
-				for(var i = 0;i < this._pkMember.length;i ++){
-					var item = this._pkMember[i];
-					var user = this._roomMember[item];
-					getHighest(user);
-				}
-			}
-			else{
-				//非pk环节
-				var member = this._roomMember;
-				for (var item in member){
-					var user = member[item];
-					getHighest(user);
-				}
+			//获得最高票数
+			var member = this._roomMember;
+			for (var item in member){
+				var user = member[item];
+				getHighest(user);
 			}
 			//最高票数者出局（唯一最高票数的情况下）
 			if(max_repeat == 1){
@@ -364,10 +341,7 @@ module.exports = function(socket,rooms,io){
 					}
 				}
 			}
-			//重复票数
-			if(max_repeat > 1){
-				this._pkMember = max_vote_id;
-			}
+			//通过ID获取用户名
 			for(var j = 0; j < max_vote_id.length; j++){
 				max_vote_name[j] = this.getNameByID(max_vote_id[j]);
 			}
@@ -378,6 +352,16 @@ module.exports = function(socket,rooms,io){
 				max_vote_name: max_vote_name,
 			};
 			return result;
+		},
+
+		//pk环节投票验证
+		pkCheckOutVote : function(voteToID){
+			for(var i = 0; i < this._pkMember.length; i ++){
+				if(voteToID == this._pkMember[i]){
+					return true;
+				}
+			}
+			return false;
 		},
 
 		//进入pk环节
@@ -398,7 +382,7 @@ module.exports = function(socket,rooms,io){
 		isGameOver : function(word){
 			//有参数代表是猜词,无参数按正常逻辑处理
 			if(!word){
-				if(this._isPK && this._pkTurns == 3){
+				if(this._isPK && this._pkTurns == 4){
 					return [2,'未能在3轮内票死一个，根据规则，鬼胜利'];
 				}
 				var member = this._roomMember;
@@ -550,6 +534,8 @@ module.exports = function(socket,rooms,io){
 		this.voteCount = 0;
 		//是否已出局
 		this.isOut = false;
+		//是否遗言
+		this.lastWord = false;
 		//游戏结果
 		this.gameResult = null;
 		//基本分
@@ -612,6 +598,11 @@ module.exports = function(socket,rooms,io){
 		outGame : function(turns){
 			this.isOut = true;
 			this.outGameTurn = turns;
+		},
+
+		//遗言
+		sayLastWord : function(){
+			this.lastWord = true;
 		},
 
 

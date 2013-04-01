@@ -256,6 +256,18 @@ module.exports = function(socket,rooms,io){
 				});
 				return false;
 			}
+			//pk回合只能投给pk台上的玩家
+			if(room_temp._isPK){
+				var check_temp = room_temp.pkCheckOutVote(voteToID);
+				if(!check_temp){
+					//不是投给pk台上的玩家
+					socket.emit('err',{
+						type: 6,
+						msg: '只能投给pk台上的玩家',
+					});
+					return;
+				}
+			}
 			beVote_temp.beVoted();
 		}
 		user_temp.voteTo(voteToID);
@@ -329,12 +341,27 @@ module.exports = function(socket,rooms,io){
 				}
 			}
 			else if(vote_data.max_repeat > 1){
+				//进入pk状态
+				room_temp.onPKTurn(vote_data.max_vote_id);
+				//是否满足游戏结束条件
+				var gameover_temp = room_temp.isGameOver();
+				if(gameover_temp){
+					//游戏结束复位处理
+					var result_temp = room_temp.onGameOver(gameover_temp[0]);					
+					//发送游戏结束
+					io.sockets.in(roomName).emit('gameOver',{
+						msg : gameover_temp[1]
+					});
+					//发送游戏结果数据
+					io.sockets.in(roomName).emit('gameOverResult',{
+						_result: result_temp,
+					});
+					return;
+				}
 				//有多人最高票数，进入Pk环节
 				io.sockets.in(roomName).emit('pkTurn',{
 					_userName : vote_data.max_vote_name
 				});
-				//进入pk状态
-				room_temp.onPKTurn(vote_data.max_vote_name);
 				//下一个玩家发言
 				io.sockets.in(roomName).emit('Message',{
 					type: 6,
@@ -342,7 +369,8 @@ module.exports = function(socket,rooms,io){
 				});				
 				//拿到下一个玩家的名字
 				io.sockets.in(roomName).emit('makeStatement',{
-					_userName : vote_data.max_vote_name[0]
+					_userName: vote_data.max_vote_name[0],
+					_userID: vote_data.max_vote_id[0],
 				});
 			}
 			else{
@@ -416,6 +444,7 @@ module.exports = function(socket,rooms,io){
 			user_temp.outGame();
 			io.sockets.in(roomName).emit('guessWordFail',{
 				_userName: userName,
+				_userID: userID,
 				msg: '玩家【'+userName+'】猜词错误，出局'
 			});
 			//游戏是否结束
@@ -451,6 +480,52 @@ module.exports = function(socket,rooms,io){
 					return;
 				}
 			}
+		}
+	});
+
+	/*
+		last words
+		遗言
+	*/
+	socket.on('lastWord',function(data){
+		var userID = data._userID;
+		var userName = data._userName;
+		var roomName = data._roomName;
+		var word = data._lastWord;
+		var room_temp = rooms.getRoom(roomName);
+		if(!room_temp){
+			socket.emit('err',{
+				//获取不到房间，即该房间不存在
+				type: 1,
+				msg: '房间不存在'
+			});
+			return;
+		}
+		var user_temp = rooms.getUser(roomName,userID);
+		if(user_temp.errType){
+			//获取不到用户，即用户不在该房间内
+			socket.emit('err',{
+				type: 3,
+				msg: '并未加入该房间'
+			});
+			return;
+		}
+		if(user_temp.isOut && !user_temp.lastWord){
+			//广播
+			io.sockets.in(roomName).emit('onlastWord',{
+				_lastWord: word,
+				_userName: userName,
+			});
+			user_temp.sayLastWord();
+			return;
+		}
+		else{
+			//尚未出局或者已遗言过
+			socket.emit('err',{
+				type: 5,
+				msg: '无法遗言',
+			});
+			return;
 		}
 	});
 }
