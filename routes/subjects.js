@@ -34,9 +34,9 @@ exports.addSubject = function(req , res){
     feature:req.body.feature,
   };
 
-  topic.Topic.add(data, function(err, yourTopic) {
+  topic.Topic.add(data, function(err, repeatWords) {
     
-    _callback(yourTopic);
+    _callback(repeatWords);
   });
 
   function _callback (_data) {

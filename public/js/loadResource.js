@@ -47,7 +47,6 @@
 
 	//event
 	loader.on('finish', function () { 
-		debugger;
 		console.log('资源预加载成功');
 		setTimeout(function () {
 			$(".preMask").hide();
@@ -55,7 +54,6 @@
 		}, 1000);
 	});
 	loader.on('error', function (e) { 
-		debugger;
 		console.log('资源预加载失败'); 
 	}); 
 
