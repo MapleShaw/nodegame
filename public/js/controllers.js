@@ -949,9 +949,16 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             var _words = $scope.obAddWord.words.replace(/\s{2,}/ig, " ").split(" ");
             var _feature = $scope.obAddWord.feature;
             $http.post('/subjects/addSubject', {words : _words, feature : _feature}).success(function (data){
-                showSystemTips("恭喜添加词语成功");
-                debugger;
-                $scope.obAddWord = {};
+                if(data.repeatMark === 0){
+                    showSystemTips("恭喜添加词语成功");
+                    $scope.obAddWord = {};
+                } else if(data.repeatMark === 1){
+                    //showErrTips("以下词语在数据库中已经存在：" + data.repeatWords);
+                    showSystemTips("恭喜添加词语成功");
+                    $scope.obAddWord = {};
+                } else {
+                    showErrTips("添加失败，请重试");
+                }
             }).error(function (data) {
                 showErrTips("添加失败，请重试");
             });
