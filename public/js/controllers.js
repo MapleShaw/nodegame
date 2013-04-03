@@ -3,23 +3,6 @@
     addfriend controller
 */
 function gameRuleCtrl($scope, $http, $routeParams, $location){//friendCtrl目前借用gameRule那个页面
-
-    $scope.topicForm = {};
-
-    //加题目
-    $scope.topicPost = function(){
-        $scope.topicForm.words=$scope.topicForm.words.split("，");
-        $http.post('/subjects/addSubject', $scope.topicForm).success(function(data, status, headers, config){
-            if(data.repeatMark==0){
-                $scope.msgTips = "You have sucessfully insert a kinds of words!!";
-            }else if(data.repeatMark==1){
-                $scope.msgTips = "这些词语重复了哦亲："+data.repeatWords;
-            }
-            
-        }).error(function(data, status, headers, config){
-            
-        });
-    };
     //更新用户信息测试函数
     $scope.updatePost = function(){
         var currentUser={
@@ -729,31 +712,89 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     isFirstLoad();
 
     //游戏声音
-    //var _sound = 'http://www.w3schools.com/html/horse.ogg';
-    var playAudio = function (_src) {
+    var bgSound = document.getElementById('bgSound');
+    var audio = document.getElementById('sound');
+    var _bgSoundIndex = 0;
+    bgSound.volume = 0.8;
+    var playAudio = function (_src, _delay, _last) {
         if (_src !== null) {
             if ($scope.sound) {
-                var audio = document.getElementById('sound');
-                audio.src = _src;
-                audio.play();
+                var _delay = _delay || 0;
+                $timeout(function () {
+                    audio.children[0].src = _src.mp3;
+                    audio.children[1].src = _src.ogg;
+                    audio.load();
+                }, _delay);
+                if (_last) {
+                    $timeout(function () {
+                        audio.pause();
+                    }, _delay + _last);
+                }
+                //event
+                audio.addEventListener('play', function(){
+                    bgSound.pause();
+                }, false);
+                audio.addEventListener('pause', function(){
+                    bgSound.play();
+                }, false);
+                audio.addEventListener('ended', function(){
+                    bgSound.play();
+                }, false);
             }
         } else {
             return 0;
         }
     };
-    var audioRoute = function (type) {
+    var audioRoute = function (type, delay, last) {
         switch(type) {
             case 0:
-                playAudio('../img/s0.ogg');
+                playAudio({ogg:'sound/begin.ogg',mp3:'sound/begin.mp3'}, delay, last);
                 break;
             case 1:
-                playAudio('../img/s1.ogg');
+                playAudio({ogg:'sound/gameOver.ogg',mp3:'sound/gameOver.mp3'}, delay, last);
                 break;
             case 2:
-                playAudio('../img/s2.ogg');
+                playAudio({ogg:'sound/die.ogg',mp3:'sound/die.mp3'}, delay, last);
                 break;
+            case 3:
+                playAudio({ogg:'sound/pk.ogg',mp3:'sound/pk.mp3'}, delay, last);
             default:
                 playAudio(null);
+        }
+    };
+
+    //切换背景音乐
+    var _bgSoundList = [
+        {ogg:'sound/bg1.ogg',mp3:'sound/bg1.mp3'},
+        {ogg:'sound/bg2.ogg',mp3:'sound/bg2.mp3'},
+        {ogg:'sound/bg9.ogg',mp3:'sound/bg9.mp3'},
+        {ogg:'sound/bg3.ogg',mp3:'sound/bg3.mp3'},
+        {ogg:'sound/bg4.ogg',mp3:'sound/bg4.mp3'},
+        {ogg:'sound/bg5.ogg',mp3:'sound/bg5.mp3'},
+        {ogg:'sound/bg6.ogg',mp3:'sound/bg6.mp3'},
+        {ogg:'sound/bg7.ogg',mp3:'sound/bg7.mp3'},
+        {ogg:'sound/bg8.ogg',mp3:'sound/bg8.mp3'}
+    ];
+    $scope.changeBgSound = function () {
+        if ($scope.bgSound) {
+            _bgSoundIndex ++;
+            if (_bgSoundIndex >= _bgSoundList.length) {
+                _bgSoundIndex = 0;
+            }
+            bgSound.pause();
+            bgSound.children[0].src = _bgSoundList[_bgSoundIndex].mp3;
+            bgSound.children[1].src = _bgSoundList[_bgSoundIndex].ogg;
+            bgSound.load();
+        }
+    };
+
+    //是否开启背景音乐
+    $scope.toggleBgSound = function () {
+        var bgSound = document.getElementById('bgSound');
+        if ($scope.bgSound) {
+            bgSound.play();
+        } else {
+            bgSound.pause();
         }
     };
 
@@ -776,35 +817,6 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             //局部重置
             $scope.isEditing = false;
             $scope.createRoomName = "";
-        }
-    };
-
-    //切换背景音乐
-    var _bgSoundIndex = 0;
-    var _bgSoundList = [
-        'sound/sBg1.ogg',
-        'sound/sBg1.ogg',
-        'sound/sBg1.ogg'
-    ];
-    $scope.changeBgSound = function () {
-        if ($scope.bgSound) {
-            var bgSound = document.getElementById('bgSound');
-            _bgSoundIndex ++;
-            if (_bgSoundIndex >= _bgSoundList.length-1) {
-                _bgSoundIndex = 0;
-            }
-            bgSound.src = _bgSoundList[_bgSoundIndex];
-            bgSound.play();
-        }
-    };
-
-    //是否开启背景音乐
-    $scope.toggleBgSound = function () {
-        var bgSound = document.getElementById('bgSound');
-        if ($scope.bgSound) {
-            bgSound.play();
-        } else {
-            bgSound.pause();
         }
     };
 
@@ -1156,6 +1168,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isGameStart = 1;
         $scope.sysMessage.push('游戏开始');
         socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom, _userID : _myself.systemid});
+        audioRoute(0)
     });
 
     //玩家猜词错误
@@ -1181,6 +1194,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         },1500);
         //重置游戏
         resetGame("gameOver");
+        audioRoute(1, 3000);
     });
 
     //游戏结束返回的数据
@@ -1209,7 +1223,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             timeLeave('say');
             $scope.isYourTurn = 1;
         }
-        audioRoute(2);
+        audioRoute(null);
     });
 
     //开始投票
@@ -1229,6 +1243,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isDisplayVoteCount = 0;
         //重置票数
         resetVoteCount();
+        audioRoute(2, 200);
     });
 
     //进入pk状态
@@ -1249,6 +1264,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isDisplayVoteCount = 0;
         //重置票数
         resetVoteCount();
+        audioRoute(3, 200, 15000);
     })
 
     //系统消息

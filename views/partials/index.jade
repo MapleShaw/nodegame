@@ -1,7 +1,11 @@
 div.wrap
 
-  audio(src='', id='sound')
-  audio(src='sound/sBg1.ogg', id='bgSound', loop='true', autoplay='true', preload='true')
+  audio(id='sound', autoplay='true', preload='true')
+    source(src='', type="audio/mpeg")
+    source(src='', type="audio/ogg")
+  audio(id='bgSound', loop='true', autoplay='true', preload='true')
+    source(src='sound/bg1.mp3', type="audio/mpeg")
+    source(src='sound/bg1.ogg', type="audio/ogg")
 
   div.operateBox.o_caici
     a.ob_close(href='javascript:;') 关闭
