@@ -57,7 +57,7 @@ module.exports = function(socket,rooms,io){
 						//第一个个玩家
 						io.sockets.in(roomName).emit('Message',{
 							type: 3,
-							msg: '玩家【'+nextName+'】开始发言'
+							msg: '玩家【'+nextName[0]+'】开始发言'
 						});
 						io.sockets.in(roomName).emit('makeStatement',{
 							_userName : nextName[0],
