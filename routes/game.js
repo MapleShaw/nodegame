@@ -60,7 +60,8 @@ module.exports = function(socket,rooms,io){
 							msg: '玩家【'+nextName+'】开始发言'
 						});
 						io.sockets.in(roomName).emit('makeStatement',{
-							_userName : nextName,
+							_userName : nextName[0],
+							_userNum: nextName[1],
 						});
 					}
 					else{
@@ -174,7 +175,8 @@ module.exports = function(socket,rooms,io){
 					msg: '轮到玩家【'+nextName+'】发言',
 				});
 				io.sockets.in(roomName).emit('makeStatement',{
-					_userName : nextName
+					_userName : nextName[0],
+					_userNum: nextName[1],
 				});
 				return 1;
 			}
@@ -190,7 +192,8 @@ module.exports = function(socket,rooms,io){
 				});				
 				//拿到下一个玩家的名字
 				io.sockets.in(roomName).emit('makeStatement',{
-					_userName : nextName
+					_userName : nextName[0],
+					_userNum: nextName[1],
 				});
 				return 1;
 			}
@@ -327,7 +330,8 @@ module.exports = function(socket,rooms,io){
 						});				
 						//拿到下一个玩家的名字
 						io.sockets.in(roomName).emit('makeStatement',{
-							_userName : nextName
+							_userName : nextName[0],
+							_userNum: nextName[1],
 						});
 						return 1;
 					}
@@ -371,6 +375,7 @@ module.exports = function(socket,rooms,io){
 				io.sockets.in(roomName).emit('makeStatement',{
 					_userName: vote_data.max_vote_name[0],
 					_userID: vote_data.max_vote_id[0],
+					_userNum: vote_data.max_vote_num[0],
 				});
 			}
 			else{
@@ -475,7 +480,8 @@ module.exports = function(socket,rooms,io){
 						msg: '轮到玩家【'+name+"】发言",
 					});
 					io.sockets.emit('makeStatement',{
-						_userName: name,
+						_userName: name[0],
+						_userNum: name[1],
 					});
 					return;
 				}

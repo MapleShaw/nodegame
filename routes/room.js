@@ -153,6 +153,11 @@ module.exports = function(socket,rooms,io){
 
 		//房间开始游戏
 		onGameStart : function(){
+			//设置玩家NUM
+			for(var i = 0; i < this._sequence.length; i ++){
+				var user = this._roomMember[this._sequence[i]];
+				user.num = i+1;
+			}
 			//获取、分配题目
 			this.distributeSubject(this.getSubject(),this._roomMember);
 			//随机指定玩家开始发言
@@ -203,14 +208,17 @@ module.exports = function(socket,rooms,io){
 			return roomMember;
 		},
 
-		//下一个玩家发言,返回玩家名字
+		//下一个玩家发言,返回玩家名字和玩家号
 		getNextPlayer : function(){
+			var arr = [];
 			if(this._isPK){
 				for(var i = 0;i < this._pkMember.length;i ++){
 					var item = this._pkMember[i];
 					var user = this._roomMember[item];
 					if(!user.isSay && !user.isOut){
-						return this.getNameByID(item);
+						arr.push(this.getNameByID(item));
+						arr.push(user.num);
+						return arr;
 					}
 				}
 				return false;
@@ -219,11 +227,14 @@ module.exports = function(socket,rooms,io){
 				var member = this._roomMember;
 				var sequence = this._sequence;
 				for (var i = 0;i < sequence.length;i ++){
-					if(member[sequence[i]].isSay || member[sequence[i]].isOut){
+					var user = member[sequence[i]];
+					if(user.isSay || user.isOut){
 						continue;
 					}
 					else{
-						return this.getNameByID(sequence[i]);
+						arr.push(this.getNameByID(sequence[i]));
+						arr.push(user.num);
+						return arr;
 					}
 				}
 				return false;
@@ -299,6 +310,8 @@ module.exports = function(socket,rooms,io){
 			var result = {};
 			//最高票数名字
 			var max_vote_name = [];
+			//最高票数玩家NUM
+			var max_vote_num = [];
 			//最高票数ID
 			var max_vote_id = [];
 			//最高票数
@@ -311,11 +324,13 @@ module.exports = function(socket,rooms,io){
 					max_vote_id = [];
 					max_vote = user.voteCount;
 					max_vote_id.push(item);
+					max_vote_num = [user.num];
 					max_repeat = 1;
 				}
 				else if(user.voteCount == max_vote && user.isOut == false){
 					max_repeat ++;
 					max_vote_id.push(item);
+					max_vote_num.push(user.num);
 				}
 				user.isVote = false;
 				user.voteCount = 0;
@@ -345,11 +360,13 @@ module.exports = function(socket,rooms,io){
 			for(var j = 0; j < max_vote_id.length; j++){
 				max_vote_name[j] = this.getNameByID(max_vote_id[j]);
 			}
+			//返回结果
 			result = {
 				max_vote_id: max_vote_id,
 				max_vote: max_vote,
 				max_repeat: max_repeat,
 				max_vote_name: max_vote_name,
+				max_vote_num: max_vote_num,
 			};
 			return result;
 		},
@@ -376,6 +393,12 @@ module.exports = function(socket,rooms,io){
 			this._isPK = false;
 			this._pkTurns = 0;
 			this._pkMember = [];
+		},
+
+		//玩家逃跑或断线
+		userDisconnect : function(userID){
+			var user = this._roomMember[userID];
+			user.disconnect();
 		},
 
 		//是否满足游戏结束条件
@@ -520,6 +543,8 @@ module.exports = function(socket,rooms,io){
 	function UserStructure(){
 		//玩家身份 0:平民 1:白痴 2:鬼
 		this.identity = null;
+		//玩家NUM
+		this.num = 0;
 		//玩家拿到的词语
 		this.word = null;
 		//词语长度
@@ -600,6 +625,12 @@ module.exports = function(socket,rooms,io){
 			this.outGameTurn = turns;
 		},
 
+		//玩家逃跑或断线
+		disconnect : function(){
+			this.isRun = true;
+			this.outGame();
+		},
+
 		//遗言
 		sayLastWord : function(){
 			this.lastWord = true;
@@ -665,6 +696,7 @@ module.exports = function(socket,rooms,io){
 		//重置游戏记录的相关数据
 		resetState : function(){
 			this.identity = null;
+			this.num = 0;
 			this.word = null;
 			this.wordLength = null;
 			this.isSay = false;
@@ -855,6 +887,30 @@ module.exports = function(socket,rooms,io){
 	*/
 	socket.on('disconnect',function(){
 		//判断玩家是否加入了房间
-		//判断玩家是否有在游戏中
+		socket.get('roomName',function(err,roomName){
+			//获取玩家ID
+			socket.get('userID',function(err,userID){
+				//有房间名，说明玩家加入了房间
+				//判断玩家是否有在游戏中		
+				var room_temp = rooms.getRoom(roomName);
+				var user_temp = rooms.getUser(roomName,userID);
+				if(!room_temp || user_temp.errType){
+					return false;
+				}
+				if(room_temp._state){
+					//如果房间已开始游戏
+					room_temp.userDisconnect(userID);
+					//如果正在发言环节
+					//直接跳过发言
+					//如果正在投票环节
+					//直接跳过投票
+					//判断游戏是否结束
+				}
+				//如果房间并未开始游戏
+				room_temp.deleteMember(userID);
+				//向成员发送消息
+				io.sockets.in(roomName).emit()
+			});		
+		});		
 	});
 }
