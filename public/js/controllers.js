@@ -646,12 +646,14 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     $scope.isYourTurn = 0;
                 } else if (type === 'vote') {
                     socket.emit('voteOne',{
-                        _roomName: roomName,
+                        _roomName: $scope.curRoom,
                         _userID: _myself.systemid,
                         _userName: _myself.name,
                         _voteToID: null,
                         _voteToName: null
                     });
+                    //显示错误信息
+                    showErrTips("规定时间内没有投票，相当于弃权");
                     //隐藏投票
                     $scope.isDisplayVote = 0;
                     //重置定时器
@@ -722,9 +724,10 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var audioPlayting = 0;
     var audioList = [];
     bgSound.volume = 0.7;
-    var playAudio = function (_src, _delay, _last) {
+    var playAudio = function (_src, _type,  _delay, _last) {
         if (_src !== null) {
-            if ($scope.sound && audioPlayting === 0) {
+            if ($scope.sound && (audioPlayting === 0 || _type == "begin" || _type == "over" || _type == "die" || _type == "pk" || _type == "vote" || _type == "out")) {
+                audioPlayting = 1;
                 var _delay = _delay || 0;
                 $timeout(function () {
                     audio.children[0].src = _src.mp3;
@@ -757,49 +760,49 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var audioRoute = function (type, delay, last) {
         switch(type) {
             case "begin":
-                playAudio({ogg:'sound/begin.ogg',mp3:'sound/begin.mp3'}, delay, last);
+                playAudio({ogg:'sound/begin.ogg',mp3:'sound/begin.mp3'}, type, delay, last);
                 break;
             case "over":
-                playAudio({ogg:'sound/gameOver.ogg',mp3:'sound/gameOver.mp3'}, delay, last);
+                playAudio({ogg:'sound/gameOver.ogg',mp3:'sound/gameOver.mp3'}, type, delay, last);
                 break;
             case "die":
-                playAudio({ogg:'sound/die.ogg',mp3:'sound/die.mp3'}, delay, last);
+                playAudio({ogg:'sound/die.ogg',mp3:'sound/die.mp3'}, type, delay, last);
                 break;
             case "pk":
-                playAudio({ogg:'sound/pk.ogg',mp3:'sound/pk.mp3'}, delay, last);
+                playAudio({ogg:'sound/pk.ogg',mp3:'sound/pk.mp3'}, type, delay, last);
                 break;
             case "vote":
-                playAudio({ogg:'sound/vote.ogg',mp3:'sound/vote.mp3'}, delay, last);
+                playAudio({ogg:'sound/vote.ogg',mp3:'sound/vote.mp3'}, type, delay, last);
                 break;
             case "out":
-                playAudio({ogg:'sound/out.ogg',mp3:'sound/out.mp3'}, delay, last);
+                playAudio({ogg:'sound/out.ogg',mp3:'sound/out.mp3'}, type, delay, last);
                 break;
             case 1:
-                playAudio({ogg:'sound/game/1.ogg',mp3:'sound/game/1.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/1.ogg',mp3:'sound/game/1.mp3'}, type, delay, last);
                 break;
             case 2:
-                playAudio({ogg:'sound/game/2.ogg',mp3:'sound/game/2.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/2.ogg',mp3:'sound/game/2.mp3'}, type, delay, last);
                 break;
             case 3:
-                playAudio({ogg:'sound/game/3.ogg',mp3:'sound/game/3.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/3.ogg',mp3:'sound/game/3.mp3'}, type, delay, last);
                 break;
             case 4:
-                playAudio({ogg:'sound/game/4.ogg',mp3:'sound/game/4.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/4.ogg',mp3:'sound/game/4.mp3'}, type, delay, last);
                 break;
             case 5:
-                playAudio({ogg:'sound/game/5.ogg',mp3:'sound/game/5.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/5.ogg',mp3:'sound/game/5.mp3'}, type, delay, last);
                 break;
             case 6:
-                playAudio({ogg:'sound/game/6.ogg',mp3:'sound/game/6.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/6.ogg',mp3:'sound/game/6.mp3'}, type, delay, last);
                 break;
             case 7:
-                playAudio({ogg:'sound/game/7.ogg',mp3:'sound/game/7.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/7.ogg',mp3:'sound/game/7.mp3'}, type, delay, last);
                 break;
             case 8:
-                playAudio({ogg:'sound/game/8.ogg',mp3:'sound/game/8.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/8.ogg',mp3:'sound/game/8.mp3'}, type, delay, last);
                 break;
             case 9:
-                playAudio({ogg:'sound/game/9.ogg',mp3:'sound/game/9.mp3'}, delay, last);
+                playAudio({ogg:'sound/game/9.ogg',mp3:'sound/game/9.mp3'}, type, delay, last);
                 break;
             default:
                 playAudio(null);
@@ -808,10 +811,10 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
 
     //切换背景音乐
     var _bgSoundList = [
+        {ogg:'sound/bg5.ogg',mp3:'sound/bg5.mp3'},
         {ogg:'sound/bg1.ogg',mp3:'sound/bg1.mp3'},
         {ogg:'sound/bg9.ogg',mp3:'sound/bg9.mp3'},
         {ogg:'sound/bg3.ogg',mp3:'sound/bg3.mp3'},
-        {ogg:'sound/bg5.ogg',mp3:'sound/bg5.mp3'},
         {ogg:'sound/bg7.ogg',mp3:'sound/bg7.mp3'},
         {ogg:'sound/bg8.ogg',mp3:'sound/bg8.mp3'}
     ];
@@ -1285,6 +1288,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             timeLeave('say');
             $scope.isYourTurn = 1;
         }
+        debugger;
+        console.log(turn);
         audioRoute(turn, 500);
     });
 
@@ -1294,6 +1299,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isDisplayVoteCount = 1;
         //系统信息
         showSystemTips("发言结束,请开始投票");
+        initLeaveTime();
         timeLeave('vote');
     });
 
