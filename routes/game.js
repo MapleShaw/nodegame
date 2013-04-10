@@ -141,7 +141,7 @@ module.exports = function(socket,rooms,io){
 			});
 		}
 		var nextName_temp = room_temp.getNextPlayer();
-		if(userName != nextName_temp){
+		if(userName != nextName_temp[0]){
 			////还没轮到玩家发言
 			socket.emit('err',{
 				msg: '还没轮到你发言',
@@ -172,7 +172,7 @@ module.exports = function(socket,rooms,io){
 				//下一个玩家发言
 				io.sockets.in(roomName).emit('Message',{
 					type: 6,
-					msg: '轮到玩家【'+nextName+'】发言',
+					msg: '轮到玩家【'+nextName[0]+'】发言',
 				});
 				io.sockets.in(roomName).emit('makeStatement',{
 					_userName : nextName[0],
@@ -188,7 +188,7 @@ module.exports = function(socket,rooms,io){
 				//下一个玩家发言
 				io.sockets.in(roomName).emit('Message',{
 					type: 6,
-					msg: '轮到玩家【'+nextName+'】发言'
+					msg: '轮到玩家【'+nextName[0]+'】发言'
 				});				
 				//拿到下一个玩家的名字
 				io.sockets.in(roomName).emit('makeStatement',{
@@ -326,7 +326,7 @@ module.exports = function(socket,rooms,io){
 						//下一个玩家发言
 						io.sockets.in(roomName).emit('Message',{
 							type: 6,
-							msg: '轮到玩家【'+nextName+'】发言'
+							msg: '轮到玩家【'+nextName[0]+'】发言'
 						});				
 						//拿到下一个玩家的名字
 						io.sockets.in(roomName).emit('makeStatement',{
@@ -477,7 +477,7 @@ module.exports = function(socket,rooms,io){
 					var name = room_temp.getNextPlayer();
 					io.sockets.emit('Message',{
 						type: 6,
-						msg: '轮到玩家【'+name+"】发言",
+						msg: '轮到玩家【'+name[0]+"】发言",
 					});
 					io.sockets.emit('makeStatement',{
 						_userName: name[0],
