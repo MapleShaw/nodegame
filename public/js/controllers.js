@@ -481,6 +481,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     $scope.obLeaveMsg = '';
     //添加词语
     $scope.obAddWord = {};
+    //当前玩家数
+    $scope.curPlayerNum = 1;
     //时间限制常量
     var TIME_LIMIT = 30;
     //系统提示定时器
@@ -493,6 +495,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var _timeLeave;
     //时间限制
     var timeLimit = TIME_LIMIT;
+    //敏感词
     var LIMIT_WORDS = ['A片','龟头','台独','法轮功','阿扁','黄片','三级片','3级片','大跃进','新疆','西藏','六四','安全套','打飞机','勃起','私处','泽民','动乱','阴茎','平反'];
 
 
@@ -664,15 +667,15 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //当前房间玩家列表
     var initPlayerList = function () {
         $scope.playerList = [
-            {isOn : 0, info : {}},
-            {isOn : 0, info : {}},
-            {isOn : 0, info : {}},
-            {isOn : 0, info : {}},
-            {isOn : 0, info : {}},
-            {isOn : 0, info : {}},
-            {isOn : 0, info : {}},
-            {isOn : 0, info : {}},
-            {isOn : 0, info : {}}
+            {isOn : 0, num : 0, info : {}},
+            {isOn : 0, num : 0, info : {}},
+            {isOn : 0, num : 0, info : {}},
+            {isOn : 0, num : 0, info : {}},
+            {isOn : 0, num : 0, info : {}},
+            {isOn : 0, num : 0, info : {}},
+            {isOn : 0, num : 0, info : {}},
+            {isOn : 0, num : 0, info : {}},
+            {isOn : 0, num : 0, info : {}}
         ];
     };
     //invote
@@ -716,10 +719,12 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var bgSound = document.getElementById('bgSound');
     var audio = document.getElementById('sound');
     var _bgSoundIndex = 0;
-    bgSound.volume = 0.8;
+    var audioPlayting = 0;
+    var audioList = [];
+    bgSound.volume = 0.7;
     var playAudio = function (_src, _delay, _last) {
         if (_src !== null) {
-            if ($scope.sound) {
+            if ($scope.sound && audioPlayting === 0) {
                 var _delay = _delay || 0;
                 $timeout(function () {
                     audio.children[0].src = _src.mp3;
@@ -733,12 +738,15 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 }
                 //event
                 audio.addEventListener('play', function(){
+                    audioPlayting = 1;
                     bgSound.pause();
                 }, false);
                 audio.addEventListener('pause', function(){
+                    audioPlayting = 0;
                     bgSound.play();
                 }, false);
                 audio.addEventListener('ended', function(){
+                    audioPlayting = 0;
                     bgSound.play();
                 }, false);
             }
@@ -759,28 +767,40 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 break;
             case "pk":
                 playAudio({ogg:'sound/pk.ogg',mp3:'sound/pk.mp3'}, delay, last);
+                break;
             case "vote":
                 playAudio({ogg:'sound/vote.ogg',mp3:'sound/vote.mp3'}, delay, last);
+                break;
             case "out":
                 playAudio({ogg:'sound/out.ogg',mp3:'sound/out.mp3'}, delay, last);
+                break;
             case 1:
                 playAudio({ogg:'sound/game/1.ogg',mp3:'sound/game/1.mp3'}, delay, last);
+                break;
             case 2:
                 playAudio({ogg:'sound/game/2.ogg',mp3:'sound/game/2.mp3'}, delay, last);
+                break;
             case 3:
                 playAudio({ogg:'sound/game/3.ogg',mp3:'sound/game/3.mp3'}, delay, last);
+                break;
             case 4:
                 playAudio({ogg:'sound/game/4.ogg',mp3:'sound/game/4.mp3'}, delay, last);
+                break;
             case 5:
                 playAudio({ogg:'sound/game/5.ogg',mp3:'sound/game/5.mp3'}, delay, last);
+                break;
             case 6:
                 playAudio({ogg:'sound/game/6.ogg',mp3:'sound/game/6.mp3'}, delay, last);
+                break;
             case 7:
                 playAudio({ogg:'sound/game/7.ogg',mp3:'sound/game/7.mp3'}, delay, last);
+                break;
             case 8:
                 playAudio({ogg:'sound/game/8.ogg',mp3:'sound/game/8.mp3'}, delay, last);
+                break;
             case 9:
                 playAudio({ogg:'sound/game/9.ogg',mp3:'sound/game/9.mp3'}, delay, last);
+                break;
             default:
                 playAudio(null);
         }
@@ -905,13 +925,24 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             showErrTips("发言不能为空");
             return 0;
         } else {
+            var _word = [];
+            if ($scope.wordLength !== null) {
+                _word = $scope.word.split("");
+            }
             for (var i = 0; i < LIMIT_WORDS.length; i++) {
-                if($scope.sayMessage.indexOf(LIMIT_WORDS[i])){
+                if($scope.sayMessage.indexOf(LIMIT_WORDS[i]) > -1){
                     showErrTips("您的发言中包含敏感信息，请从新输入");
                     return 0;
                     break;
                 }
-            };
+            }
+            for (var i = 0; i < _word.length; i++) {
+                if($scope.sayMessage.indexOf(_word[i]) > -1){
+                    showErrTips("发言中不能包含词语中相关字或者词，请从新输入");
+                    return 0;
+                    break;
+                }
+            }
             socket.emit('onMakeStatement',{
                 _roomName: roomName,
                 _userID : _myself.systemid,
@@ -1110,12 +1141,14 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     socket.on('updateRoomMember',function (data) {
         var _member = data._list;
         var _type = data._type;
+        $scope.curPlayerNum = 1;
         //重置当前玩家数组
         initPlayerList();
         //把服务器传来的信息赋值给本地变量
         var _length = _member.length;
         for (var i = 0; i < _length; i++) {
             $scope.playerList[i].isOn = 1;
+            $scope.playerList[i].num = $scope.curPlayerNum++;
             $scope.playerList[i].info = _member[i];
             $scope.isPlayerReady[_member[i].systemID] = _member[i].isPrepare;
         }
