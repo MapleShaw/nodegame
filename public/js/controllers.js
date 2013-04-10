@@ -493,6 +493,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     var _timeLeave;
     //时间限制
     var timeLimit = TIME_LIMIT;
+    var LIMIT_WORDS = ['A片','龟头','台独','法轮功','阿扁','黄片','三级片','3级片','大跃进','新疆','西藏','六四','安全套','打飞机','勃起','私处','泽民','动乱','阴茎','平反'];
 
 
 
@@ -747,17 +748,39 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     };
     var audioRoute = function (type, delay, last) {
         switch(type) {
-            case 0:
+            case "begin":
                 playAudio({ogg:'sound/begin.ogg',mp3:'sound/begin.mp3'}, delay, last);
                 break;
-            case 1:
+            case "over":
                 playAudio({ogg:'sound/gameOver.ogg',mp3:'sound/gameOver.mp3'}, delay, last);
                 break;
-            case 2:
+            case "die":
                 playAudio({ogg:'sound/die.ogg',mp3:'sound/die.mp3'}, delay, last);
                 break;
-            case 3:
+            case "pk":
                 playAudio({ogg:'sound/pk.ogg',mp3:'sound/pk.mp3'}, delay, last);
+            case "vote":
+                playAudio({ogg:'sound/vote.ogg',mp3:'sound/vote.mp3'}, delay, last);
+            case "out":
+                playAudio({ogg:'sound/out.ogg',mp3:'sound/out.mp3'}, delay, last);
+            case 1:
+                playAudio({ogg:'sound/game/1.ogg',mp3:'sound/game/1.mp3'}, delay, last);
+            case 2:
+                playAudio({ogg:'sound/game/2.ogg',mp3:'sound/game/2.mp3'}, delay, last);
+            case 3:
+                playAudio({ogg:'sound/game/3.ogg',mp3:'sound/game/3.mp3'}, delay, last);
+            case 4:
+                playAudio({ogg:'sound/game/4.ogg',mp3:'sound/game/4.mp3'}, delay, last);
+            case 5:
+                playAudio({ogg:'sound/game/5.ogg',mp3:'sound/game/5.mp3'}, delay, last);
+            case 6:
+                playAudio({ogg:'sound/game/6.ogg',mp3:'sound/game/6.mp3'}, delay, last);
+            case 7:
+                playAudio({ogg:'sound/game/7.ogg',mp3:'sound/game/7.mp3'}, delay, last);
+            case 8:
+                playAudio({ogg:'sound/game/8.ogg',mp3:'sound/game/8.mp3'}, delay, last);
+            case 9:
+                playAudio({ogg:'sound/game/9.ogg',mp3:'sound/game/9.mp3'}, delay, last);
             default:
                 playAudio(null);
         }
@@ -766,12 +789,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //切换背景音乐
     var _bgSoundList = [
         {ogg:'sound/bg1.ogg',mp3:'sound/bg1.mp3'},
-        {ogg:'sound/bg2.ogg',mp3:'sound/bg2.mp3'},
         {ogg:'sound/bg9.ogg',mp3:'sound/bg9.mp3'},
         {ogg:'sound/bg3.ogg',mp3:'sound/bg3.mp3'},
-        {ogg:'sound/bg4.ogg',mp3:'sound/bg4.mp3'},
         {ogg:'sound/bg5.ogg',mp3:'sound/bg5.mp3'},
-        {ogg:'sound/bg6.ogg',mp3:'sound/bg6.mp3'},
         {ogg:'sound/bg7.ogg',mp3:'sound/bg7.mp3'},
         {ogg:'sound/bg8.ogg',mp3:'sound/bg8.mp3'}
     ];
@@ -882,8 +902,16 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //发言
     $scope.makeStatement = function (roomName,statement) {
         if ($scope.sayMessage == "") {
+            showErrTips("发言不能为空");
             return 0;
         } else {
+            for (var i = 0; i < LIMIT_WORDS.length; i++) {
+                if($scope.sayMessage.indexOf(LIMIT_WORDS[i])){
+                    showErrTips("您的发言中包含敏感信息，请从新输入");
+                    return 0;
+                    break;
+                }
+            };
             socket.emit('onMakeStatement',{
                 _roomName: roomName,
                 _userID : _myself.systemid,
@@ -1168,7 +1196,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isGameStart = 1;
         $scope.sysMessage.push('游戏开始');
         socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom, _userID : _myself.systemid});
-        audioRoute(0)
+        audioRoute("begin")
     });
 
     //玩家猜词错误
@@ -1194,7 +1222,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         },1500);
         //重置游戏
         resetGame("gameOver");
-        audioRoute(1, 3000);
+        audioRoute("over", 3000);
     });
 
     //游戏结束返回的数据
@@ -1218,12 +1246,13 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //轮到用户user发言时
     socket.on('makeStatement',function(data){
         var userName = data._userName;
+        var turn = data._userNum;
         if(userName == _myself.name){
             //time leave
             timeLeave('say');
             $scope.isYourTurn = 1;
         }
-        audioRoute(null);
+        audioRoute(turn, 500);
     });
 
     //开始投票
@@ -1243,7 +1272,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isDisplayVoteCount = 0;
         //重置票数
         resetVoteCount();
-        audioRoute(2, 200);
+        audioRoute("die", 200);
     });
 
     //进入pk状态
@@ -1264,7 +1293,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isDisplayVoteCount = 0;
         //重置票数
         resetVoteCount();
-        audioRoute(3, 200, 15000);
+        audioRoute("pk", 200, 15000);
     })
 
     //系统消息
@@ -1273,7 +1302,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             //显示发言信息
             showSayTips(data.msg);
         }
-        if (data.type == 8 || data.type == 7 || data.type == 6 || data.type == 5 || data.type == 3 || data.type == 2 || data.type ==1) {
+        if (data.type == 8 || data.type == 7 || data.type == 5 || data.type == 2 || data.type ==1) {
             $timeout(function () {
                 //系统信息
                 showSystemTips(data.msg);

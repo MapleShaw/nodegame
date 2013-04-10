@@ -27,18 +27,24 @@
 		'img/wordbg.png',
 		'img/admin.png',
 		'bg1*:sound/bg1.ogg||sound/bg1.mp3',
-		'bg2*:sound/bg2.ogg||sound/bg2.mp3',
 		'bg3*:sound/bg3.ogg||sound/bg3.mp3',
-		'bg4*:sound/bg4.ogg||sound/bg4.mp3',
 		'bg5*:sound/bg5.ogg||sound/bg5.mp3',
-		'bg6*:sound/bg6.ogg||sound/bg6.mp3',
 		'bg7*:sound/bg7.ogg||sound/bg7.mp3',
 		'bg8*:sound/bg8.ogg||sound/bg8.mp3',
 		'bg8*:sound/bg9.ogg||sound/bg9.mp3',
 		'bg8*:sound/begin.ogg||sound/begin.mp3',
 		'bg8*:sound/pk.ogg||sound/pk.mp3',
 		'bg8*:sound/die.ogg||sound/die.mp3',
-		'bg8*:sound/gameOver.ogg||sound/gameOver.mp3'
+		'bg8*:sound/gameOver.ogg||sound/gameOver.mp3',
+		's1*:sound/game/1.ogg||sound/game/1.mp3',
+		's2*:sound/game/2.ogg||sound/game/2.mp3',
+		's3*:sound/game/3.ogg||sound/game/3.mp3',
+		's4*:sound/game/4.ogg||sound/game/4.mp3',
+		's5*:sound/game/5.ogg||sound/game/5.mp3',
+		's6*:sound/game/6.ogg||sound/game/6.mp3',
+		's7*:sound/game/7.ogg||sound/game/7.mp3',
+		's8*:sound/game/8.ogg||sound/game/8.mp3',
+		's8*:sound/game/9.ogg||sound/game/9.mp3',
 	];
 
 	//template
