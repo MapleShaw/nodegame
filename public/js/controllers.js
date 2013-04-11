@@ -472,9 +472,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     //当前房间玩家列表
     $scope.playerList = [];
     //是否开启游戏声音
-    $scope.sound = true;
+    $scope.sound = false;
     //是否开启游戏背景音乐
-    $scope.bgSound = true;
+    $scope.bgSound = false;
     //猜词语
     $scope.obGuessWord = '';
     //留遗言
@@ -832,6 +832,9 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
     };
 
     //是否开启背景音乐
+    if (!$scope.bgSound) {
+        bgSound.pause();
+    }
     $scope.toggleBgSound = function () {
         var bgSound = document.getElementById('bgSound');
         if ($scope.bgSound) {
@@ -928,10 +931,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
             showErrTips("发言不能为空");
             return 0;
         } else {
-            var _word = [];
-            if ($scope.wordLength !== null) {
-                _word = $scope.word.split("");
-            }
+            var _word = $scope.word.split("");
             for (var i = 0; i < LIMIT_WORDS.length; i++) {
                 if($scope.sayMessage.indexOf(LIMIT_WORDS[i]) > -1){
                     showErrTips("您的发言中包含敏感信息，请从新输入");
@@ -939,8 +939,8 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     break;
                 }
             }
-            for (var i = 0; i < _word.length; i++) {
-                if($scope.sayMessage.indexOf(_word[i]) > -1){
+            for (var j = 0; j < _word.length; j++) {
+                if($scope.sayMessage.indexOf(_word[j]) > -1){
                     showErrTips("发言中不能包含词语中相关字或者词，请从新输入");
                     return 0;
                     break;
@@ -1232,7 +1232,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         $scope.isGameStart = 1;
         $scope.sysMessage.push('游戏开始');
         socket.emit('getIdentity',{_userName : _myself.name, _roomName : $scope.curRoom, _userID : _myself.systemid});
-        audioRoute("begin")
+        audioRoute("begin", 0, 16000)
     });
 
     //玩家猜词错误
