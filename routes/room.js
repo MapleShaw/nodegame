@@ -172,14 +172,14 @@ module.exports = function(socket,rooms,io){
 
 		//获取题目
 		getSubject : function(){
-			var subjects = require('./routes/subjects');
+			//var subjects = require('./routes/subjects');
 
-			// var word = {
-			// 	answer : '红茶' ,
-			// 	similar : '绿茶' ,
-			// 	feature : '饮料' ,
-			// 	wordLength :　2,
-			// };
+			var word = {
+				answer : '红茶' ,
+			 	similar : '绿茶' ,
+			 	feature : '饮料' ,
+			 	wordLength :　2,
+			};
 			//保存到房间
 			this._answer = word.answer;
 			return word;
@@ -605,7 +605,7 @@ module.exports = function(socket,rooms,io){
 
 		voteTo : function(userID){
 			this.isVote = true;
-			if(!userID){
+			if(userID.length > 0){
 				this.voteToAsID.push(userID);
 			}
 		},
