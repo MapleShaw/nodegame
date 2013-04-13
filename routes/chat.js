@@ -10,7 +10,7 @@ module.exports = function (socket) {
         var user = user;
         users_chat[user.systemid] = socket;
         //set username
-        users_chat[user.systemid].set('username', user.systemid, function () { 
+        users_chat[user.systemid].set('userID', user.systemid, function () { 
             users_chat[user.systemid].emit('ready', {}); 
         });
         //event of private message
@@ -18,7 +18,7 @@ module.exports = function (socket) {
             var data = data;
             //get the username to judge if the user of "data.sendTo" is exist.
             try{
-                users_chat[data.sendTo].get('username', function(err, name){
+                users_chat[data.sendTo].get('userID', function(err, name){
                 //send message to friend from server
                 if (err) {
                     users_chat[user.systemid].emit('chatErrMsg', {
