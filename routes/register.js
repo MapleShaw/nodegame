@@ -26,9 +26,10 @@ exports.post = function(req, res){
     friendList: [],
     winRate:"50%",
     level:2,
-    totalScroe:0,
-    totalRounds:0,
-    winRounds:0,
+    scroe:0,
+    totalTimes:0,
+    winTimes:0,
+    failTimes:0,
   });
   
 	//next is doing with the database of MongoDB
