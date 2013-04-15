@@ -90,7 +90,7 @@ exports.onConnect = function(socket,io){
 		数据保存
 	*/
 	//保存用户ID
-	socket.set();
+	//socket.set();
 	/*
 		聊天逻辑
 	*/

@@ -174,7 +174,7 @@ module.exports = function(socket,rooms,io){
 		//获取题目
 		getSubject : function(){
 			var subjects = require('./routes/subjects');
-
+			//数据库回调函数
 			var subjectCallback = function(target,word){
 				target._answer = word.answer;
 				target.distributeSubject(word,target._roomMember);
@@ -535,14 +535,25 @@ module.exports = function(socket,rooms,io){
 				itemResult.userName = member[item].userInfo.userName;
 				itemResult.identity = member[item].identity;
 				itemResult.word = member[item].word;
-				if(!itemResult.wordLength){
+				//词长度
+				if(!member[item].wordLength){
 					itemResult.wordLength = "";
 				}
 				else{
 					itemResult.wordLength = member[item].wordLength;
 				}
+				//是否逃跑
+				if(member[item].isRun){
+					itemResult.isRun = 1;
+				}
+				else{
+					itemResult.isRun = 0;
+				}
+				//是否胜利
 				itemResult.isWin = member[item].gameResult;
+				//分数
 				itemResult.score = member[item].basicScores;
+				//奖惩分
 				itemResult.rewardScore = member[item].rewardPoints;
 				//保存到数组
 				result.push(itemResult);
@@ -587,6 +598,10 @@ module.exports = function(socket,rooms,io){
 			// winRate : null,
 			// level : null,
 			// userName : null,
+			// score: null,
+			// totalTimes: null,
+			// winTimes: null,
+			// failTimes: null,
 		};
 		//是否逃跑
 		this.isRun = false;
@@ -656,6 +671,10 @@ module.exports = function(socket,rooms,io){
 
 		//积分奖励
 		calculateRewardPoints : function(roomMember){
+			if(this.isRun){
+				this.rewardPoints = -10;
+				return ;
+			}
 			if(this.identity == 0){
 				//平民如果胜利且并未出局，投的每个是鬼，则加两分
 				if(this.gameResult && !this.isOut){
@@ -710,6 +729,35 @@ module.exports = function(socket,rooms,io){
 			}
 		},
 
+		//计算总分和等级
+		calculateScoreAndLevel: function(){
+			//总局数加一
+			this.userInfo.totalTimes ++;
+			//计算总分
+			if(this.isWin){
+				//胜利
+				if(!this.isRun){
+					this.userInfo.score += 2;
+					this.userInfo.winTimes ++;
+				}
+				this.userInfo.score += this.rewardPoints;
+			}
+			else{
+				//失败
+				if(!this.isRun){
+					this.userInfo.score -= 2;
+					this.userInfo.failTimes ++;
+				}
+				this.userInfo.score -= this.rewardPoints;
+			}
+			//计算等级
+			var score = this.userInfo.score;
+			this.userInfo.level = Math.floor(Math.sqrt(score/6))+1;
+			//计算胜率
+			this.userInfo.winRate = (this.userInfo.winTimes / this.userInfo.totalTimes).toFixed(2);
+			this.userInfo.winRate = this.userInfo.winRate*100 + '%';
+		},
+
 		//重置游戏记录的相关数据
 		resetState : function(){
 			this.identity = null;
@@ -733,7 +781,11 @@ module.exports = function(socket,rooms,io){
 		calculateScores : function(roomMember){
 			//先计算奖励分数
 			this.calculateRewardPoints(roomMember);
+			//再计算总分和等级
+			this.calculateScoreAndLevel();
 			//更新到数据库
+			var update = require('./add_friend');
+			update.update(this.userInfo);
 		},
 	};
 
