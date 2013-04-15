@@ -8,6 +8,9 @@ exports.User = function(user) {
   this.friendList = user.friendList;
   this.winRate = user.winRate;
   this.level = user.level;
+  this.totalScroe = user.totalScroe;
+  this.totalRounds = user.totalRounds;
+  this.winRounds = user.winRounds;
 };
 
 exports.Friend = function(user) {
@@ -25,6 +28,9 @@ exports.User.prototype.save = function save(callback) {
     friendList: [],
     winRate:this.winRate,
     level:this.level,
+    totalScroe:this.totalScroe,
+    totalRounds:this.totalRounds,
+    winRounds:this.winRounds,
     //isOnline
     //isOnGame
   };

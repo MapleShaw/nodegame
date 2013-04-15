@@ -61,8 +61,8 @@ exports.remove = function(req, res){
   }
 };
 
-exports.update = function(req, res){
-  var data = req.body;
+exports.update = function(newUserInfo){
+  var data = newUserInfo;
   var currentUser = new user.User({
     systemid: data.systemid, 
     winRate:data.winRate,
