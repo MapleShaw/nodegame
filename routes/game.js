@@ -100,6 +100,10 @@ module.exports = function(socket,rooms,io){
 		}
 		else{
 			var data = {};
+			if(!user.word){
+				socket.emit('serverBusy',{});
+				return false;
+			}
 			data._word = user.word;
 			if(user.wordLength){
 				data._wordLength = user.wordLength;

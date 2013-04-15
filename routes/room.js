@@ -159,7 +159,8 @@ module.exports = function(socket,rooms,io){
 				user.num = i+1;
 			}
 			//获取、分配题目
-			this.distributeSubject(this.getSubject(),this._roomMember);
+			//this.distributeSubject(this.getSubject(),this._roomMember);
+			this.getSubject();
 			//随机指定玩家开始发言
 			var _length = this._sequence.length;
 			var random = Math.floor(Math.random()*_length);
@@ -172,17 +173,22 @@ module.exports = function(socket,rooms,io){
 
 		//获取题目
 		getSubject : function(){
-			//var subjects = require('./routes/subjects');
+			var subjects = require('./routes/subjects');
 
-			var word = {
-				answer : '红茶' ,
-			 	similar : '绿茶' ,
-			 	feature : '饮料' ,
-			 	wordLength :　2,
-			};
+			var subjectCallback = function(target,word){
+				target._answer = word.answer;
+				target.distributeSubject(word,target._roomMember);
+			}
+			subjects.getSubject(this,subjectCallback);
+			// var word = {
+			// 	answer : '红茶' ,
+			//  	similar : '绿茶' ,
+			//  	feature : '饮料' ,
+			//  	wordLength :　2,
+			// };
 			//保存到房间
-			this._answer = word.answer;
-			return word;
+			//this._answer = word.answer;
+			return ;
 		},
 
 		//题目分配
