@@ -63,22 +63,36 @@ exports.remove = function(req, res){
 
 exports.update = function(newUserInfo){
   var data = newUserInfo;
-  var currentUser = new user.User({
-    systemid: data.systemid, 
-    winRate:data.winRate,
-    level:data.level,
-    score:data.score,
-    totalTimes:data.totalTimes,
-    winTimes:data.winTimes,
-    failTimes:data.failTimes
-  });
-  user.User.check(currentUser.systemid, function(tip) {
-    if(tip==0){
-      currentUser.update(currentUser.systemid, currentUser.winRate, currentUser.level, currentUser.score, currentUser.totalTimes, currentUser.failTimes, currentUser.winTimes, function(tips){
-        _callback(tips);
+  var index = 0;
+  var initUser = function () {
+    var currentUser = new user.User({
+      systemid: data[index].systemid, 
+      winRate:data[index].winRate,
+      level:data[index].level,
+      score:data[index].score,
+      totalTimes:data[index].totalTimes,
+      winTimes:data[index].winTimes,
+      failTimes:data[index].failTimes
+    });
+  }
+  var updateInfo = function () {
+    index++;
+    if (index > 8) {
+      return 0;
+    } else {
+      initUser();
+      user.User.check(currentUser.systemid, function(tip) {
+        if(tip==0){
+          currentUser.update(currentUser.systemid, currentUser.winRate, currentUser.level, currentUser.score, currentUser.totalTimes, currentUser.failTimes, currentUser.winTimes, function(tips){
+            _callback(tips);
+            updateInfo();
+          });
+        }
       });
     }
-  });
+  }
+  initUser();
+    
   function _callback (_data) {
     res.json({
       data : _data
