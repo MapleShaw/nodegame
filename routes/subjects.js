@@ -9,7 +9,6 @@ var topic = require('../models/topics');
 exports.getSubject = function(target,_callback){
   
   var subject = {};
-  console.log("=================" + target + "===============")
   
   topic.Topic.getCount(function (count) {
   	

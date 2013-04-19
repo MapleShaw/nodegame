@@ -74,7 +74,7 @@ exports.update = function(newUserInfo){
   });
   user.User.check(currentUser.systemid, function(tip) {
     if(tip==0){
-      currentUser.update(currentUser.systemid, currentUser.winRate, currentUser.level, function(tips){
+      currentUser.update(currentUser.systemid, currentUser.winRate, currentUser.level, currentUser.score, currentUser.totalTimes, currentUser.failTimes, currentUser.winTimes, function(tips){
         _callback(tips);
       });
     }

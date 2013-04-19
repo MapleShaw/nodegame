@@ -92,8 +92,10 @@ exports.User.get = function get(username, callback) {
   });
 };
 //更新用户信息
-exports.User.prototype.update = function update(systemid,winRate,level,callback) {
+exports.User.prototype.update = function update(systemid,winRate,level,score,totalTimes,winTimes,failTimes,callback) {
+  console.log("=========================================================update");
   mongodb.open(function(err, db) {
+    console.log("=========================================================222open");
     if (err) {
       return callback(err);
     }
@@ -103,9 +105,9 @@ exports.User.prototype.update = function update(systemid,winRate,level,callback)
         mongodb.close();
         return callback(err);
       }
-
+      console.log("=========================================================222open");
       // 更新 user 文檔      
-      collection.update({systemid:systemid}, {$set:{winRate:winRate,level:level}}, function(err) {
+      collection.update({systemid:systemid}, {$set:{winRate:winRate,level:level,score:score,totalTimes:totalTimes,winTimes:winTimes,failTimes:failTimes}}, function(err) {
         mongodb.close();
         if(err){
           callback(err);
@@ -118,7 +120,9 @@ exports.User.prototype.update = function update(systemid,winRate,level,callback)
   });
 }
 exports.User.check = function ckeck(systemid, callback) {
+  console.log("=========================================================check");
   mongodb.open(function(err, db) {
+    console.log("=========================================================1111open");
     if (err) {
       return callback(err);
     }
@@ -128,7 +132,7 @@ exports.User.check = function ckeck(systemid, callback) {
         mongodb.close();
         return callback(err);
       }
-      
+      console.log("=========================================================111findone");
       collection.findOne({systemid: systemid}, function(err, doc) {
         mongodb.close();
         if (doc) {

@@ -626,7 +626,7 @@ module.exports = function(socket,rooms,io){
 
 		voteTo : function(userID){
 			this.isVote = true;
-			if(userID.length > 0){
+			if(userID.length && userID.length > 0){
 				this.voteToAsID.push(userID);
 			}
 		},

@@ -598,7 +598,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     }, 1200);
                     //加入房间
                     var _jID = _myself.systemid;
-                    var _jUserInfo = {winRate : _myself.winRate || null, level : _myself.level || null, userName : _myself.name, totalTimes : _myself.totalTimes || null, winTimes : _myself.winTimes || null, failTimes : _myself.failTimes || null, score : _myself.score};
+                    var _jUserInfo = {winRate : _myself.winRate || null, level : _myself.level || null, userName : _myself.name, totalTimes : _myself.totalTimes || null, winTimes : _myself.winTimes || null, failTimes : _myself.failTimes || null, score : _myself.score || 0};
                     socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0, _userID : _jID, _userInfo : _jUserInfo});
                 }
             });
@@ -871,7 +871,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 var _jName = _myself.name;
                 var _jRoom = roomName;
                 var _jID = _myself.systemid;
-                var _jUserInfo = {winRate : _myself.winRate || null, level : _myself.level || null, userName : _myself.name, totalTimes : _myself.totalTimes || null, winTimes : _myself.winTimes || null, failTimes : _myself.failTimes || null, score : _myself.score};
+                var _jUserInfo = {winRate : _myself.winRate || null, level : _myself.level || null, userName : _myself.name, totalTimes : _myself.totalTimes || null, winTimes : _myself.winTimes || null, failTimes : _myself.failTimes || null, score : _myself.score || 0};
                 socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex, _userID : _jID, _userInfo : _jUserInfo});
                 //加入成功
                 socket.on('joinRoomSuccess', function (data) {
