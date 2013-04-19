@@ -461,9 +461,17 @@ module.exports = function(socket,rooms,io){
 
 		//更新房间内用户的分数等级
 		updateScores : function(){
+			//游戏结束后更新到数据库的数组
+			var result_data = [];
 			for(var item in this._roomMember){
+				//先计算分数
 				this._roomMember[item].calculateScores(this._roomMember);
+				//保存到数组
+				result_data.push(this._roomMember[item].userInfo);
 			}
+			//更新到数据库
+			var update = require('./add_friend');
+			update.update(result_data);
 		},
 
 		//房间游戏结束,type为胜利的某一方
@@ -783,9 +791,6 @@ module.exports = function(socket,rooms,io){
 			this.calculateRewardPoints(roomMember);
 			//再计算总分和等级
 			this.calculateScoreAndLevel();
-			//更新到数据库
-			var update = require('./add_friend');
-			update.update(this.userInfo);
 		},
 	};
 
