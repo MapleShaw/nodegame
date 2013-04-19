@@ -24,8 +24,8 @@ exports.post = function(req, res){
     password: password,
     systemid: _id, //名字要跟user.js里面的对象属性对应
     friendList: [],
-    winRate:"50%",
-    level:2,
+    winRate:"0%",
+    level:1,
     scroe:0,
     totalTimes:0,
     winTimes:0,
