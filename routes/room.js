@@ -173,7 +173,7 @@ module.exports = function(socket,rooms,io){
 
 		//获取题目
 		getSubject : function(){
-			var subjects = require('./routes/subjects');
+			var subjects = require('./subjects');
 			//数据库回调函数
 			var subjectCallback = function(target,word){
 				target._answer = word.answer;

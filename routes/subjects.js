@@ -6,11 +6,12 @@ var topic = require('../models/topics');
 //   });
 // }
 
-exports.getSubject = function(_callback){
+exports.getSubject = function(target,_callback){
   
   var subject = {};
+  console.log("=================" + target + "===============")
   
-  topic.Topic.getCount(function(count){
+  topic.Topic.getCount(function (count) {
   	
   	var random,arrTmp=[],theSort=parseInt(Math.random()*count+1);                                 //随机数，缓存数组
 
@@ -33,7 +34,7 @@ exports.getSubject = function(_callback){
           subject.similar = arrTmp[1];
           subject.wordLength = arrTmp[0].length;
           subject.feature = doc.feature;
-          _callback(subject);
+          _callback(target,subject);
           
         }
       });

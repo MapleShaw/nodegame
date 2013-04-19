@@ -3,20 +3,6 @@
     addfriend controller
 */
 function gameRuleCtrl($scope, $http, $routeParams, $location){//friendCtrl目前借用gameRule那个页面
-    //更新用户信息测试函数
-    $scope.updatePost = function(){
-        var currentUser={
-            systemid:"nodegame11377627961363776874746",
-            winRate:"100%",
-            level:100,
-        };
-        $http.post('/add_friend/update', currentUser).success(function(data, status, headers, config){
-            console.log(data.data);
-           
-        }).error(function(data, status, headers, config){
-            
-        });
-    };
 }
 gameRuleCtrl.$inject = ['$scope', '$http', '$routeParams', '$location'];//friendCtrl
 
@@ -28,8 +14,7 @@ function loginCtrl($scope, $http, $routeParams, $location, localStorage, session
 	$scope.loginForm = {};
 	//submit function
 	$scope.loginPost = function(){
-		$http.post('/login/login', $scope.loginForm).success(function(data, status, headers, config){
-			//var 
+		$http.post('/login/login', $scope.loginForm).success(function (data) {
 			var loginMark = data.err;
 			var friendToJson = data.friendList;
 			var myselfInfoToJson = data.myselfInfo;
@@ -45,7 +30,7 @@ function loginCtrl($scope, $http, $routeParams, $location, localStorage, session
 			}else if(loginMark == 0){
 				window.location.href="/";
 			}
-		}).error(function(data, status, headers, config){
+		}).error(function (data) {
 			
 		});
 	};
@@ -57,19 +42,23 @@ loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStora
 /*
 	loginOut controllers
 */
-function loginOutController($scope, $http, $routeParams, $location, localStorage, sessionStorage) {
+function loginOutController($scope, $http, $routeParams, $location, localStorage, sessionStorage, socket) {
   $scope.loginOut = function(){
-		$http.get('/login/loginout').success(function(data, status, headers, config){
-			//set storage
+		$http.get('/login/loginout').success(function (data) {
+            //get info
+            var myInfo = sessionStorage.get('myselfInfo');
+            //socket
+            socket.emit('loginOut',{userId : myInfo.systemid});
+            //loginOut
             localStorage.clear();
 			sessionStorage.clear();
 			window.location.reload();
-		}).error(function(data, status, headers, config){
+		}).error(function (data) {
 			//err
 		});
 	};
 }
-loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStorage', 'sessionStorage'];
+loginCtrl.$inject = ['$scope', '$http', '$routeParams', '$location', 'localStorage', 'sessionStorage', 'socket'];
 
 /*
 	register controller
@@ -609,7 +598,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     }, 1200);
                     //加入房间
                     var _jID = _myself.systemid;
-                    var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
+                    var _jUserInfo = {winRate : _myself.winRate || null, level : _myself.level || null, userName : _myself.name, totalTimes : _myself.totalTimes || null, winTimes : _myself.winTimes || null, failTimes : _myself.failTimes || null, score : _myself.score};
                     socket.emit('joinRoom',{_roomName : roomName, _userName : _myself.name, _location : 0, _userID : _jID, _userInfo : _jUserInfo});
                 }
             });
@@ -882,7 +871,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                 var _jName = _myself.name;
                 var _jRoom = roomName;
                 var _jID = _myself.systemid;
-                var _jUserInfo = {winRate : _myself.winRate || "", level : _myself.level || "", userName : _myself.name}
+                var _jUserInfo = {winRate : _myself.winRate || null, level : _myself.level || null, userName : _myself.name, totalTimes : _myself.totalTimes || null, winTimes : _myself.winTimes || null, failTimes : _myself.failTimes || null, score : _myself.score};
                 socket.emit('joinRoom',{_roomName : _jRoom, _userName : _jName, _location : roomIndex, _userID : _jID, _userInfo : _jUserInfo});
                 //加入成功
                 socket.on('joinRoomSuccess', function (data) {
@@ -1022,7 +1011,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
         } else {
             var _words = $scope.obAddWord.words.replace(/\s{2,}/ig, " ").split(" ");
             var _feature = $scope.obAddWord.feature;
-            $http.post('/subjects/addSubject', {words : _words, feature : _feature}).success(function (data){
+            $http.post('/subjects/addSubject', {words : _words, feature : _feature}).success(function (data) {
                 if(data.repeatMark === 0){
                     showSystemTips("恭喜添加词语成功");
                     $scope.obAddWord = {};
@@ -1034,7 +1023,7 @@ function indexCtrl ($scope, $http, $location, $timeout, $compile, socket, localS
                     showErrTips("添加失败，请重试");
                 }
             }).error(function (data) {
-                showErrTips("添加失败，请重试");
+                //showErrTips("添加失败，请重试");
             });
         }
     };

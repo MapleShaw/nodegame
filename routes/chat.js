@@ -7,7 +7,7 @@ var users_chat = {};
 module.exports = function (socket) {
     //客户端连接成功则设置客户端标示
 	socket.on('setNickname', function (user) {
-        var user = user;
+        
         users_chat[user.systemid] = socket;
         //set username
         users_chat[user.systemid].set('userID', user.systemid, function () { 
@@ -59,7 +59,10 @@ module.exports = function (socket) {
                     flag : false
                 });
             }
-            
         });
     });
+    //loginOut
+    socket.on('loginOut', function (data) {
+        delete users_chat[data.userId];
+    })
 };

@@ -86,9 +86,7 @@ io.sockets.on('connection', function(socket){
 });
 
 //test
-subjects.getSubject(function(subject){
-  console.log(subject);
-});
+
 
 
 

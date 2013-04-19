@@ -67,6 +67,10 @@ exports.update = function(newUserInfo){
     systemid: data.systemid, 
     winRate:data.winRate,
     level:data.level,
+    score:data.score,
+    totalTimes:data.totalTimes,
+    winTimes:data.winTimes,
+    failTimes:data.failTimes
   });
   user.User.check(currentUser.systemid, function(tip) {
     if(tip==0){

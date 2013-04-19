@@ -117,7 +117,7 @@ background: -webkit-linear-gradient(top, #fc8646 0%,#ea5507 100%,#fb955e 100%); 
 .gameArea .gameCtrl{float: left;width: 280px;margin-right: 10px;}
 .gameCtrl .gameUserInfo{margin-bottom: 10px;height: 160px;}
 .gameCtrl .gameUserInfo .items{padding: 5px 0 0 0;}
-.gameCtrl .gameUserInfo .items li{line-height: 2;}
+.gameCtrl .gameUserInfo .items li{line-height: 1.5;}
 .gameCtrl .gameUserCtrl{height: 340px;}
 .gameCtrl .gameUserCtrl .btn_list{padding: 10px 0 0 0;}
 

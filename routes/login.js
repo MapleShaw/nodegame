@@ -40,7 +40,7 @@ exports.login = function(req, res){
     }else if(_err==0){
       res.json({
         err : _err,
-        myselfInfo : {name:_user.name,systemid:_user.systemid,winRate:_user.winRate,level:_user.level,totalTime:_user.totalTime,winTimes:_user.winTimes,failTimes:_user.failTimes},
+        myselfInfo : {name:_user.name,systemid:_user.systemid,winRate:_user.winRate,level:_user.level,totalTime:_user.totalTime,winTimes:_user.winTimes,failTimes:_user.failTimes,score:_user.score},
         friendList : _user.friendList ? _user.friendList : []
       });
     }

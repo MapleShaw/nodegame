@@ -52,17 +52,20 @@ div.wrap
     a.roomClose(href='javascript:;') 关闭
     table.gameOverInfo
       tr.goiHeader
-        th(style="width:200px;") 玩家名字
+        th(style="width:160px;") 玩家名字
         th 玩家角色
         th 玩家词语
+        th 是否逃跑
         th 成功或失败
-        th(style="width:200px;") 所得分数(基本分+奖励分)
+        th(style="width:160px;") 所得分数(基本分+奖励分)
       tr.goiList(ng-repeat='goi in gameOverInfo')
         td {{goi.userName}}
         td(ng-show='goi.identity==0') 平民
         td(ng-show='goi.identity==1') 白痴
         td(ng-show='goi.identity==2') 鬼
         td {{goi.word}} {{goi.wordLength}}
+        td(ng-show='goi.isRun')是
+        td(ng-hide='goi.isRun')否
         td(ng-hide='goi.isWin', ng-class='{red:goi.isWin==false}') 失败
         td(ng-show='goi.isWin', ng-class='{green:goi.isWin==true}') 胜利
         td {{goi.score}} + {{goi.rewardScore}}
@@ -85,6 +88,7 @@ div.wrap
         ul.items
           li 昵称：{{_myself.name}}
           li 胜率：{{_myself.winRate}}
+          li 分数: {{_myself.score}}
           li 等级：{{_myself.level}}
           li 房间：{{curRoom}}
       div.gameUserCtrl.box_style
